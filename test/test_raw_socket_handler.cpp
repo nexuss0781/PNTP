@@ -406,14 +406,12 @@ TEST_F(RawSocketHandlerRootTest, StatsAfterAcquire) {
 }
 
 TEST_F(RawSocketHandlerRootTest, SetRingParams) {
+    // Custom params BEFORE init so they are applied during socket setup.
+    ASSERT_TRUE(handler.setRingParams(8, 4096));
     ASSERT_TRUE(handler.init("lo"));
-    // Try reconfiguring the ring with different parameters.
-    // This may fail on some kernels but should not crash.
-    bool ok = handler.setRingParams(8, 4096);
-    if (!ok) {
-        GTEST_SKIP() << "Reconfiguring ring parameters not supported";
-    }
+
     EXPECT_TRUE(handler.isInitialized());
+    EXPECT_TRUE(handler.usingRing());
 }
 
 TEST_F(RawSocketHandlerRootTest, FanoutGroupFails_WithoutMultipleSockets) {

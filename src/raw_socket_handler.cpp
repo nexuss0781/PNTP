@@ -93,8 +93,8 @@ bool RawSocketHandler::init(const std::string& interface_name) {
     if (sock_fd < 0) return false;
 
     // try PACKET_MMAP ring; fall back to heap on failure
-    ring_block_num   = 16;
-    ring_frame_size  = 2048;
+    if (ring_block_num == 0)  ring_block_num  = 16;
+    if (ring_frame_size == 0) ring_frame_size = 2048;
     if (!setupRing()) {
         use_heap_mode = true;
     }
@@ -102,17 +102,9 @@ bool RawSocketHandler::init(const std::string& interface_name) {
 }
 
 bool RawSocketHandler::setRingParams(uint32_t block_num, uint32_t frame_size) {
-    if (sock_fd < 0) return false;
-    if (ring_ptr) teardownRing();
-
+    // Store desired params — they take effect on the next init() call.
     ring_block_num  = block_num;
     ring_frame_size = frame_size;
-
-    if (!setupRing()) {
-        use_heap_mode = true;
-        return false;
-    }
-    use_heap_mode = false;
     return true;
 }
 

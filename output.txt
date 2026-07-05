@@ -15,7 +15,7 @@ W: Skipping acquire of configured file 'main/source/Sources' as repository 'http
 ninja: Entering directory `build'
 [18/18] Linking CXX executable test/pntp_tests
 Running main() from ./googletest/src/gtest_main.cc
-[==========] Running 66 tests from 7 test suites.
+[==========] Running 97 tests from 11 test suites.
 [----------] Global test environment set-up.
 [----------] 38 tests from PNTPCoreTest
 [ RUN      ] PNTPCoreTest.GetRDTSC_ReturnsIncreasingValues
@@ -96,13 +96,88 @@ Running main() from ./googletest/src/gtest_main.cc
 [       OK ] PNTPCoreTest.CrossCheck_FlushThenRead_NoFault (0 ms)
 [----------] 38 tests from PNTPCoreTest (24 ms total)
 
-[----------] 2 tests from RawSocketHandlerTest
+[----------] 3 tests from PacketViewTest
+[ RUN      ] PacketViewTest.DefaultConstructorIsNull
+[       OK ] PacketViewTest.DefaultConstructorIsNull (0 ms)
+[ RUN      ] PacketViewTest.ValueConstructor
+[       OK ] PacketViewTest.ValueConstructor (0 ms)
+[ RUN      ] PacketViewTest.NullDataPointerIsFalsy
+[       OK ] PacketViewTest.NullDataPointerIsFalsy (0 ms)
+[----------] 3 tests from PacketViewTest (0 ms total)
+
+[----------] 11 tests from HeaderParsingTest
+[ RUN      ] HeaderParsingTest.GetIPv4Header_ReturnsValidPointer
+[       OK ] HeaderParsingTest.GetIPv4Header_ReturnsValidPointer (0 ms)
+[ RUN      ] HeaderParsingTest.GetIPv4Header_RejectsARP
+[       OK ] HeaderParsingTest.GetIPv4Header_RejectsARP (0 ms)
+[ RUN      ] HeaderParsingTest.GetIPv4Header_RejectsTooShort
+[       OK ] HeaderParsingTest.GetIPv4Header_RejectsTooShort (0 ms)
+[ RUN      ] HeaderParsingTest.GetTCPHeader_ReturnsValidPointer
+[       OK ] HeaderParsingTest.GetTCPHeader_ReturnsValidPointer (0 ms)
+[ RUN      ] HeaderParsingTest.GetTCPHeader_RejectsUDP
+[       OK ] HeaderParsingTest.GetTCPHeader_RejectsUDP (0 ms)
+[ RUN      ] HeaderParsingTest.GetUDPHeader_ReturnsValidPointer
+[       OK ] HeaderParsingTest.GetUDPHeader_ReturnsValidPointer (0 ms)
+[ RUN      ] HeaderParsingTest.GetUDPHeader_RejectsTCP
+[       OK ] HeaderParsingTest.GetUDPHeader_RejectsTCP (0 ms)
+[ RUN      ] HeaderParsingTest.GetPayload_TCP_ExtractsCorrectBytes
+[       OK ] HeaderParsingTest.GetPayload_TCP_ExtractsCorrectBytes (0 ms)
+[ RUN      ] HeaderParsingTest.GetPayload_UDP_ExtractsCorrectBytes
+[       OK ] HeaderParsingTest.GetPayload_UDP_ExtractsCorrectBytes (0 ms)
+[ RUN      ] HeaderParsingTest.GetPayload_TCP_NoPayload_ReturnsEmpty
+[       OK ] HeaderParsingTest.GetPayload_TCP_NoPayload_ReturnsEmpty (0 ms)
+[ RUN      ] HeaderParsingTest.GetPayload_EmptyPacket_ReturnsEmpty
+[       OK ] HeaderParsingTest.GetPayload_EmptyPacket_ReturnsEmpty (0 ms)
+[----------] 11 tests from HeaderParsingTest (0 ms total)
+
+[----------] 4 tests from BPFFactoryTest
+[ RUN      ] BPFFactoryTest.MakeBPF_All_ReturnsOneInstruction
+[       OK ] BPFFactoryTest.MakeBPF_All_ReturnsOneInstruction (0 ms)
+[ RUN      ] BPFFactoryTest.MakeBPF_TCPOnly_HasEightInstructions
+[       OK ] BPFFactoryTest.MakeBPF_TCPOnly_HasEightInstructions (0 ms)
+[ RUN      ] BPFFactoryTest.MakeBPF_UDPOnly_HasEightInstructions
+[       OK ] BPFFactoryTest.MakeBPF_UDPOnly_HasEightInstructions (0 ms)
+[ RUN      ] BPFFactoryTest.MakeBPF_PortOnly_HasElevenInstructions
+[       OK ] BPFFactoryTest.MakeBPF_PortOnly_HasElevenInstructions (0 ms)
+[----------] 4 tests from BPFFactoryTest (0 ms total)
+
+[----------] 4 tests from RawSocketHandlerTest
 [ RUN      ] RawSocketHandlerTest.InitFailsOnNonexistentInterface
-Error getting interface index for nonexistent_iface_xyz: No such device
-[       OK ] RawSocketHandlerTest.InitFailsOnNonexistentInterface (4 ms)
-[ RUN      ] RawSocketHandlerTest.CapturePacket_ReturnsEmptyWhenNotInitialized
-[       OK ] RawSocketHandlerTest.CapturePacket_ReturnsEmptyWhenNotInitialized (0 ms)
-[----------] 2 tests from RawSocketHandlerTest (4 ms total)
+[       OK ] RawSocketHandlerTest.InitFailsOnNonexistentInterface (0 ms)
+[ RUN      ] RawSocketHandlerTest.Acquire_OnUninitialized_ReturnsEmpty
+[       OK ] RawSocketHandlerTest.Acquire_OnUninitialized_ReturnsEmpty (0 ms)
+[ RUN      ] RawSocketHandlerTest.Release_DoesNotCrash_OnUninitialized
+[       OK ] RawSocketHandlerTest.Release_DoesNotCrash_OnUninitialized (0 ms)
+[ RUN      ] RawSocketHandlerTest.GetStats_ReturnsZeroes_OnUninitialized
+[       OK ] RawSocketHandlerTest.GetStats_ReturnsZeroes_OnUninitialized (0 ms)
+[----------] 4 tests from RawSocketHandlerTest (0 ms total)
+
+[----------] 11 tests from RawSocketHandlerRootTest
+[ RUN      ] RawSocketHandlerRootTest.InitOnLoopback_Succeeds
+[       OK ] RawSocketHandlerRootTest.InitOnLoopback_Succeeds (26 ms)
+[ RUN      ] RawSocketHandlerRootTest.UsingRing_AfterInit
+[       OK ] RawSocketHandlerRootTest.UsingRing_AfterInit (25 ms)
+[ RUN      ] RawSocketHandlerRootTest.AttachBPF_All_DoesNotCrash
+[       OK ] RawSocketHandlerRootTest.AttachBPF_All_DoesNotCrash (21 ms)
+[ RUN      ] RawSocketHandlerRootTest.AttachBPF_TCPOnly_DoesNotCrash
+[       OK ] RawSocketHandlerRootTest.AttachBPF_TCPOnly_DoesNotCrash (27 ms)
+[ RUN      ] RawSocketHandlerRootTest.SetPromiscuous
+[       OK ] RawSocketHandlerRootTest.SetPromiscuous (35 ms)
+[ RUN      ] RawSocketHandlerRootTest.SetTimeout
+[       OK ] RawSocketHandlerRootTest.SetTimeout (32 ms)
+[ RUN      ] RawSocketHandlerRootTest.InjectAndCapture
+[       OK ] RawSocketHandlerRootTest.InjectAndCapture (27 ms)
+[ RUN      ] RawSocketHandlerRootTest.AcquireRelease_MultipleTimes
+[       OK ] RawSocketHandlerRootTest.AcquireRelease_MultipleTimes (28 ms)
+[ RUN      ] RawSocketHandlerRootTest.StatsAfterAcquire
+[       OK ] RawSocketHandlerRootTest.StatsAfterAcquire (29 ms)
+[ RUN      ] RawSocketHandlerRootTest.SetRingParams
+/content/PNTP/test/test_raw_socket_handler.cpp:414: Skipped
+Reconfiguring ring parameters not supported
+[  SKIPPED ] RawSocketHandlerRootTest.SetRingParams (29 ms)
+[ RUN      ] RawSocketHandlerRootTest.FanoutGroupFails_WithoutMultipleSockets
+[       OK ] RawSocketHandlerRootTest.FanoutGroupFails_WithoutMultipleSockets (33 ms)
+[----------] 11 tests from RawSocketHandlerRootTest (322 ms total)
 
 [----------] 2 tests from TCPEngineTest
 [ RUN      ] TCPEngineTest.InitializeFailsWithoutRoot
@@ -110,7 +185,7 @@ Error getting interface index for nonexistent_iface_xyz: No such device
 [       OK ] TCPEngineTest.InitializeFailsWithoutRoot (0 ms)
 [ RUN      ] TCPEngineTest.TranscendentFetch_ReturnsNonEmpty
 [PNTP] Transcendent fetch initiated for: https://example.com
-[PNTP] Request signed with hardware stealth ID: SIG--66124-126-128-121800-166400820
+[PNTP] Request signed with hardware stealth ID: SIG--68-92-92-17-731600-166400820
 [       OK ] TCPEngineTest.TranscendentFetch_ReturnsNonEmpty (0 ms)
 [----------] 2 tests from TCPEngineTest (0 ms total)
 
@@ -226,7 +301,7 @@ Warning: parseHtmlForElement is a conceptual placeholder. Use a proper HTML pars
 [ RUN      ] PerformanceMonitorTest.StartEndMeasurement_ReturnsPositiveDuration
 PerformanceMonitor initialized.
 Measurement started for: test_event
-Measurement ended for: test_event, Duration: 1.10573 ms
+Measurement ended for: test_event, Duration: 1.12111 ms
 [       OK ] PerformanceMonitorTest.StartEndMeasurement_ReturnsPositiveDuration (1 ms)
 [ RUN      ] PerformanceMonitorTest.GetDurationMs_UnmeasuredEvent_ReturnsZero
 PerformanceMonitor initialized.
@@ -244,12 +319,14 @@ PerformanceMonitor initialized.
 PerformanceMonitor initialized.
 Measurement started for: event_a
 Measurement started for: event_b
-Measurement ended for: event_b, Duration: 1.1195 ms
-Measurement ended for: event_a, Duration: 1.15856 ms
+Measurement ended for: event_b, Duration: 1.09787 ms
+Measurement ended for: event_a, Duration: 1.12746 ms
 [       OK ] PerformanceMonitorTest.SequentialMeasurements_Independent (1 ms)
 [----------] 5 tests from PerformanceMonitorTest (2 ms total)
 
 [----------] Global test environment tear-down
-[==========] 66 tests from 7 test suites ran. (35 ms total)
-[  PASSED  ] 66 tests.
+[==========] 97 tests from 11 test suites ran. (354 ms total)
+[  PASSED  ] 96 tests.
+[  SKIPPED ] 1 test, listed below:
+[  SKIPPED ] RawSocketHandlerRootTest.SetRingParams
 
