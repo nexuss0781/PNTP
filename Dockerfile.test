@@ -1,0 +1,34 @@
+FROM ubuntu:24.04 AS builder
+
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    cmake \
+    ninja-build \
+    nasm \
+    libssl-dev \
+    libcurl4-openssl-dev \
+    libpcap-dev \
+    git \
+    python3 \
+    lld \
+    clang-tidy \
+    clang-format \
+    valgrind \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /pntp
+COPY . .
+
+RUN cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DPNTP_ENABLE_ASAN=ON -DPNTP_ENABLE_UBSAN=ON && \
+    ninja -C build && \
+    ninja -C build test
+
+FROM ubuntu:24.04 AS runtime
+RUN apt-get update && apt-get install -y \
+    libssl3 \
+    libcurl4 \
+    libpcap0.8 \
+    && rm -rf /var/lib/apt/lists/*
+COPY --from=builder /pntp/build/pntp_v4 /usr/local/bin/pntp_v4
+
+ENTRYPOINT ["pntp_v4"]

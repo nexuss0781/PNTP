@@ -1,0 +1,4 @@
+-- Configuring done (32.6s)
+-- Generating done (1.2s)
+-- Build files have been written to: /mnt/c/Users/NAR/documents/nex/PNTP/build
+ninja: error: unknown target 'pntp_tests'

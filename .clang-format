@@ -1,0 +1,22 @@
+---
+BasedOnStyle: Google
+ColumnLimit: 100
+IndentWidth: 4
+AccessModifierOffset: -4
+AllowShortFunctionsOnASingleLine: None
+AllowShortIfStatementsOnASingleLine: false
+AlwaysBreakTemplateDeclarations: Yes
+DerivePointerAlignment: false
+PointerAlignment: Left
+IncludeBlocks: Regroup
+IncludeCategories:
+  - Regex:           '^<.*\.h>'
+    Priority:        1
+  - Regex:           '^<[^>]+>'
+    Priority:        2
+  - Regex:           '^".*pntp/'
+    Priority:        3
+  - Regex:           '^"'
+    Priority:        4
+SortIncludes: CaseSensitive
+...

@@ -1,0 +1,19 @@
+---
+Checks: >
+    -*,
+    modernize-*,
+    performance-*,
+    readability-*,
+    bugprone-*,
+    clang-analyzer-*,
+    google-*,
+    -modernize-use-trailing-return-type,
+    -readability-identifier-length,
+    -readability-magic-numbers,
+    -google-build-using-namespace,
+WarningsAsErrors: '*'
+HeaderFilterRegex: 'include/pntp/.*'
+CheckOptions:
+  - key:   readability-function-cognitive-complexity.Threshold
+    value: '50'
+...

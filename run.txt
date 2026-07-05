@@ -1,0 +1,6 @@
+#!/bin/bash
+set -e
+cd /mnt/c/Users/NAR/documents/nex/PNTP
+cmake -S . -B build -G Ninja -DPNTP_WERROR=OFF -DPNTP_BUILD_TESTS=ON 2>&1
+ninja -C build pntp_tests 2>&1
+./build/pntp_tests 2>&1

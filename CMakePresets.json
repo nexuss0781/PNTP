@@ -1,0 +1,99 @@
+{
+    "version": 6,
+    "configurePresets": [
+        {
+            "name": "debug",
+            "displayName": "Debug",
+            "description": "Debug build with no optimizations",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "PNTP_BUILD_TESTS": "ON",
+                "PNTP_BUILD_BENCH": "OFF",
+                "PNTP_ENABLE_ASAN": "ON",
+                "PNTP_ENABLE_UBSAN": "ON",
+                "PNTP_WERROR": "ON"
+            }
+        },
+        {
+            "name": "release",
+            "displayName": "Release",
+            "description": "Release build with full optimizations",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/release",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "PNTP_BUILD_TESTS": "ON",
+                "PNTP_BUILD_BENCH": "ON",
+                "PNTP_ENABLE_ASAN": "OFF",
+                "PNTP_ENABLE_UBSAN": "OFF",
+                "PNTP_WERROR": "ON"
+            }
+        },
+        {
+            "name": "perf",
+            "displayName": "Performance",
+            "description": "Maximum performance, no exceptions, no RTTI",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/perf",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "CMAKE_CXX_FLAGS": "-O3 -march=native -mtune=native -flto=thin -fno-exceptions -fno-rtti -fvisibility=hidden",
+                "PNTP_BUILD_TESTS": "OFF",
+                "PNTP_BUILD_BENCH": "ON",
+                "PNTP_WERROR": "OFF"
+            }
+        },
+        {
+            "name": "asan",
+            "displayName": "AddressSanitizer",
+            "description": "Debug with ASan and UBSan",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/asan",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "PNTP_BUILD_TESTS": "ON",
+                "PNTP_BUILD_BENCH": "OFF",
+                "PNTP_ENABLE_ASAN": "ON",
+                "PNTP_ENABLE_UBSAN": "ON",
+                "PNTP_WERROR": "ON"
+            }
+        },
+        {
+            "name": "size",
+            "displayName": "Size Optimized",
+            "description": "Minimize binary size",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/size",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "MinSizeRel",
+                "PNTP_BUILD_TESTS": "OFF",
+                "PNTP_BUILD_BENCH": "OFF",
+                "PNTP_WERROR": "ON"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "debug",
+            "configurePreset": "debug"
+        },
+        {
+            "name": "release",
+            "configurePreset": "release"
+        },
+        {
+            "name": "perf",
+            "configurePreset": "perf"
+        },
+        {
+            "name": "asan",
+            "configurePreset": "asan"
+        },
+        {
+            "name": "size",
+            "configurePreset": "size"
+        }
+    ]
+}
