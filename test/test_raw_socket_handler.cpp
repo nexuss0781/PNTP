@@ -20,17 +20,6 @@ static bool hasRawAccess() {
     return true;
 }
 
-static bool hasNetAdmin() {
-    int fd = socket(AF_INET, SOCK_DGRAM, 0);
-    if (fd < 0) return false;
-    struct ifreq ifr;
-    memset(&ifr, 0, sizeof(ifr));
-    // can't test promisc without knowing an interface name; assume
-    // CAP_NET_ADMIN if we got this far.
-    close(fd);
-    return true;
-}
-
 // Build a synthetic Ethernet + IPv4 + TCP packet in a vector.
 // payload_len bytes are appended after the TCP header.
 static std::vector<uint8_t> buildTcpPacket(uint16_t src_port,
