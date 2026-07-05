@@ -74,8 +74,11 @@ mfence_release:
 ; void cache_flush_line(const void* addr)
 ; Flush cache line containing addr from all cache levels.
 cache_flush_line:
+    test rdi, rdi
+    jz .done
     clflush [rdi]
     sfence
+.done:
     ret
 
 ; void avx2_copy_nt(void* dst, const void* src, size_t len)
@@ -187,6 +190,8 @@ pause_loop:
 ; void prefetch_range(const void* addr, size_t len)
 ; Software prefetch for cache warming.
 prefetch_range:
+    test rdi, rdi
+    jz .done
     test rsi, rsi
     jz .done
 .loop:

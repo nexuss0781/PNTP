@@ -9,7 +9,7 @@ W: Skipping acquire of configured file 'main/source/Sources' as repository 'http
 -- Detecting CXX compile features
 -- Detecting CXX compile features - done
 -- Found OpenSSL: /usr/lib/x86_64-linux-gnu/libcrypto.so (found version "3.0.2")
--- Configuring done (0.5s)
+-- Configuring done (0.8s)
 -- Generating done (0.0s)
 -- Build files have been written to: /content/PNTP/build
 ninja: Entering directory `build'
@@ -29,5 +29,17 @@ Running main() from ./googletest/src/gtest_main.cc
 [ RUN      ] PNTPCoreTest.GetRDTSCSerialized_MonotonicUnderConcurrentAccess
 [       OK ] PNTPCoreTest.GetRDTSCSerialized_MonotonicUnderConcurrentAccess (0 ms)
 [ RUN      ] PNTPCoreTest.GetRDTSCP_ReturnsIncreasingValues
-run.txt: line 11: 22572 Segmentation fault      (core dumped) ./build/test/pntp_tests 2>&1
+[       OK ] PNTPCoreTest.GetRDTSCP_ReturnsIncreasingValues (0 ms)
+[ RUN      ] PNTPCoreTest.GetRDTSCP_NullPtrs_DoesNotCrash
+[       OK ] PNTPCoreTest.GetRDTSCP_NullPtrs_DoesNotCrash (0 ms)
+[ RUN      ] PNTPCoreTest.MFence_DoesNotCrash
+[       OK ] PNTPCoreTest.MFence_DoesNotCrash (0 ms)
+[ RUN      ] PNTPCoreTest.MFence_OrderingVisible
+[       OK ] PNTPCoreTest.MFence_OrderingVisible (0 ms)
+[ RUN      ] PNTPCoreTest.CacheFlushLine_DoesNotCrash
+[       OK ] PNTPCoreTest.CacheFlushLine_DoesNotCrash (0 ms)
+[ RUN      ] PNTPCoreTest.CacheFlushLine_OnArrayDoesNotCrash
+[       OK ] PNTPCoreTest.CacheFlushLine_OnArrayDoesNotCrash (0 ms)
+[ RUN      ] PNTPCoreTest.CacheFlushLine_NullPtr_DoesNotCrash
+run.txt: line 11: 24857 Segmentation fault      (core dumped) ./build/test/pntp_tests 2>&1
 
