@@ -19,6 +19,7 @@ section .text
     global pause_loop
     global prefetch_range
     global generate_stealth_id
+    global entropy_pool
 
 ; uint64_t get_rdtsc()
 ; Returns the processor's time-stamp counter (TSC) — no serialization.
