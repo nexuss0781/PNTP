@@ -1,4 +1,9 @@
--- Configuring done (32.6s)
--- Generating done (1.2s)
--- Build files have been written to: /mnt/c/Users/NAR/documents/nex/PNTP/build
-ninja: error: unknown target 'pntp_tests'
+To fix this issue directly in your code, go to line 8 of src/pntp_core.asm and change:
+
+cpu CORE_AVX2
+
+to
+
+cpu x86-64
+
+This is because the standard Ubuntu package for NASM is version 2.15, which does not recognize the CORE_AVX2 alias (added in version 2.16). Changing it to x86-64 will allow it to compile while still supporting the AVX2 instructions used in the file.
