@@ -86,8 +86,8 @@ int main() {
               << "Bytes:      " << bytes << "\n"
               << "Duration:   " << secs << " s\n"
               << "Rate:       " << (count / secs) << " pkt/s\n"
-              << "Stats:      " << st.packets_captured.load() << " captured, "
-              << st.packets_dropped_kernel.load() << " dropped\n";
+              << "Stats:      " << st.packets_captured << " captured, "
+              << st.packets_dropped_kernel << " dropped\n";
 
     handler.setPromiscuous(false);
     std::cout << "\nDone.\n";

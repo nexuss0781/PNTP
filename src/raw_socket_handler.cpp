@@ -207,8 +207,10 @@ PacketView RawSocketHandler::acquirePacket() {
         stats.packets_captured.fetch_add(1, std::memory_order_relaxed);
         stats.bytes_captured.fetch_add(len, std::memory_order_relaxed);
 
+#ifdef TP_STATUS_DROPPED
         if (hdr->tp_status & TP_STATUS_DROPPED)
             stats.packets_dropped_kernel.fetch_add(1, std::memory_order_relaxed);
+#endif
 
         return PacketView(data, len);
     }
@@ -295,22 +297,19 @@ bool RawSocketHandler::injectPacket(const uint8_t* data, size_t len) {
 
 // ── stats ──────────────────────────────────────────────────────────────
 
-QueueStats RawSocketHandler::getStats() const {
+QueueStatsSnapshot RawSocketHandler::getStats() const {
     // poll kernel drop counter if available
     if (sock_fd >= 0) {
         struct tpacket_stats kstats;
         socklen_t slen = sizeof(kstats);
         if (getsockopt(sock_fd, SOL_PACKET, PACKET_STATISTICS,
                        &kstats, &slen) == 0) {
-            // merge kernel drop info into our stats
-            // (const-cast because logically this is a read — on Linux
-            //  getsockopt doesn't modify the pointed-to data for this opt)
             const_cast<QueueStats&>(stats)
-                .packets_dropped_kernel.store(kstats.tp_drop,
+                .packets_dropped_kernel.store(kstats.tp_drops,
                                               std::memory_order_relaxed);
         }
     }
-    return stats;
+    return stats.snapshot();
 }
 
 // ── header parsing ─────────────────────────────────────────────────────

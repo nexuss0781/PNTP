@@ -22,11 +22,27 @@ struct PacketView {
     explicit operator bool() const { return data != nullptr && len > 0; }
 };
 
+struct QueueStatsSnapshot {
+    uint64_t packets_captured;
+    uint64_t packets_dropped_kernel;
+    uint64_t packets_dropped_ring;
+    uint64_t bytes_captured;
+};
+
 struct QueueStats {
     std::atomic<uint64_t> packets_captured{0};
     std::atomic<uint64_t> packets_dropped_kernel{0};
     std::atomic<uint64_t> packets_dropped_ring{0};
     std::atomic<uint64_t> bytes_captured{0};
+
+    QueueStatsSnapshot snapshot() const {
+        QueueStatsSnapshot s;
+        s.packets_captured       = packets_captured.load(std::memory_order_relaxed);
+        s.packets_dropped_kernel = packets_dropped_kernel.load(std::memory_order_relaxed);
+        s.packets_dropped_ring   = packets_dropped_ring.load(std::memory_order_relaxed);
+        s.bytes_captured         = bytes_captured.load(std::memory_order_relaxed);
+        return s;
+    }
 };
 
 class RawSocketHandler {
@@ -49,7 +65,7 @@ public:
 
     bool injectPacket(const uint8_t* data, size_t len);
 
-    QueueStats getStats() const;
+    QueueStatsSnapshot getStats() const;
     bool usingRing() const { return !use_heap_mode; }
     bool isInitialized() const { return sock_fd >= 0; }
     int  getFd() const { return sock_fd; }

@@ -310,8 +310,8 @@ TEST(RawSocketHandlerTest, Release_DoesNotCrash_OnUninitialized) {
 TEST(RawSocketHandlerTest, GetStats_ReturnsZeroes_OnUninitialized) {
     RawSocketHandler handler;
     auto s = handler.getStats();
-    EXPECT_EQ(0u, s.packets_captured.load());
-    EXPECT_EQ(0u, s.bytes_captured.load());
+    EXPECT_EQ(0u, s.packets_captured);
+    EXPECT_EQ(0u, s.bytes_captured);
 }
 
 // ── Root-gated tests ─────────────────────────────────────────────────
@@ -411,8 +411,8 @@ TEST_F(RawSocketHandlerRootTest, StatsAfterAcquire) {
     ASSERT_TRUE(handler.init("lo"));
     auto s = handler.getStats();
     // Stats may be zero if no packets captured, but the call must work.
-    EXPECT_LE(0u, s.packets_captured.load());
-    EXPECT_LE(0u, s.bytes_captured.load());
+    EXPECT_LE(0u, s.packets_captured);
+    EXPECT_LE(0u, s.bytes_captured);
 }
 
 TEST_F(RawSocketHandlerRootTest, SetRingParams) {
