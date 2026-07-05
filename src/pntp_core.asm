@@ -41,8 +41,10 @@ get_rdtsc_serialized:
 
 ; void get_rdtscp(uint32_t* lo, uint32_t* hi, uint32_t* proc_id)
 ; rdi = lo output, rsi = hi output, rdx = proc_id output
+; rdtscp clobbers rdx (hi TSC) and rcx (proc_id), so save rdx first.
 get_rdtscp:
-    rdtscp
+    mov r8, rdx           ; save proc_id pointer before rdtscp clobbers rdx
+    rdtscp                ; eax=lo, edx=hi, ecx=proc_id
     test rdi, rdi
     jz .skip_lo
     mov [rdi], eax
@@ -51,9 +53,9 @@ get_rdtscp:
     jz .skip_hi
     mov [rsi], edx
 .skip_hi:
-    test rdx, rdx
+    test r8, r8
     jz .skip_proc
-    mov [rdx], ecx
+    mov [r8], ecx
 .skip_proc:
     ret
 

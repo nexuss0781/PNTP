@@ -14,6 +14,20 @@ W: Skipping acquire of configured file 'main/source/Sources' as repository 'http
 -- Build files have been written to: /content/PNTP/build
 ninja: Entering directory `build'
 [18/18] Linking CXX executable test/pntp_tests
-run.txt: line 11: ./build/pntp_tests: No such file or directory
+Running main() from ./googletest/src/gtest_main.cc
+[==========] Running 66 tests from 7 test suites.
+[----------] Global test environment set-up.
+[----------] 38 tests from PNTPCoreTest
+[ RUN      ] PNTPCoreTest.GetRDTSC_ReturnsIncreasingValues
+[       OK ] PNTPCoreTest.GetRDTSC_ReturnsIncreasingValues (0 ms)
+[ RUN      ] PNTPCoreTest.GetRDTSC_NonZero
+[       OK ] PNTPCoreTest.GetRDTSC_NonZero (0 ms)
+[ RUN      ] PNTPCoreTest.GetRDTSCSerialized_ReturnsIncreasingValues
+[       OK ] PNTPCoreTest.GetRDTSCSerialized_ReturnsIncreasingValues (0 ms)
+[ RUN      ] PNTPCoreTest.GetRDTSCSerialized_GreaterOrEqual_GetRDTSC
+[       OK ] PNTPCoreTest.GetRDTSCSerialized_GreaterOrEqual_GetRDTSC (0 ms)
+[ RUN      ] PNTPCoreTest.GetRDTSCSerialized_MonotonicUnderConcurrentAccess
+[       OK ] PNTPCoreTest.GetRDTSCSerialized_MonotonicUnderConcurrentAccess (0 ms)
+[ RUN      ] PNTPCoreTest.GetRDTSCP_ReturnsIncreasingValues
+run.txt: line 11: 22572 Segmentation fault      (core dumped) ./build/test/pntp_tests 2>&1
 
-/content/PNTP/build/test/pntp_tests
