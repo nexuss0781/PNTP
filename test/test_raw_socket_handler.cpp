@@ -228,8 +228,9 @@ TEST_F(HeaderParsingTest, GetPayload_UDP_ExtractsCorrectBytes) {
 TEST_F(HeaderParsingTest, GetPayload_TCP_NoPayload_ReturnsEmpty) {
     PacketView pv(tcp_pkt.data(), tcp_pkt.size());
     PacketView payload = RawSocketHandler::getPayload(pv, IPPROTO_TCP);
-    ASSERT_TRUE(payload);
-    EXPECT_EQ(0u, payload.len);
+    EXPECT_NE(nullptr, payload.data);  // points past TCP header
+    EXPECT_EQ(0u, payload.len);         // zero bytes of payload
+    EXPECT_FALSE(payload);             // bool conversion: falsy (len==0)
 }
 
 TEST_F(HeaderParsingTest, GetPayload_EmptyPacket_ReturnsEmpty) {
