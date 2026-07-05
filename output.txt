@@ -9,7 +9,7 @@ W: Skipping acquire of configured file 'main/source/Sources' as repository 'http
 -- Detecting CXX compile features
 -- Detecting CXX compile features - done
 -- Found OpenSSL: /usr/lib/x86_64-linux-gnu/libcrypto.so (found version "3.0.2")
--- Configuring done (0.7s)
+-- Configuring done (0.5s)
 -- Generating done (0.0s)
 -- Build files have been written to: /content/PNTP/build
 ninja: Entering directory `build'
@@ -27,7 +27,7 @@ Running main() from ./googletest/src/gtest_main.cc
 [ RUN      ] PNTPCoreTest.GetRDTSCSerialized_GreaterOrEqual_GetRDTSC
 [       OK ] PNTPCoreTest.GetRDTSCSerialized_GreaterOrEqual_GetRDTSC (0 ms)
 [ RUN      ] PNTPCoreTest.GetRDTSCSerialized_MonotonicUnderConcurrentAccess
-[       OK ] PNTPCoreTest.GetRDTSCSerialized_MonotonicUnderConcurrentAccess (1 ms)
+[       OK ] PNTPCoreTest.GetRDTSCSerialized_MonotonicUnderConcurrentAccess (0 ms)
 [ RUN      ] PNTPCoreTest.GetRDTSCP_ReturnsIncreasingValues
 [       OK ] PNTPCoreTest.GetRDTSCP_ReturnsIncreasingValues (0 ms)
 [ RUN      ] PNTPCoreTest.GetRDTSCP_NullPtrs_DoesNotCrash
@@ -49,131 +49,11 @@ Running main() from ./googletest/src/gtest_main.cc
 [ RUN      ] PNTPCoreTest.AVX2CopyNT_PartialLastBlock
 [       OK ] PNTPCoreTest.AVX2CopyNT_PartialLastBlock (0 ms)
 [ RUN      ] PNTPCoreTest.StealthRand_ReturnsDifferentValues
-[       OK ] PNTPCoreTest.StealthRand_ReturnsDifferentValues (1 ms)
+[       OK ] PNTPCoreTest.StealthRand_ReturnsDifferentValues (0 ms)
 [ RUN      ] PNTPCoreTest.StealthRand_NonZero
 [       OK ] PNTPCoreTest.StealthRand_NonZero (0 ms)
 [ RUN      ] PNTPCoreTest.StealthRand_Distribution_BitEntropy
-/content/PNTP/test/test_pntp_core.cpp:197: Failure
-Expected: (ratio) > (0.1), actual: 0 vs 0.1
-Bit 24 set too rarely: 0
-/content/PNTP/test/test_pntp_core.cpp:197: Failure
-Expected: (ratio) > (0.1), actual: 0 vs 0.1
-Bit 25 set too rarely: 0
-/content/PNTP/test/test_pntp_core.cpp:198: Failure
-Expected: (ratio) < (0.9), actual: 1 vs 0.9
-Bit 26 set too often: 1
-/content/PNTP/test/test_pntp_core.cpp:198: Failure
-Expected: (ratio) < (0.9), actual: 1 vs 0.9
-Bit 27 set too often: 1
-/content/PNTP/test/test_pntp_core.cpp:197: Failure
-Expected: (ratio) > (0.1), actual: 0 vs 0.1
-Bit 28 set too rarely: 0
-/content/PNTP/test/test_pntp_core.cpp:198: Failure
-Expected: (ratio) < (0.9), actual: 1 vs 0.9
-Bit 29 set too often: 1
-/content/PNTP/test/test_pntp_core.cpp:197: Failure
-Expected: (ratio) > (0.1), actual: 0 vs 0.1
-Bit 30 set too rarely: 0
-/content/PNTP/test/test_pntp_core.cpp:198: Failure
-Expected: (ratio) < (0.9), actual: 1 vs 0.9
-Bit 31 set too often: 1
-/content/PNTP/test/test_pntp_core.cpp:197: Failure
-Expected: (ratio) > (0.1), actual: 0 vs 0.1
-Bit 32 set too rarely: 0
-/content/PNTP/test/test_pntp_core.cpp:197: Failure
-Expected: (ratio) > (0.1), actual: 0 vs 0.1
-Bit 33 set too rarely: 0
-/content/PNTP/test/test_pntp_core.cpp:197: Failure
-Expected: (ratio) > (0.1), actual: 0 vs 0.1
-Bit 34 set too rarely: 0
-/content/PNTP/test/test_pntp_core.cpp:197: Failure
-Expected: (ratio) > (0.1), actual: 0 vs 0.1
-Bit 35 set too rarely: 0
-/content/PNTP/test/test_pntp_core.cpp:197: Failure
-Expected: (ratio) > (0.1), actual: 0 vs 0.1
-Bit 36 set too rarely: 0
-/content/PNTP/test/test_pntp_core.cpp:197: Failure
-Expected: (ratio) > (0.1), actual: 0 vs 0.1
-Bit 37 set too rarely: 0
-/content/PNTP/test/test_pntp_core.cpp:197: Failure
-Expected: (ratio) > (0.1), actual: 0 vs 0.1
-Bit 38 set too rarely: 0
-/content/PNTP/test/test_pntp_core.cpp:197: Failure
-Expected: (ratio) > (0.1), actual: 0 vs 0.1
-Bit 39 set too rarely: 0
-/content/PNTP/test/test_pntp_core.cpp:197: Failure
-Expected: (ratio) > (0.1), actual: 0 vs 0.1
-Bit 40 set too rarely: 0
-/content/PNTP/test/test_pntp_core.cpp:197: Failure
-Expected: (ratio) > (0.1), actual: 0 vs 0.1
-Bit 41 set too rarely: 0
-/content/PNTP/test/test_pntp_core.cpp:197: Failure
-Expected: (ratio) > (0.1), actual: 0 vs 0.1
-Bit 42 set too rarely: 0
-/content/PNTP/test/test_pntp_core.cpp:197: Failure
-Expected: (ratio) > (0.1), actual: 0 vs 0.1
-Bit 43 set too rarely: 0
-/content/PNTP/test/test_pntp_core.cpp:197: Failure
-Expected: (ratio) > (0.1), actual: 0 vs 0.1
-Bit 44 set too rarely: 0
-/content/PNTP/test/test_pntp_core.cpp:197: Failure
-Expected: (ratio) > (0.1), actual: 0 vs 0.1
-Bit 45 set too rarely: 0
-/content/PNTP/test/test_pntp_core.cpp:197: Failure
-Expected: (ratio) > (0.1), actual: 0 vs 0.1
-Bit 46 set too rarely: 0
-/content/PNTP/test/test_pntp_core.cpp:197: Failure
-Expected: (ratio) > (0.1), actual: 0 vs 0.1
-Bit 47 set too rarely: 0
-/content/PNTP/test/test_pntp_core.cpp:197: Failure
-Expected: (ratio) > (0.1), actual: 0 vs 0.1
-Bit 48 set too rarely: 0
-/content/PNTP/test/test_pntp_core.cpp:197: Failure
-Expected: (ratio) > (0.1), actual: 0 vs 0.1
-Bit 49 set too rarely: 0
-/content/PNTP/test/test_pntp_core.cpp:197: Failure
-Expected: (ratio) > (0.1), actual: 0 vs 0.1
-Bit 50 set too rarely: 0
-/content/PNTP/test/test_pntp_core.cpp:197: Failure
-Expected: (ratio) > (0.1), actual: 0 vs 0.1
-Bit 51 set too rarely: 0
-/content/PNTP/test/test_pntp_core.cpp:197: Failure
-Expected: (ratio) > (0.1), actual: 0 vs 0.1
-Bit 52 set too rarely: 0
-/content/PNTP/test/test_pntp_core.cpp:197: Failure
-Expected: (ratio) > (0.1), actual: 0 vs 0.1
-Bit 53 set too rarely: 0
-/content/PNTP/test/test_pntp_core.cpp:197: Failure
-Expected: (ratio) > (0.1), actual: 0 vs 0.1
-Bit 54 set too rarely: 0
-/content/PNTP/test/test_pntp_core.cpp:197: Failure
-Expected: (ratio) > (0.1), actual: 0 vs 0.1
-Bit 55 set too rarely: 0
-/content/PNTP/test/test_pntp_core.cpp:197: Failure
-Expected: (ratio) > (0.1), actual: 0 vs 0.1
-Bit 56 set too rarely: 0
-/content/PNTP/test/test_pntp_core.cpp:197: Failure
-Expected: (ratio) > (0.1), actual: 0 vs 0.1
-Bit 57 set too rarely: 0
-/content/PNTP/test/test_pntp_core.cpp:197: Failure
-Expected: (ratio) > (0.1), actual: 0 vs 0.1
-Bit 58 set too rarely: 0
-/content/PNTP/test/test_pntp_core.cpp:197: Failure
-Expected: (ratio) > (0.1), actual: 0 vs 0.1
-Bit 59 set too rarely: 0
-/content/PNTP/test/test_pntp_core.cpp:197: Failure
-Expected: (ratio) > (0.1), actual: 0 vs 0.1
-Bit 60 set too rarely: 0
-/content/PNTP/test/test_pntp_core.cpp:197: Failure
-Expected: (ratio) > (0.1), actual: 0 vs 0.1
-Bit 61 set too rarely: 0
-/content/PNTP/test/test_pntp_core.cpp:197: Failure
-Expected: (ratio) > (0.1), actual: 0 vs 0.1
-Bit 62 set too rarely: 0
-/content/PNTP/test/test_pntp_core.cpp:197: Failure
-Expected: (ratio) > (0.1), actual: 0 vs 0.1
-Bit 63 set too rarely: 0
-[  FAILED  ] PNTPCoreTest.StealthRand_Distribution_BitEntropy (6 ms)
+[       OK ] PNTPCoreTest.StealthRand_Distribution_BitEntropy (2 ms)
 [ RUN      ] PNTPCoreTest.InitEntropyPool_LeavesNonZeroData
 [       OK ] PNTPCoreTest.InitEntropyPool_LeavesNonZeroData (0 ms)
 [ RUN      ] PNTPCoreTest.CPUIDString_Leaf0_ReturnsVendorString
@@ -187,7 +67,7 @@ Bit 63 set too rarely: 0
 [ RUN      ] PNTPCoreTest.PauseLoop_SmallCount_Completes
 [       OK ] PNTPCoreTest.PauseLoop_SmallCount_Completes (0 ms)
 [ RUN      ] PNTPCoreTest.PauseLoop_LargeCount_Completes
-[       OK ] PNTPCoreTest.PauseLoop_LargeCount_Completes (20 ms)
+[       OK ] PNTPCoreTest.PauseLoop_LargeCount_Completes (15 ms)
 [ RUN      ] PNTPCoreTest.PrefetchRange_DoesNotCrash
 [       OK ] PNTPCoreTest.PrefetchRange_DoesNotCrash (0 ms)
 [ RUN      ] PNTPCoreTest.PrefetchRange_ZeroLength
@@ -214,7 +94,7 @@ Bit 63 set too rarely: 0
 [       OK ] PNTPCoreTest.CrossCheck_AVX2Copy_Then_Prefetch (0 ms)
 [ RUN      ] PNTPCoreTest.CrossCheck_FlushThenRead_NoFault
 [       OK ] PNTPCoreTest.CrossCheck_FlushThenRead_NoFault (0 ms)
-[----------] 38 tests from PNTPCoreTest (34 ms total)
+[----------] 38 tests from PNTPCoreTest (24 ms total)
 
 [----------] 2 tests from RawSocketHandlerTest
 [ RUN      ] RawSocketHandlerTest.InitFailsOnNonexistentInterface
@@ -230,7 +110,7 @@ Error getting interface index for nonexistent_iface_xyz: No such device
 [       OK ] TCPEngineTest.InitializeFailsWithoutRoot (0 ms)
 [ RUN      ] TCPEngineTest.TranscendentFetch_ReturnsNonEmpty
 [PNTP] Transcendent fetch initiated for: https://example.com
-[PNTP] Request signed with hardware stealth ID: SIG-42-272-7932800-166400821
+[PNTP] Request signed with hardware stealth ID: SIG--66124-126-128-121800-166400820
 [       OK ] TCPEngineTest.TranscendentFetch_ReturnsNonEmpty (0 ms)
 [----------] 2 tests from TCPEngineTest (0 ms total)
 
@@ -340,13 +220,13 @@ Conceptual data extraction for Content-Type: application/octet-stream
 DataExtractor initialized (conceptual).
 Warning: parseHtmlForElement is a conceptual placeholder. Use a proper HTML parser for robust extraction.
 [       OK ] DataExtractorTest.ParseHtmlForElement_ReturnsEmpty (0 ms)
-[----------] 7 tests from DataExtractorTest (4 ms total)
+[----------] 7 tests from DataExtractorTest (3 ms total)
 
 [----------] 5 tests from PerformanceMonitorTest
 [ RUN      ] PerformanceMonitorTest.StartEndMeasurement_ReturnsPositiveDuration
 PerformanceMonitor initialized.
 Measurement started for: test_event
-Measurement ended for: test_event, Duration: 1.12241 ms
+Measurement ended for: test_event, Duration: 1.10573 ms
 [       OK ] PerformanceMonitorTest.StartEndMeasurement_ReturnsPositiveDuration (1 ms)
 [ RUN      ] PerformanceMonitorTest.GetDurationMs_UnmeasuredEvent_ReturnsZero
 PerformanceMonitor initialized.
@@ -364,16 +244,12 @@ PerformanceMonitor initialized.
 PerformanceMonitor initialized.
 Measurement started for: event_a
 Measurement started for: event_b
-Measurement ended for: event_b, Duration: 1.0866 ms
-Measurement ended for: event_a, Duration: 1.11489 ms
-[       OK ] PerformanceMonitorTest.SequentialMeasurements_Independent (46 ms)
-[----------] 5 tests from PerformanceMonitorTest (47 ms total)
+Measurement ended for: event_b, Duration: 1.1195 ms
+Measurement ended for: event_a, Duration: 1.15856 ms
+[       OK ] PerformanceMonitorTest.SequentialMeasurements_Independent (1 ms)
+[----------] 5 tests from PerformanceMonitorTest (2 ms total)
 
 [----------] Global test environment tear-down
-[==========] 66 tests from 7 test suites ran. (92 ms total)
-[  PASSED  ] 65 tests.
-[  FAILED  ] 1 test, listed below:
-[  FAILED  ] PNTPCoreTest.StealthRand_Distribution_BitEntropy
-
- 1 FAILED TEST
+[==========] 66 tests from 7 test suites ran. (35 ms total)
+[  PASSED  ] 66 tests.
 

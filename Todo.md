@@ -32,21 +32,21 @@
 ## Phase 1 — Assembly Core Hardening
 
 ```
-[in progress] P1-001: Add get_rdtsc_serialized: mfence; lfence; rdtsc; shl; or; ret (0.5h)
-[in progress] P1-002: Add get_rdtscp: rdtscp; mov [rdi], eax; mov [rdi+4], edx; ret (0.5h)
-[in progress] P1-003: Add mfence_acquire and mfence_release wrapper functions (0.25h)
-[in progress] P1-004: Add cache_flush_line(addr): clflush [rdi]; sfence; ret (0.25h)
-[in progress] P1-005: Add avx2_copy_nt(dst, src, len): vmovntdqa + vmovntdq + sfence (1h)
-[in progress] P1-006: Add stealth_rand(): mix RDTSC + CPUID entropy + RDRAND fallback (1h)
-[in progress] P1-007: Add 256-byte entropy pool in .data section, seeded at init (1h)
-[in progress] P1-008: Add cpuid_string(leaf, buffer): dump full CPUID leaf to buffer (0.5h)
-[in progress] P1-009: Add pause_loop(count): spin-loop with PAUSE instruction (0.25h)
-[in progress] P1-010: Add prefetch_range(addr, len): software prefetch with PREFETCHT0 (0.5h)
-[in progress] P1-011: Update pntp_core.h extern "C" declarations for all new functions (0.5h)
-[ ] P1-012: Verify with objdump -d | grep -E 'rdtsc|cpuid|clflush|vmov' (0.25h)
-[in progress] P1-013: Write unit test: verify get_rdtsc_serialized returns increasing values (0.5h)
-[in progress] P1-014: Write unit test: verify cache_flush_line doesn't crash (0.25h)
-[in progress] P1-015: Calibrate TSC frequency via sleep(1) delta and print at startup (1h)
+[x] P1-001: Add get_rdtsc_serialized: mfence; lfence; rdtsc; shl; or; ret (0.5h)
+[x] P1-002: Add get_rdtscp: rdtscp; mov [rdi], eax; mov [rdi+4], edx; ret (0.5h)
+[x] P1-003: Add mfence_acquire and mfence_release wrapper functions (0.25h)
+[x] P1-004: Add cache_flush_line(addr): clflush [rdi]; sfence; ret (0.25h)
+[x] P1-005: Add avx2_copy_nt(dst, src, len): vmovntdqa + vmovntdq + sfence (1h)
+[x] P1-006: Add stealth_rand(): mix RDTSC + CPUID entropy + RDRAND fallback (1h)
+[x] P1-007: Add 256-byte entropy pool in .data section, seeded at init (1h)
+[x] P1-008: Add cpuid_string(leaf, buffer): dump full CPUID leaf to buffer (0.5h)
+[x] P1-009: Add pause_loop(count): spin-loop with PAUSE instruction (0.25h)
+[x] P1-010: Add prefetch_range(addr, len): software prefetch with PREFETCHT0 (0.5h)
+[x] P1-011: Update pntp_core.h extern "C" declarations for all new functions (0.5h)
+[x] P1-012: Verify with objdump -d | grep -E 'rdtsc|cpuid|clflush|vmov' (0.25h)
+[x] P1-013: Write unit test: verify get_rdtsc_serialized returns increasing values (0.5h)
+[x] P1-014: Write unit test: verify cache_flush_line doesn't crash (0.25h)
+[x] P1-015: Calibrate TSC frequency via sleep(1) delta and print at startup (1h)
 ```
 
 **Total:** 8.25h
