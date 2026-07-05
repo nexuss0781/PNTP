@@ -16,7 +16,11 @@ ninja: Entering directory `build'
 [1/18] Building ASM_NASM object test/CMakeFiles/pntp_tests.dir/__/src/pntp_core.asm.o
 FAILED: test/CMakeFiles/pntp_tests.dir/__/src/pntp_core.asm.o 
 /usr/bin/nasm  -I/content/PNTP/include -I/usr/include -wno-unknown-warning -DGTEST_HAS_PTHREAD=1 -MD test/CMakeFiles/pntp_tests.dir/__/src/pntp_core.asm.o.d -MT test/CMakeFiles/pntp_tests.dir/__/src/pntp_core.asm.o -f elf64 -o test/CMakeFiles/pntp_tests.dir/__/src/pntp_core.asm.o /content/PNTP/src/pntp_core.asm
-/content/PNTP/src/pntp_core.asm:111: error: invalid effective address
+/content/PNTP/src/pntp_core.asm:84: error: no instruction for this cpu level
+/content/PNTP/src/pntp_core.asm:85: error: no instruction for this cpu level
+/content/PNTP/src/pntp_core.asm:91: error: no instruction for this cpu level
+/content/PNTP/src/pntp_core.asm:98: error: no instruction for this cpu level
+/content/PNTP/src/pntp_core.asm:130: error: no instruction for this cpu level
 [3/18] Building CXX object test/CMakeFiles/pntp_tests.dir/__/src/raw_socket_handler.cpp.o
 ninja: build stopped: subcommand failed.
 

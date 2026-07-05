@@ -5,7 +5,6 @@ section .data
     pool_initialized: db 0
 
 section .text
-    CPU x86-64
     global get_rdtsc
     global get_rdtsc_serialized
     global get_rdtscp
