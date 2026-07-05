@@ -8,4 +8,4 @@ apt-get update -qq && apt-get install -y -qq libgtest-dev libgmock-dev 2>/dev/nu
 rm -rf build
 cmake -S . -B build -G Ninja -DPNTP_WERROR=OFF -DPNTP_BUILD_TESTS=ON 2>&1
 ninja -C build pntp_tests 2>&1
-./build/pntp_tests 2>&1
+./build/test/pntp_tests 2>&1

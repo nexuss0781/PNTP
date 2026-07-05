@@ -14,12 +14,6 @@ W: Skipping acquire of configured file 'main/source/Sources' as repository 'http
 -- Build files have been written to: /content/PNTP/build
 ninja: Entering directory `build'
 [18/18] Linking CXX executable test/pntp_tests
-FAILED: test/pntp_tests test/pntp_tests[1]_tests.cmake /content/PNTP/build/test/pntp_tests[1]_tests.cmake 
-: && /usr/bin/c++   test/CMakeFiles/pntp_tests.dir/__/src/pntp_core.asm.o test/CMakeFiles/pntp_tests.dir/__/src/raw_socket_handler.cpp.o test/CMakeFiles/pntp_tests.dir/__/src/tcp_engine.cpp.o test/CMakeFiles/pntp_tests.dir/__/src/stealth_ensemble.cpp.o test/CMakeFiles/pntp_tests.dir/__/src/tls_interceptor.cpp.o test/CMakeFiles/pntp_tests.dir/__/src/http2_parser.cpp.o test/CMakeFiles/pntp_tests.dir/__/src/url_manipulator.cpp.o test/CMakeFiles/pntp_tests.dir/__/src/data_extractor.cpp.o test/CMakeFiles/pntp_tests.dir/__/src/transcendence_engine.cpp.o test/CMakeFiles/pntp_tests.dir/__/src/performance_monitor.cpp.o test/CMakeFiles/pntp_tests.dir/test_pntp_core.cpp.o test/CMakeFiles/pntp_tests.dir/test_raw_socket_handler.cpp.o test/CMakeFiles/pntp_tests.dir/test_tcp_engine.cpp.o test/CMakeFiles/pntp_tests.dir/test_http2_parser.cpp.o test/CMakeFiles/pntp_tests.dir/test_url_manipulator.cpp.o test/CMakeFiles/pntp_tests.dir/test_data_extractor.cpp.o test/CMakeFiles/pntp_tests.dir/test_performance_monitor.cpp.o -o test/pntp_tests  /usr/lib/x86_64-linux-gnu/libgtest.a  /usr/lib/x86_64-linux-gnu/libgtest_main.a  /usr/lib/x86_64-linux-gnu/libssl.so  /usr/lib/x86_64-linux-gnu/libcrypto.so  /usr/lib/x86_64-linux-gnu/libgtest.a && cd /content/PNTP/build/test && /usr/local/lib/python3.12/dist-packages/cmake/data/bin/cmake -D TEST_TARGET=pntp_tests -D TEST_EXECUTABLE=/content/PNTP/build/test/pntp_tests -D TEST_EXECUTOR= -D TEST_WORKING_DIR=/content/PNTP/build/test -D TEST_EXTRA_ARGS= -D TEST_PROPERTIES= -D TEST_PREFIX= -D TEST_SUFFIX= -D TEST_FILTER= -D NO_PRETTY_TYPES=FALSE -D NO_PRETTY_VALUES=FALSE -D TEST_LIST=pntp_tests_TESTS -D CTEST_FILE=/content/PNTP/build/test/pntp_tests[1]_tests.cmake -D TEST_DISCOVERY_TIMEOUT=5 -D TEST_DISCOVERY_EXTRA_ARGS= -D TEST_XML_OUTPUT_DIR= -P /usr/local/lib/python3.12/dist-packages/cmake/data/share/cmake-3.31/Modules/GoogleTestAddTests.cmake
-/usr/bin/ld: test/CMakeFiles/pntp_tests.dir/test_pntp_core.cpp.o: warning: relocation against `entropy_pool' in read-only section `.text'
-/usr/bin/ld: test/CMakeFiles/pntp_tests.dir/test_pntp_core.cpp.o: in function `PNTPCoreTest_InitEntropyPool_LeavesNonZeroData_Test::TestBody()':
-test_pntp_core.cpp:(.text+0x2427): undefined reference to `entropy_pool'
-/usr/bin/ld: warning: creating DT_TEXTREL in a PIE
-collect2: error: ld returned 1 exit status
-ninja: build stopped: subcommand failed.
+run.txt: line 11: ./build/pntp_tests: No such file or directory
 
+/content/PNTP/build/test/pntp_tests
