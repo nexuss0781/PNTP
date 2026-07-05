@@ -363,7 +363,7 @@ PacketView RawSocketHandler::getPayload(const PacketView& pkt, uint8_t protocol)
         size_t ip_total = ntohs(ip->tot_len);
         size_t total_len = 14 + ip_total;   // from ethernet start
         if (pkt.len < total_len) total_len = pkt.len;
-        if (total_start >= total_len) return PacketView();
+        if (total_start > total_len) return PacketView();
         return PacketView(pkt.data + total_start, total_len - total_start);
     }
 
@@ -372,14 +372,12 @@ PacketView RawSocketHandler::getPayload(const PacketView& pkt, uint8_t protocol)
         if (!udp) return PacketView();
         auto* ip = getIPv4Header(pkt);
         size_t ip_hdr_len = static_cast<size_t>(ip->ihl) * 4;
-        size_t udp_start = 14 + ip_hdr_len + 8;  // 8 = sizeof udp header
+        size_t payload_off = 14 + ip_hdr_len + 8;
         size_t udp_len = ntohs(udp->len);
-        size_t total_start = 14 + ip_hdr_len;
-        size_t total_len  = total_start + udp_len;
-        if (pkt.len < total_len) total_len = pkt.len;
-        size_t payload_len = (total_len > udp_start) ? total_len - udp_start : 0;
-        if (payload_len == 0) return PacketView();
-        return PacketView(pkt.data + udp_start, payload_len);
+        size_t end = 14 + ip_hdr_len + udp_len;
+        if (pkt.len < end) end = pkt.len;
+        if (payload_off > end) return PacketView();
+        return PacketView(pkt.data + payload_off, end - payload_off);
     }
 
     return PacketView();
