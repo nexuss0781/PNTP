@@ -1,9 +1,22 @@
-To fix this issue directly in your code, go to line 8 of src/pntp_core.asm and change:
+=== Working dir: /content/PNTP ===
+W: Skipping acquire of configured file 'main/source/Sources' as repository 'https://r2u.stat.illinois.edu/ubuntu jammy InRelease' does not seem to provide it (sources.list entry misspelt?)
+-- The CXX compiler identification is GNU 11.4.0
+-- The ASM_NASM compiler identification is NASM
+-- Found assembler: /usr/bin/nasm
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Found OpenSSL: /usr/lib/x86_64-linux-gnu/libcrypto.so (found version "3.0.2")
+-- Configuring done (0.5s)
+-- Generating done (0.0s)
+-- Build files have been written to: /content/PNTP/build
+ninja: Entering directory `build'
+[1/18] Building ASM_NASM object test/CMakeFiles/pntp_tests.dir/__/src/pntp_core.asm.o
+FAILED: test/CMakeFiles/pntp_tests.dir/__/src/pntp_core.asm.o 
+/usr/bin/nasm  -I/content/PNTP/include -I/usr/include -wno-unknown-warning -DGTEST_HAS_PTHREAD=1 -MD test/CMakeFiles/pntp_tests.dir/__/src/pntp_core.asm.o.d -MT test/CMakeFiles/pntp_tests.dir/__/src/pntp_core.asm.o -f elf64 -o test/CMakeFiles/pntp_tests.dir/__/src/pntp_core.asm.o /content/PNTP/src/pntp_core.asm
+/content/PNTP/src/pntp_core.asm:111: error: invalid effective address
+[3/18] Building CXX object test/CMakeFiles/pntp_tests.dir/__/src/raw_socket_handler.cpp.o
+ninja: build stopped: subcommand failed.
 
-cpu CORE_AVX2
-
-to
-
-cpu x86-64
-
-This is because the standard Ubuntu package for NASM is version 2.15, which does not recognize the CORE_AVX2 alias (added in version 2.16). Changing it to x86-64 will allow it to compile while still supporting the AVX2 instructions used in the file.

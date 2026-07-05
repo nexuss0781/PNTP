@@ -108,7 +108,7 @@ stealth_rand:
     movzx ecx, byte [rsi + rcx]
     xor al, cl
     lea rsi, [entropy_pool + 128]
-    movzx ecx, byte [rsi + cl]
+    movzx ecx, byte [rsi + rcx]
     xor ah, cl
     pop rdx
     pop rcx
