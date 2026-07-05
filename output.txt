@@ -13,14 +13,17 @@ W: Skipping acquire of configured file 'main/source/Sources' as repository 'http
 -- Generating done (0.0s)
 -- Build files have been written to: /content/PNTP/build
 ninja: Entering directory `build'
-[1/18] Building ASM_NASM object test/CMakeFiles/pntp_tests.dir/__/src/pntp_core.asm.o
-FAILED: test/CMakeFiles/pntp_tests.dir/__/src/pntp_core.asm.o 
-/usr/bin/nasm  -I/content/PNTP/include -I/usr/include -wno-unknown-warning -DGTEST_HAS_PTHREAD=1 -MD test/CMakeFiles/pntp_tests.dir/__/src/pntp_core.asm.o.d -MT test/CMakeFiles/pntp_tests.dir/__/src/pntp_core.asm.o -f elf64 -o test/CMakeFiles/pntp_tests.dir/__/src/pntp_core.asm.o /content/PNTP/src/pntp_core.asm
-/content/PNTP/src/pntp_core.asm:84: error: no instruction for this cpu level
-/content/PNTP/src/pntp_core.asm:85: error: no instruction for this cpu level
-/content/PNTP/src/pntp_core.asm:91: error: no instruction for this cpu level
-/content/PNTP/src/pntp_core.asm:98: error: no instruction for this cpu level
-/content/PNTP/src/pntp_core.asm:130: error: no instruction for this cpu level
-[3/18] Building CXX object test/CMakeFiles/pntp_tests.dir/__/src/raw_socket_handler.cpp.o
+[16/18] Building CXX object test/CMakeFiles/pntp_tests.dir/test_data_extractor.cpp.o
+FAILED: test/CMakeFiles/pntp_tests.dir/test_data_extractor.cpp.o 
+/usr/bin/c++  -I/content/PNTP/include -std=gnu++20 -fPIE -DGTEST_HAS_PTHREAD=1 -MD -MT test/CMakeFiles/pntp_tests.dir/test_data_extractor.cpp.o -MF test/CMakeFiles/pntp_tests.dir/test_data_extractor.cpp.o.d -o test/CMakeFiles/pntp_tests.dir/test_data_extractor.cpp.o -c /content/PNTP/test/test_data_extractor.cpp
+/content/PNTP/test/test_data_extractor.cpp: In member function ‘virtual void DataExtractorTest_ParseHtmlForElement_ReturnsEmpty_Test::TestBody()’:
+/content/PNTP/test/test_data_extractor.cpp:52:55: error: ‘std::string DataExtractor::parseHtmlForElement(const string&, const string&, const string&) const’ is private within this context
+   52 |     std::string result = extractor.parseHtmlForElement("<div>test</div>", "div", "class");
+      |                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from /content/PNTP/test/test_data_extractor.cpp:1:
+/content/PNTP/include/pntp/data_extractor.h:23:17: note: declared private here
+   23 |     std::string parseHtmlForElement(const std::string& html, const std::string& tag, const std::string& attribute) const;
+      |                 ^~~~~~~~~~~~~~~~~~~
+[17/18] Building CXX object test/CMakeFiles/pntp_tests.dir/test_performance_monitor.cpp.o
 ninja: build stopped: subcommand failed.
 
