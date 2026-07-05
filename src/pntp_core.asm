@@ -82,20 +82,32 @@ cache_flush_line:
     ret
 
 ; void avx2_copy_nt(void* dst, const void* src, size_t len)
-; Non-temporal aligned copy using AVX2. Requires 32-byte alignment.
+; Non-temporal aligned copy using AVX2 + byte remainder.
+; Requires 32-byte alignment for the AVX2 portion.
 avx2_copy_nt:
     test rdx, rdx
     jz .done
-.loop:
+.avx_loop:
+    cmp rdx, 32
+    jb .byte_loop
     vmovntdqa ymm0, [rsi]
     vmovntdq  [rdi], ymm0
     add rsi, 32
     add rdi, 32
     sub rdx, 32
-    jg .loop
+    jmp .avx_loop
+.byte_loop:
+    test rdx, rdx
+    jz .done
+    mov al, [rsi]
+    mov [rdi], al
+    inc rsi
+    inc rdi
+    dec rdx
+    jmp .byte_loop
+.done:
     sfence
     vzeroupper
-.done:
     ret
 
 ; uint64_t stealth_rand()

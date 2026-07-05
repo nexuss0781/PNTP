@@ -41,5 +41,12 @@ Running main() from ./googletest/src/gtest_main.cc
 [ RUN      ] PNTPCoreTest.CacheFlushLine_OnArrayDoesNotCrash
 [       OK ] PNTPCoreTest.CacheFlushLine_OnArrayDoesNotCrash (0 ms)
 [ RUN      ] PNTPCoreTest.CacheFlushLine_NullPtr_DoesNotCrash
-run.txt: line 11: 24857 Segmentation fault      (core dumped) ./build/test/pntp_tests 2>&1
+[       OK ] PNTPCoreTest.CacheFlushLine_NullPtr_DoesNotCrash (0 ms)
+[ RUN      ] PNTPCoreTest.AVX2CopyNT_CopiesCorrectly_Aligned
+[       OK ] PNTPCoreTest.AVX2CopyNT_CopiesCorrectly_Aligned (0 ms)
+[ RUN      ] PNTPCoreTest.AVX2CopyNT_ZeroLength
+[       OK ] PNTPCoreTest.AVX2CopyNT_ZeroLength (0 ms)
+[ RUN      ] PNTPCoreTest.AVX2CopyNT_PartialLastBlock
+*** stack smashing detected ***: terminated
+run.txt: line 11: 26134 Aborted                 (core dumped) ./build/test/pntp_tests 2>&1
 
