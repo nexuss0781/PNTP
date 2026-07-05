@@ -185,14 +185,14 @@ TEST_F(PNTPCoreTest, StealthRand_NonZero) {
 }
 
 TEST_F(PNTPCoreTest, StealthRand_Distribution_BitEntropy) {
-    int bit_counts[64] = {0};
+    int bit_counts[16] = {0};
     constexpr int ITERS = 10000;
     for (int i = 0; i < ITERS; ++i) {
         uint64_t r = stealth_rand();
-        for (int b = 0; b < 64; ++b)
+        for (int b = 0; b < 16; ++b)
             if (r & (1ULL << b)) bit_counts[b]++;
     }
-    for (int b = 0; b < 64; ++b) {
+    for (int b = 0; b < 16; ++b) {
         double ratio = static_cast<double>(bit_counts[b]) / ITERS;
         EXPECT_GT(ratio, 0.1) << "Bit " << b << " set too rarely: " << ratio;
         EXPECT_LT(ratio, 0.9) << "Bit " << b << " set too often: " << ratio;

@@ -9,7 +9,7 @@ W: Skipping acquire of configured file 'main/source/Sources' as repository 'http
 -- Detecting CXX compile features
 -- Detecting CXX compile features - done
 -- Found OpenSSL: /usr/lib/x86_64-linux-gnu/libcrypto.so (found version "3.0.2")
--- Configuring done (0.8s)
+-- Configuring done (0.7s)
 -- Generating done (0.0s)
 -- Build files have been written to: /content/PNTP/build
 ninja: Entering directory `build'
@@ -27,7 +27,7 @@ Running main() from ./googletest/src/gtest_main.cc
 [ RUN      ] PNTPCoreTest.GetRDTSCSerialized_GreaterOrEqual_GetRDTSC
 [       OK ] PNTPCoreTest.GetRDTSCSerialized_GreaterOrEqual_GetRDTSC (0 ms)
 [ RUN      ] PNTPCoreTest.GetRDTSCSerialized_MonotonicUnderConcurrentAccess
-[       OK ] PNTPCoreTest.GetRDTSCSerialized_MonotonicUnderConcurrentAccess (0 ms)
+[       OK ] PNTPCoreTest.GetRDTSCSerialized_MonotonicUnderConcurrentAccess (1 ms)
 [ RUN      ] PNTPCoreTest.GetRDTSCP_ReturnsIncreasingValues
 [       OK ] PNTPCoreTest.GetRDTSCP_ReturnsIncreasingValues (0 ms)
 [ RUN      ] PNTPCoreTest.GetRDTSCP_NullPtrs_DoesNotCrash
@@ -47,6 +47,333 @@ Running main() from ./googletest/src/gtest_main.cc
 [ RUN      ] PNTPCoreTest.AVX2CopyNT_ZeroLength
 [       OK ] PNTPCoreTest.AVX2CopyNT_ZeroLength (0 ms)
 [ RUN      ] PNTPCoreTest.AVX2CopyNT_PartialLastBlock
-*** stack smashing detected ***: terminated
-run.txt: line 11: 26134 Aborted                 (core dumped) ./build/test/pntp_tests 2>&1
+[       OK ] PNTPCoreTest.AVX2CopyNT_PartialLastBlock (0 ms)
+[ RUN      ] PNTPCoreTest.StealthRand_ReturnsDifferentValues
+[       OK ] PNTPCoreTest.StealthRand_ReturnsDifferentValues (1 ms)
+[ RUN      ] PNTPCoreTest.StealthRand_NonZero
+[       OK ] PNTPCoreTest.StealthRand_NonZero (0 ms)
+[ RUN      ] PNTPCoreTest.StealthRand_Distribution_BitEntropy
+/content/PNTP/test/test_pntp_core.cpp:197: Failure
+Expected: (ratio) > (0.1), actual: 0 vs 0.1
+Bit 24 set too rarely: 0
+/content/PNTP/test/test_pntp_core.cpp:197: Failure
+Expected: (ratio) > (0.1), actual: 0 vs 0.1
+Bit 25 set too rarely: 0
+/content/PNTP/test/test_pntp_core.cpp:198: Failure
+Expected: (ratio) < (0.9), actual: 1 vs 0.9
+Bit 26 set too often: 1
+/content/PNTP/test/test_pntp_core.cpp:198: Failure
+Expected: (ratio) < (0.9), actual: 1 vs 0.9
+Bit 27 set too often: 1
+/content/PNTP/test/test_pntp_core.cpp:197: Failure
+Expected: (ratio) > (0.1), actual: 0 vs 0.1
+Bit 28 set too rarely: 0
+/content/PNTP/test/test_pntp_core.cpp:198: Failure
+Expected: (ratio) < (0.9), actual: 1 vs 0.9
+Bit 29 set too often: 1
+/content/PNTP/test/test_pntp_core.cpp:197: Failure
+Expected: (ratio) > (0.1), actual: 0 vs 0.1
+Bit 30 set too rarely: 0
+/content/PNTP/test/test_pntp_core.cpp:198: Failure
+Expected: (ratio) < (0.9), actual: 1 vs 0.9
+Bit 31 set too often: 1
+/content/PNTP/test/test_pntp_core.cpp:197: Failure
+Expected: (ratio) > (0.1), actual: 0 vs 0.1
+Bit 32 set too rarely: 0
+/content/PNTP/test/test_pntp_core.cpp:197: Failure
+Expected: (ratio) > (0.1), actual: 0 vs 0.1
+Bit 33 set too rarely: 0
+/content/PNTP/test/test_pntp_core.cpp:197: Failure
+Expected: (ratio) > (0.1), actual: 0 vs 0.1
+Bit 34 set too rarely: 0
+/content/PNTP/test/test_pntp_core.cpp:197: Failure
+Expected: (ratio) > (0.1), actual: 0 vs 0.1
+Bit 35 set too rarely: 0
+/content/PNTP/test/test_pntp_core.cpp:197: Failure
+Expected: (ratio) > (0.1), actual: 0 vs 0.1
+Bit 36 set too rarely: 0
+/content/PNTP/test/test_pntp_core.cpp:197: Failure
+Expected: (ratio) > (0.1), actual: 0 vs 0.1
+Bit 37 set too rarely: 0
+/content/PNTP/test/test_pntp_core.cpp:197: Failure
+Expected: (ratio) > (0.1), actual: 0 vs 0.1
+Bit 38 set too rarely: 0
+/content/PNTP/test/test_pntp_core.cpp:197: Failure
+Expected: (ratio) > (0.1), actual: 0 vs 0.1
+Bit 39 set too rarely: 0
+/content/PNTP/test/test_pntp_core.cpp:197: Failure
+Expected: (ratio) > (0.1), actual: 0 vs 0.1
+Bit 40 set too rarely: 0
+/content/PNTP/test/test_pntp_core.cpp:197: Failure
+Expected: (ratio) > (0.1), actual: 0 vs 0.1
+Bit 41 set too rarely: 0
+/content/PNTP/test/test_pntp_core.cpp:197: Failure
+Expected: (ratio) > (0.1), actual: 0 vs 0.1
+Bit 42 set too rarely: 0
+/content/PNTP/test/test_pntp_core.cpp:197: Failure
+Expected: (ratio) > (0.1), actual: 0 vs 0.1
+Bit 43 set too rarely: 0
+/content/PNTP/test/test_pntp_core.cpp:197: Failure
+Expected: (ratio) > (0.1), actual: 0 vs 0.1
+Bit 44 set too rarely: 0
+/content/PNTP/test/test_pntp_core.cpp:197: Failure
+Expected: (ratio) > (0.1), actual: 0 vs 0.1
+Bit 45 set too rarely: 0
+/content/PNTP/test/test_pntp_core.cpp:197: Failure
+Expected: (ratio) > (0.1), actual: 0 vs 0.1
+Bit 46 set too rarely: 0
+/content/PNTP/test/test_pntp_core.cpp:197: Failure
+Expected: (ratio) > (0.1), actual: 0 vs 0.1
+Bit 47 set too rarely: 0
+/content/PNTP/test/test_pntp_core.cpp:197: Failure
+Expected: (ratio) > (0.1), actual: 0 vs 0.1
+Bit 48 set too rarely: 0
+/content/PNTP/test/test_pntp_core.cpp:197: Failure
+Expected: (ratio) > (0.1), actual: 0 vs 0.1
+Bit 49 set too rarely: 0
+/content/PNTP/test/test_pntp_core.cpp:197: Failure
+Expected: (ratio) > (0.1), actual: 0 vs 0.1
+Bit 50 set too rarely: 0
+/content/PNTP/test/test_pntp_core.cpp:197: Failure
+Expected: (ratio) > (0.1), actual: 0 vs 0.1
+Bit 51 set too rarely: 0
+/content/PNTP/test/test_pntp_core.cpp:197: Failure
+Expected: (ratio) > (0.1), actual: 0 vs 0.1
+Bit 52 set too rarely: 0
+/content/PNTP/test/test_pntp_core.cpp:197: Failure
+Expected: (ratio) > (0.1), actual: 0 vs 0.1
+Bit 53 set too rarely: 0
+/content/PNTP/test/test_pntp_core.cpp:197: Failure
+Expected: (ratio) > (0.1), actual: 0 vs 0.1
+Bit 54 set too rarely: 0
+/content/PNTP/test/test_pntp_core.cpp:197: Failure
+Expected: (ratio) > (0.1), actual: 0 vs 0.1
+Bit 55 set too rarely: 0
+/content/PNTP/test/test_pntp_core.cpp:197: Failure
+Expected: (ratio) > (0.1), actual: 0 vs 0.1
+Bit 56 set too rarely: 0
+/content/PNTP/test/test_pntp_core.cpp:197: Failure
+Expected: (ratio) > (0.1), actual: 0 vs 0.1
+Bit 57 set too rarely: 0
+/content/PNTP/test/test_pntp_core.cpp:197: Failure
+Expected: (ratio) > (0.1), actual: 0 vs 0.1
+Bit 58 set too rarely: 0
+/content/PNTP/test/test_pntp_core.cpp:197: Failure
+Expected: (ratio) > (0.1), actual: 0 vs 0.1
+Bit 59 set too rarely: 0
+/content/PNTP/test/test_pntp_core.cpp:197: Failure
+Expected: (ratio) > (0.1), actual: 0 vs 0.1
+Bit 60 set too rarely: 0
+/content/PNTP/test/test_pntp_core.cpp:197: Failure
+Expected: (ratio) > (0.1), actual: 0 vs 0.1
+Bit 61 set too rarely: 0
+/content/PNTP/test/test_pntp_core.cpp:197: Failure
+Expected: (ratio) > (0.1), actual: 0 vs 0.1
+Bit 62 set too rarely: 0
+/content/PNTP/test/test_pntp_core.cpp:197: Failure
+Expected: (ratio) > (0.1), actual: 0 vs 0.1
+Bit 63 set too rarely: 0
+[  FAILED  ] PNTPCoreTest.StealthRand_Distribution_BitEntropy (6 ms)
+[ RUN      ] PNTPCoreTest.InitEntropyPool_LeavesNonZeroData
+[       OK ] PNTPCoreTest.InitEntropyPool_LeavesNonZeroData (0 ms)
+[ RUN      ] PNTPCoreTest.CPUIDString_Leaf0_ReturnsVendorString
+[       OK ] PNTPCoreTest.CPUIDString_Leaf0_ReturnsVendorString (0 ms)
+[ RUN      ] PNTPCoreTest.CPUIDString_Leaf1_ReturnsNonZero
+[       OK ] PNTPCoreTest.CPUIDString_Leaf1_ReturnsNonZero (0 ms)
+[ RUN      ] PNTPCoreTest.CPUIDString_DifferentLeaves_Differ
+[       OK ] PNTPCoreTest.CPUIDString_DifferentLeaves_Differ (0 ms)
+[ RUN      ] PNTPCoreTest.PauseLoop_ZeroCount_ReturnsImmediately
+[       OK ] PNTPCoreTest.PauseLoop_ZeroCount_ReturnsImmediately (0 ms)
+[ RUN      ] PNTPCoreTest.PauseLoop_SmallCount_Completes
+[       OK ] PNTPCoreTest.PauseLoop_SmallCount_Completes (0 ms)
+[ RUN      ] PNTPCoreTest.PauseLoop_LargeCount_Completes
+[       OK ] PNTPCoreTest.PauseLoop_LargeCount_Completes (20 ms)
+[ RUN      ] PNTPCoreTest.PrefetchRange_DoesNotCrash
+[       OK ] PNTPCoreTest.PrefetchRange_DoesNotCrash (0 ms)
+[ RUN      ] PNTPCoreTest.PrefetchRange_ZeroLength
+[       OK ] PNTPCoreTest.PrefetchRange_ZeroLength (0 ms)
+[ RUN      ] PNTPCoreTest.PrefetchRange_LargeBuffer
+[       OK ] PNTPCoreTest.PrefetchRange_LargeBuffer (0 ms)
+[ RUN      ] PNTPCoreTest.PrefetchRange_NullPtr_DoesNotCrash
+[       OK ] PNTPCoreTest.PrefetchRange_NullPtr_DoesNotCrash (0 ms)
+[ RUN      ] PNTPCoreTest.GenerateStealthId_ProducesNonZeroBuffer
+[       OK ] PNTPCoreTest.GenerateStealthId_ProducesNonZeroBuffer (0 ms)
+[ RUN      ] PNTPCoreTest.GenerateStealthId_CPUIDPartIsStable
+[       OK ] PNTPCoreTest.GenerateStealthId_CPUIDPartIsStable (0 ms)
+[ RUN      ] PNTPCoreTest.GenerateStealthId_WritesSixteenBytes
+[       OK ] PNTPCoreTest.GenerateStealthId_WritesSixteenBytes (0 ms)
+[ RUN      ] PNTPCoreTest.CrossCheck_AllTimingFunctions_Monotonic
+[       OK ] PNTPCoreTest.CrossCheck_AllTimingFunctions_Monotonic (0 ms)
+[ RUN      ] PNTPCoreTest.CrossCheck_RDTSC_ElapsedTimeReasonable
+[       OK ] PNTPCoreTest.CrossCheck_RDTSC_ElapsedTimeReasonable (1 ms)
+[ RUN      ] PNTPCoreTest.CrossCheck_StealthRand_AfterEntropyInit
+[       OK ] PNTPCoreTest.CrossCheck_StealthRand_AfterEntropyInit (0 ms)
+[ RUN      ] PNTPCoreTest.CrossCheck_CPUID_Consistency
+[       OK ] PNTPCoreTest.CrossCheck_CPUID_Consistency (0 ms)
+[ RUN      ] PNTPCoreTest.CrossCheck_AVX2Copy_Then_Prefetch
+[       OK ] PNTPCoreTest.CrossCheck_AVX2Copy_Then_Prefetch (0 ms)
+[ RUN      ] PNTPCoreTest.CrossCheck_FlushThenRead_NoFault
+[       OK ] PNTPCoreTest.CrossCheck_FlushThenRead_NoFault (0 ms)
+[----------] 38 tests from PNTPCoreTest (34 ms total)
+
+[----------] 2 tests from RawSocketHandlerTest
+[ RUN      ] RawSocketHandlerTest.InitFailsOnNonexistentInterface
+Error getting interface index for nonexistent_iface_xyz: No such device
+[       OK ] RawSocketHandlerTest.InitFailsOnNonexistentInterface (4 ms)
+[ RUN      ] RawSocketHandlerTest.CapturePacket_ReturnsEmptyWhenNotInitialized
+[       OK ] RawSocketHandlerTest.CapturePacket_ReturnsEmptyWhenNotInitialized (0 ms)
+[----------] 2 tests from RawSocketHandlerTest (4 ms total)
+
+[----------] 2 tests from TCPEngineTest
+[ RUN      ] TCPEngineTest.InitializeFailsWithoutRoot
+[PNTP] Network engine initialized at layer 3/4.
+[       OK ] TCPEngineTest.InitializeFailsWithoutRoot (0 ms)
+[ RUN      ] TCPEngineTest.TranscendentFetch_ReturnsNonEmpty
+[PNTP] Transcendent fetch initiated for: https://example.com
+[PNTP] Request signed with hardware stealth ID: SIG-42-272-7932800-166400821
+[       OK ] TCPEngineTest.TranscendentFetch_ReturnsNonEmpty (0 ms)
+[----------] 2 tests from TCPEngineTest (0 ms total)
+
+[----------] 5 tests from Http2ParserTest
+[ RUN      ] Http2ParserTest.ParseEmptyData_ReturnsNoFrames
+Http2Parser initialized (conceptual).
+Conceptual HTTP/2 parsing complete. Found 0 frames.
+Http2Parser destroyed.
+[       OK ] Http2ParserTest.ParseEmptyData_ReturnsNoFrames (0 ms)
+[ RUN      ] Http2ParserTest.ParseSingleFrame_RoundTrip
+Http2Parser initialized (conceptual).
+Conceptual HTTP/2 frame serialization complete. Total bytes: 13
+Conceptual HTTP/2 parsing complete. Found 1 frames.
+Http2Parser destroyed.
+[       OK ] Http2ParserTest.ParseSingleFrame_RoundTrip (0 ms)
+[ RUN      ] Http2ParserTest.ParseMultipleFrames
+Http2Parser initialized (conceptual).
+Conceptual HTTP/2 frame serialization complete. Total bytes: 23
+Conceptual HTTP/2 parsing complete. Found 2 frames.
+Http2Parser destroyed.
+[       OK ] Http2ParserTest.ParseMultipleFrames (0 ms)
+[ RUN      ] Http2ParserTest.ParseIncompleteFrame_ReturnsPartial
+Http2Parser initialized (conceptual).
+Error: Incomplete HTTP/2 frame payload. Expected 5 bytes, but only 2 available.
+Warning: Remaining unparsed data after HTTP/2 frame parsing: 2 bytes.
+Conceptual HTTP/2 parsing complete. Found 0 frames.
+Http2Parser destroyed.
+[       OK ] Http2ParserTest.ParseIncompleteFrame_ReturnsPartial (0 ms)
+[ RUN      ] Http2ParserTest.SerializeAndParse_LargePayload
+Http2Parser initialized (conceptual).
+Conceptual HTTP/2 frame serialization complete. Total bytes: 265
+Conceptual HTTP/2 parsing complete. Found 1 frames.
+Http2Parser destroyed.
+[       OK ] Http2ParserTest.SerializeAndParse_LargePayload (0 ms)
+[----------] 5 tests from Http2ParserTest (0 ms total)
+
+[----------] 7 tests from UrlManipulatorTest
+[ RUN      ] UrlManipulatorTest.RewriteUrl_ReturnsOriginal
+UrlManipulator initialized (conceptual).
+Conceptual URL rewriting for: https://learn.udacity.com/course
+[       OK ] UrlManipulatorTest.RewriteUrl_ReturnsOriginal (0 ms)
+[ RUN      ] UrlManipulatorTest.ModifyRequestHeaders_AddsUserAgent
+UrlManipulator initialized (conceptual).
+Conceptual header modification for URL: https://example.com
+  Modified User-Agent header.
+[       OK ] UrlManipulatorTest.ModifyRequestHeaders_AddsUserAgent (0 ms)
+[ RUN      ] UrlManipulatorTest.ModifyRequestHeaders_WithAuthToken
+UrlManipulator initialized (conceptual).
+Authentication token set (conceptual).
+Conceptual header modification for URL: https://example.com
+  Added Authorization header with token.
+  Modified User-Agent header.
+[       OK ] UrlManipulatorTest.ModifyRequestHeaders_WithAuthToken (0 ms)
+[ RUN      ] UrlManipulatorTest.SetAndGetAuthToken
+UrlManipulator initialized (conceptual).
+Authentication token set (conceptual).
+[       OK ] UrlManipulatorTest.SetAndGetAuthToken (0 ms)
+[ RUN      ] UrlManipulatorTest.ShouldIntercept_ReturnsTrueForHttps
+UrlManipulator initialized (conceptual).
+[       OK ] UrlManipulatorTest.ShouldIntercept_ReturnsTrueForHttps (0 ms)
+[ RUN      ] UrlManipulatorTest.ShouldIntercept_ReturnsFalseForHttp
+UrlManipulator initialized (conceptual).
+[       OK ] UrlManipulatorTest.ShouldIntercept_ReturnsFalseForHttp (0 ms)
+[ RUN      ] UrlManipulatorTest.AuthTokenRoundTrip
+UrlManipulator initialized (conceptual).
+Authentication token set (conceptual).
+Conceptual header modification for URL: https://test.com
+  Added Authorization header with token.
+  Modified User-Agent header.
+[       OK ] UrlManipulatorTest.AuthTokenRoundTrip (0 ms)
+[----------] 7 tests from UrlManipulatorTest (0 ms total)
+
+[----------] 7 tests from DataExtractorTest
+[ RUN      ] DataExtractorTest.ExtractHtmlTitle
+DataExtractor initialized (conceptual).
+Conceptual data extraction for Content-Type: text/html
+  Processing as HTML.
+  Found 0 conceptual video URLs.
+  Found 0 conceptual course listings.
+[       OK ] DataExtractorTest.ExtractHtmlTitle (1 ms)
+[ RUN      ] DataExtractorTest.ExtractEmptyHtml
+DataExtractor initialized (conceptual).
+Conceptual data extraction for Content-Type: text/html
+  Processing as HTML.
+  Found 0 conceptual video URLs.
+  Found 0 conceptual course listings.
+[       OK ] DataExtractorTest.ExtractEmptyHtml (1 ms)
+[ RUN      ] DataExtractorTest.FindYoutubeUrl
+DataExtractor initialized (conceptual).
+  Found 1 conceptual video URLs.
+[       OK ] DataExtractorTest.FindYoutubeUrl (0 ms)
+[ RUN      ] DataExtractorTest.FindMultipleYoutubeUrls
+DataExtractor initialized (conceptual).
+  Found 2 conceptual video URLs.
+[       OK ] DataExtractorTest.FindMultipleYoutubeUrls (0 ms)
+[ RUN      ] DataExtractorTest.ExtractJsonCourseName
+DataExtractor initialized (conceptual).
+Conceptual data extraction for Content-Type: application/json
+  Processing as JSON.
+[       OK ] DataExtractorTest.ExtractJsonCourseName (0 ms)
+[ RUN      ] DataExtractorTest.ExtractUnknownContentType
+DataExtractor initialized (conceptual).
+Conceptual data extraction for Content-Type: application/octet-stream
+  Content type not specifically handled for extraction.
+[       OK ] DataExtractorTest.ExtractUnknownContentType (0 ms)
+[ RUN      ] DataExtractorTest.ParseHtmlForElement_ReturnsEmpty
+DataExtractor initialized (conceptual).
+Warning: parseHtmlForElement is a conceptual placeholder. Use a proper HTML parser for robust extraction.
+[       OK ] DataExtractorTest.ParseHtmlForElement_ReturnsEmpty (0 ms)
+[----------] 7 tests from DataExtractorTest (4 ms total)
+
+[----------] 5 tests from PerformanceMonitorTest
+[ RUN      ] PerformanceMonitorTest.StartEndMeasurement_ReturnsPositiveDuration
+PerformanceMonitor initialized.
+Measurement started for: test_event
+Measurement ended for: test_event, Duration: 1.12241 ms
+[       OK ] PerformanceMonitorTest.StartEndMeasurement_ReturnsPositiveDuration (1 ms)
+[ RUN      ] PerformanceMonitorTest.GetDurationMs_UnmeasuredEvent_ReturnsZero
+PerformanceMonitor initialized.
+[       OK ] PerformanceMonitorTest.GetDurationMs_UnmeasuredEvent_ReturnsZero (0 ms)
+[ RUN      ] PerformanceMonitorTest.RecordPacketLoss_AccumulatesCount
+PerformanceMonitor initialized.
+Recorded 1 packet loss(es) for connection: conn1
+Recorded 2 packet loss(es) for connection: conn1
+Recorded 5 packet loss(es) for connection: conn2
+[       OK ] PerformanceMonitorTest.RecordPacketLoss_AccumulatesCount (0 ms)
+[ RUN      ] PerformanceMonitorTest.GetHighPrecisionTimestamp_ReturnsNonZero
+PerformanceMonitor initialized.
+[       OK ] PerformanceMonitorTest.GetHighPrecisionTimestamp_ReturnsNonZero (0 ms)
+[ RUN      ] PerformanceMonitorTest.SequentialMeasurements_Independent
+PerformanceMonitor initialized.
+Measurement started for: event_a
+Measurement started for: event_b
+Measurement ended for: event_b, Duration: 1.0866 ms
+Measurement ended for: event_a, Duration: 1.11489 ms
+[       OK ] PerformanceMonitorTest.SequentialMeasurements_Independent (46 ms)
+[----------] 5 tests from PerformanceMonitorTest (47 ms total)
+
+[----------] Global test environment tear-down
+[==========] 66 tests from 7 test suites ran. (92 ms total)
+[  PASSED  ] 65 tests.
+[  FAILED  ] 1 test, listed below:
+[  FAILED  ] PNTPCoreTest.StealthRand_Distribution_BitEntropy
+
+ 1 FAILED TEST
 
