@@ -1,11 +1,18 @@
-# GoogleTest
-include(FetchContent)
-FetchContent_Declare(
-    googletest
-    URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
-)
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(googletest)
+# GoogleTest — try system-installed first, fall back to FetchContent
+find_package(GTest QUIET)
+if(NOT GTest_FOUND)
+    include(FetchContent)
+    FetchContent_Declare(
+        googletest
+        URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
+    )
+    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+    FetchContent_MakeAvailable(googletest)
+    set(GTEST_LIBRARIES gtest gtest_main)
+    set(GTEST_INCLUDE_DIRS ${googletest_SOURCE_DIR}/include)
+else()
+    set(GTEST_LIBRARIES GTest::gtest GTest::gtest_main)
+endif()
 
 # Test executable
 set(PNTP_TEST_SOURCES
@@ -30,12 +37,14 @@ set(PNTP_TEST_SOURCES
 
 add_executable(pntp_tests ${PNTP_TEST_SOURCES})
 target_link_libraries(pntp_tests PRIVATE
-    gtest
-    gtest_main
+    ${GTEST_LIBRARIES}
     OpenSSL::SSL
     OpenSSL::Crypto
 )
-target_include_directories(pntp_tests PRIVATE ${CMAKE_SOURCE_DIR}/include)
+target_include_directories(pntp_tests PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    ${GTEST_INCLUDE_DIRS}
+)
 
 include(GoogleTest)
 gtest_discover_tests(pntp_tests)
