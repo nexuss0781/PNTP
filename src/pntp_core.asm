@@ -5,6 +5,7 @@ section .data
     pool_initialized: db 0
 
 section .text
+    default rel
     global get_rdtsc
     global get_rdtsc_serialized
     global get_rdtscp
