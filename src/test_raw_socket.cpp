@@ -1,49 +1,95 @@
 #include "pntp/raw_socket_handler.h"
+#include "pntp/pntp_core.h"
 #include <iostream>
 #include <iomanip>
 #include <thread>
 #include <chrono>
+#include <csignal>
+#include <atomic>
+
+static std::atomic<bool> running{true};
 
 int main() {
+    init_entropy_pool();
+
     RawSocketHandler handler;
-    std::string interface_name = "eth0"; // Determined from 'ip a'
+    std::string iface = "eth0";
 
-    if (!handler.init(interface_name)) {
-        std::cerr << "Failed to initialize RawSocketHandler on " << interface_name << std::endl;
-        return 1;
-    }
+    std::cout << "=== PNTP Raw Socket Test ===\n";
 
-    std::cout << "Attempting to capture packets for 5 seconds...\n";
-    auto start_time = std::chrono::high_resolution_clock::now();
-    int packets_captured = 0;
-
-    while (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - start_time).count() < 5) {
-        std::vector<unsigned char> packet = handler.capturePacket();
-        if (!packet.empty()) {
-            packets_captured++;
-            std::cout << "Captured packet of size: " << packet.size() << " bytes\n";
-            // Optionally print a snippet of the packet
-            // std::cout << "Hex dump (first 16 bytes): ";
-            // for (size_t i = 0; i < std::min((size_t)16, packet.size()); ++i) {
-            //     std::cout << std::hex << std::setw(2) << std::setfill('0') << (int)packet[i] << " ";
-            // }
-            // std::cout << std::dec << std::endl;
+    if (!handler.init(iface)) {
+        // Try loopback
+        iface = "lo";
+        std::cout << "[INFO] eth0 unavailable, trying lo...\n";
+        if (!handler.init(iface)) {
+            std::cerr << "FAIL: Cannot init on any interface\n";
+            return 1;
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(10)); // Small delay to avoid busy-waiting
     }
 
-    std::cout << "\nFinished capturing. Total packets captured: " << packets_captured << std::endl;
+    std::cout << "[OK] Initialized on " << iface
+              << " (mode: " << (handler.usingRing() ? "PACKET_MMAP" : "heap") << ")\n";
 
-    // Example of injecting a dummy packet (requires root and careful handling)
-    // std::vector<unsigned char> dummy_packet = { /* ... raw ethernet frame data ... */ };
-    // if (!dummy_packet.empty()) {
-    //     std::cout << "Attempting to inject a dummy packet...\n";
-    //     if (handler.injectPacket(dummy_packet)) {
-    //         std::cout << "Dummy packet injected successfully.\n";
-    //     } else {
-    //         std::cerr << "Failed to inject dummy packet.\n";
-    //     }
-    // }
+    // Optional BPF filter — capture only TCP
+    auto tcp_filter = RawSocketHandler::makeBPF_TCPOnly();
+    if (handler.attachBPF(tcp_filter))
+        std::cout << "[OK] BPF filter attached (TCP only)\n";
+    else
+        std::cout << "[WARN] BPF attach failed (non-fatal)\n";
 
+    if (handler.setPromiscuous(true))
+        std::cout << "[OK] Promiscuous mode enabled\n";
+
+    if (!handler.setTimeoutMs(2000))
+        std::cout << "[WARN] Cannot set timeout\n";
+
+    auto start = std::chrono::steady_clock::now();
+    uint64_t count = 0;
+    uint64_t bytes = 0;
+
+    std::cout << "\nCapturing packets for 5 seconds...\n";
+
+    while (running) {
+        auto elapsed = std::chrono::steady_clock::now() - start;
+        if (elapsed > std::chrono::seconds(5)) break;
+
+        auto pkt = handler.acquirePacket();
+        if (pkt) {
+            ++count;
+            bytes += pkt.len;
+
+            // Parse headers
+            auto* ip  = RawSocketHandler::getIPv4Header(pkt);
+            auto* tcp = RawSocketHandler::getTCPHeader(pkt);
+            if (ip && tcp) {
+                char src[16], dst[16];
+                inet_ntop(AF_INET, &ip->saddr, src, sizeof(src));
+                inet_ntop(AF_INET, &ip->daddr, dst, sizeof(dst));
+                std::cout << "TCP " << src << ":" << ntohs(tcp->source)
+                          << " -> " << dst << ":" << ntohs(tcp->dest)
+                          << "  (" << pkt.len << "B)\n";
+            } else {
+                std::cout << "Packet " << count << ": " << pkt.len << "B\n";
+            }
+            handler.releasePacket(pkt);
+        } else {
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        }
+    }
+
+    auto end = std::chrono::steady_clock::now();
+    double secs = std::chrono::duration<double>(end - start).count();
+
+    auto st = handler.getStats();
+    std::cout << "\n=== Results ===\n"
+              << "Packets:    " << count << "\n"
+              << "Bytes:      " << bytes << "\n"
+              << "Duration:   " << secs << " s\n"
+              << "Rate:       " << (count / secs) << " pkt/s\n"
+              << "Stats:      " << st.packets_captured.load() << " captured, "
+              << st.packets_dropped_kernel.load() << " dropped\n";
+
+    handler.setPromiscuous(false);
+    std::cout << "\nDone.\n";
     return 0;
 }

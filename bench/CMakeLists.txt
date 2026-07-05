@@ -8,9 +8,11 @@ FetchContent_MakeAvailable(googlebenchmark)
 
 add_executable(pntp_bench
     ${CMAKE_SOURCE_DIR}/src/pntp_core.asm
+    ${CMAKE_SOURCE_DIR}/src/raw_socket_handler.cpp
     ${CMAKE_SOURCE_DIR}/src/http2_parser.cpp
     ${CMAKE_SOURCE_DIR}/src/url_manipulator.cpp
     bench_pntp_core.cpp
+    bench_raw_socket.cpp
     bench_http2_parser.cpp
 )
 
