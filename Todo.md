@@ -408,7 +408,7 @@
 | P0: Foundation | 11.75 | 20+ |
 | P1: Assembly | 8.25 | 2 |
 | P2: Raw Socket | 14.00 | 2 |
-| P3: TCP Engine | 31.25 | 2 |
+| P3: TCP Engine | 31.25 [x] | 2 |
 | P4: DNS Resolver | 11.50 | 2 |
 | P5: TLS Interceptor | 29.00 | 2 |
 | P6: HTTP/2 | 40.00 | 2 |

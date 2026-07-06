@@ -94,18 +94,18 @@ Phase 16: V5 Foundation                   (wk 16-17)
 **Goal:** Replace the hardcoded SYN-packet builder with a complete RFC 793 TCP state machine.
 
 ### Tasks
-- [ ] Implement `TCPState` enum and state transition table (RFC 793)
-- [ ] Implement `TCPConnection` struct with send/recv sequence space
-- [ ] Implement `open()` — full SYN → SYN-ACK → ACK handshake via raw socket
-- [ ] Implement `send()` — data segmentation, PSH flag, sequence tracking
-- [ ] Implement `recv()` — ACK processing, data reassembly, out-of-order queue
-- [ ] Implement `close()` — FIN exchange with TIME_WAIT handling
-- [ ] Implement TCP options: MSS, Window Scale, SACK Permitted, Timestamps (RFC 1323)
-- [ ] Implement RTT estimation: SRTT, RTTVAR, RTO calculation (RFC 6298)
-- [ ] Implement retransmission timer and fast retransmit (RFC 5681)
-- [ ] Implement CUBIC congestion control
-- [ ] Implement RST handling and connection abort
-- [ ] Add `TCPEngine::buildSegment()` packet builder (wraps PacketBuilder)
+- [x] Implement `TCPState` enum and state transition table (RFC 793)
+- [x] Implement `TCPConnection` struct with send/recv sequence space
+- [x] Implement `open()` — full SYN → SYN-ACK → ACK handshake via raw socket
+- [x] Implement `send()` — data segmentation, PSH flag, sequence tracking
+- [x] Implement `recv()` — ACK processing, data reassembly, out-of-order queue
+- [x] Implement `close()` — FIN exchange with TIME_WAIT handling
+- [x] Implement TCP options: MSS, Window Scale, SACK Permitted, Timestamps (RFC 1323)
+- [x] Implement RTT estimation: SRTT, RTTVAR, RTO calculation (RFC 6298)
+- [x] Implement retransmission timer and fast retransmit (RFC 5681)
+- [x] Implement CUBIC congestion control
+- [x] Implement RST handling and connection abort
+- [x] Add `TCPEngine::buildSegment()` packet builder (wraps PacketBuilder)
 - [ ] Test against local nginx with `pntp-test-http1` container
 - [ ] Test RTT estimation accuracy against ping
 

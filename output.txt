@@ -73,7 +73,7 @@ Running main() from ./googletest/src/gtest_main.cc
 [ RUN      ] PNTPCoreTest.PrefetchRange_ZeroLength
 [       OK ] PNTPCoreTest.PrefetchRange_ZeroLength (0 ms)
 [ RUN      ] PNTPCoreTest.PrefetchRange_LargeBuffer
-[       OK ] PNTPCoreTest.PrefetchRange_LargeBuffer (0 ms)
+[       OK ] PNTPCoreTest.PrefetchRange_LargeBuffer (1 ms)
 [ RUN      ] PNTPCoreTest.PrefetchRange_NullPtr_DoesNotCrash
 [       OK ] PNTPCoreTest.PrefetchRange_NullPtr_DoesNotCrash (0 ms)
 [ RUN      ] PNTPCoreTest.GenerateStealthId_ProducesNonZeroBuffer
@@ -94,7 +94,7 @@ Running main() from ./googletest/src/gtest_main.cc
 [       OK ] PNTPCoreTest.CrossCheck_AVX2Copy_Then_Prefetch (0 ms)
 [ RUN      ] PNTPCoreTest.CrossCheck_FlushThenRead_NoFault
 [       OK ] PNTPCoreTest.CrossCheck_FlushThenRead_NoFault (0 ms)
-[----------] 38 tests from PNTPCoreTest (23 ms total)
+[----------] 38 tests from PNTPCoreTest (24 ms total)
 
 [----------] 3 tests from PacketViewTest
 [ RUN      ] PacketViewTest.DefaultConstructorIsNull
@@ -154,7 +154,7 @@ Running main() from ./googletest/src/gtest_main.cc
 
 [----------] 11 tests from RawSocketHandlerRootTest
 [ RUN      ] RawSocketHandlerRootTest.InitOnLoopback_Succeeds
-[       OK ] RawSocketHandlerRootTest.InitOnLoopback_Succeeds (27 ms)
+[       OK ] RawSocketHandlerRootTest.InitOnLoopback_Succeeds (34 ms)
 [ RUN      ] RawSocketHandlerRootTest.UsingRing_AfterInit
 [       OK ] RawSocketHandlerRootTest.UsingRing_AfterInit (27 ms)
 [ RUN      ] RawSocketHandlerRootTest.AttachBPF_All_DoesNotCrash
@@ -162,20 +162,20 @@ Running main() from ./googletest/src/gtest_main.cc
 [ RUN      ] RawSocketHandlerRootTest.AttachBPF_TCPOnly_DoesNotCrash
 [       OK ] RawSocketHandlerRootTest.AttachBPF_TCPOnly_DoesNotCrash (29 ms)
 [ RUN      ] RawSocketHandlerRootTest.SetPromiscuous
-[       OK ] RawSocketHandlerRootTest.SetPromiscuous (32 ms)
+[       OK ] RawSocketHandlerRootTest.SetPromiscuous (37 ms)
 [ RUN      ] RawSocketHandlerRootTest.SetTimeout
-[       OK ] RawSocketHandlerRootTest.SetTimeout (27 ms)
+[       OK ] RawSocketHandlerRootTest.SetTimeout (28 ms)
 [ RUN      ] RawSocketHandlerRootTest.InjectAndCapture
-[       OK ] RawSocketHandlerRootTest.InjectAndCapture (28 ms)
+[       OK ] RawSocketHandlerRootTest.InjectAndCapture (29 ms)
 [ RUN      ] RawSocketHandlerRootTest.AcquireRelease_MultipleTimes
-[       OK ] RawSocketHandlerRootTest.AcquireRelease_MultipleTimes (30 ms)
+[       OK ] RawSocketHandlerRootTest.AcquireRelease_MultipleTimes (29 ms)
 [ RUN      ] RawSocketHandlerRootTest.StatsAfterAcquire
 [       OK ] RawSocketHandlerRootTest.StatsAfterAcquire (29 ms)
 [ RUN      ] RawSocketHandlerRootTest.SetRingParams
 [       OK ] RawSocketHandlerRootTest.SetRingParams (29 ms)
 [ RUN      ] RawSocketHandlerRootTest.FanoutGroupFails_WithoutMultipleSockets
-[       OK ] RawSocketHandlerRootTest.FanoutGroupFails_WithoutMultipleSockets (31 ms)
-[----------] 11 tests from RawSocketHandlerRootTest (328 ms total)
+[       OK ] RawSocketHandlerRootTest.FanoutGroupFails_WithoutMultipleSockets (29 ms)
+[----------] 11 tests from RawSocketHandlerRootTest (339 ms total)
 
 [----------] 5 tests from IPv4AddrTest
 [ RUN      ] IPv4AddrTest.FromString_Valid
@@ -273,15 +273,11 @@ Running main() from ./googletest/src/gtest_main.cc
 
 [----------] 13 tests from PacketBuilderSegmentTest
 [ RUN      ] PacketBuilderSegmentTest.BuildSYN_CorrectLength
-/content/PNTP/test/test_packet_builder.cpp:436: Failure
-Expected: (frame.size()) >= (14u + 20u + 24u), actual: 54 vs 58
-[  FAILED  ] PacketBuilderSegmentTest.BuildSYN_CorrectLength (0 ms)
+[       OK ] PacketBuilderSegmentTest.BuildSYN_CorrectLength (0 ms)
 [ RUN      ] PacketBuilderSegmentTest.BuildSYN_HasSYNFlag
 [       OK ] PacketBuilderSegmentTest.BuildSYN_HasSYNFlag (0 ms)
 [ RUN      ] PacketBuilderSegmentTest.BuildSYN_AcceptsPacketView
-/content/PNTP/test/test_packet_builder.cpp:447: Failure
-Expected: (frame.size()) >= (58u), actual: 54 vs 58
-[  FAILED  ] PacketBuilderSegmentTest.BuildSYN_AcceptsPacketView (0 ms)
+[       OK ] PacketBuilderSegmentTest.BuildSYN_AcceptsPacketView (0 ms)
 [ RUN      ] PacketBuilderSegmentTest.BuildSYNACK_HasBothFlags
 [       OK ] PacketBuilderSegmentTest.BuildSYNACK_HasBothFlags (0 ms)
 [ RUN      ] PacketBuilderSegmentTest.BuildACK_HasACKFlag
@@ -378,14 +374,14 @@ Expected: (frame.size()) >= (58u), actual: 54 vs 58
 [ RUN      ] TCPEngineTest.TranscendentFetch_EmptyUrl
 [       OK ] TCPEngineTest.TranscendentFetch_EmptyUrl (0 ms)
 [ RUN      ] TCPEngineTest.Open_BadHost_ReturnsNull
-[       OK ] TCPEngineTest.Open_BadHost_ReturnsNull (21 ms)
+[       OK ] TCPEngineTest.Open_BadHost_ReturnsNull (12 ms)
 [ RUN      ] TCPEngineTest.ProcessIncomingPacket_NonTCP_ReturnsFalse
 [       OK ] TCPEngineTest.ProcessIncomingPacket_NonTCP_ReturnsFalse (0 ms)
 [ RUN      ] TCPEngineTest.ProcessIncomingPacket_WrongPorts_ReturnsFalse
 [       OK ] TCPEngineTest.ProcessIncomingPacket_WrongPorts_ReturnsFalse (0 ms)
 [ RUN      ] TCPEngineTest.ProcessIncomingPacket_RST_ClosesConn
 [       OK ] TCPEngineTest.ProcessIncomingPacket_RST_ClosesConn (0 ms)
-[----------] 6 tests from TCPEngineTest (21 ms total)
+[----------] 6 tests from TCPEngineTest (12 ms total)
 
 [----------] 2 tests from RTTIntegrationTest
 [ RUN      ] RTTIntegrationTest.RTTUsedInConnection
@@ -405,13 +401,7 @@ Expected: (frame.size()) >= (58u), actual: 54 vs 58
 [ RUN      ] DataTransferTest.Recv_InOrderData_Delivered
 [       OK ] DataTransferTest.Recv_InOrderData_Delivered (0 ms)
 [ RUN      ] DataTransferTest.Recv_OutOfOrder_Queued
-/content/PNTP/test/test_tcp_engine.cpp:461: Failure
-Expected equality of these values:
-  conn.rcv_nxt
-    Which is: 5002
-  5006u
-    Which is: 5006
-[  FAILED  ] DataTransferTest.Recv_OutOfOrder_Queued (0 ms)
+[       OK ] DataTransferTest.Recv_OutOfOrder_Queued (0 ms)
 [ RUN      ] DataTransferTest.Recv_DupACK_IncrementsCounter
 [       OK ] DataTransferTest.Recv_DupACK_IncrementsCounter (0 ms)
 [----------] 3 tests from DataTransferTest (0 ms total)
@@ -484,14 +474,14 @@ Error: Incomplete HTTP/2 frame payload. Expected 5 bytes, but only 2 available.
 Warning: Remaining unparsed data after HTTP/2 frame parsing: 2 bytes.
 Conceptual HTTP/2 parsing complete. Found 0 frames.
 Http2Parser destroyed.
-[       OK ] Http2ParserTest.ParseIncompleteFrame_ReturnsPartial (0 ms)
+[       OK ] Http2ParserTest.ParseIncompleteFrame_ReturnsPartial (6 ms)
 [ RUN      ] Http2ParserTest.SerializeAndParse_LargePayload
 Http2Parser initialized (conceptual).
 Conceptual HTTP/2 frame serialization complete. Total bytes: 265
 Conceptual HTTP/2 parsing complete. Found 1 frames.
 Http2Parser destroyed.
 [       OK ] Http2ParserTest.SerializeAndParse_LargePayload (0 ms)
-[----------] 5 tests from Http2ParserTest (65 ms total)
+[----------] 5 tests from Http2ParserTest (7 ms total)
 
 [----------] 7 tests from UrlManipulatorTest
 [ RUN      ] UrlManipulatorTest.RewriteUrl_ReturnsOriginal
@@ -543,7 +533,7 @@ Conceptual data extraction for Content-Type: text/html
   Processing as HTML.
   Found 0 conceptual video URLs.
   Found 0 conceptual course listings.
-[       OK ] DataExtractorTest.ExtractEmptyHtml (2 ms)
+[       OK ] DataExtractorTest.ExtractEmptyHtml (1 ms)
 [ RUN      ] DataExtractorTest.FindYoutubeUrl
 DataExtractor initialized (conceptual).
   Found 1 conceptual video URLs.
@@ -566,13 +556,13 @@ Conceptual data extraction for Content-Type: application/octet-stream
 DataExtractor initialized (conceptual).
 Warning: parseHtmlForElement is a conceptual placeholder. Use a proper HTML parser for robust extraction.
 [       OK ] DataExtractorTest.ParseHtmlForElement_ReturnsEmpty (0 ms)
-[----------] 7 tests from DataExtractorTest (5 ms total)
+[----------] 7 tests from DataExtractorTest (3 ms total)
 
 [----------] 5 tests from PerformanceMonitorTest
 [ RUN      ] PerformanceMonitorTest.StartEndMeasurement_ReturnsPositiveDuration
 PerformanceMonitor initialized.
 Measurement started for: test_event
-Measurement ended for: test_event, Duration: 1.1234 ms
+Measurement ended for: test_event, Duration: 1.15708 ms
 [       OK ] PerformanceMonitorTest.StartEndMeasurement_ReturnsPositiveDuration (1 ms)
 [ RUN      ] PerformanceMonitorTest.GetDurationMs_UnmeasuredEvent_ReturnsZero
 PerformanceMonitor initialized.
@@ -590,18 +580,12 @@ PerformanceMonitor initialized.
 PerformanceMonitor initialized.
 Measurement started for: event_a
 Measurement started for: event_b
-Measurement ended for: event_b, Duration: 1.11191 ms
-Measurement ended for: event_a, Duration: 1.15173 ms
+Measurement ended for: event_b, Duration: 1.21107 ms
+Measurement ended for: event_a, Duration: 1.257 ms
 [       OK ] PerformanceMonitorTest.SequentialMeasurements_Independent (1 ms)
 [----------] 5 tests from PerformanceMonitorTest (2 ms total)
 
 [----------] Global test environment tear-down
-[==========] 209 tests from 25 test suites ran. (450 ms total)
-[  PASSED  ] 206 tests.
-[  FAILED  ] 3 tests, listed below:
-[  FAILED  ] PacketBuilderSegmentTest.BuildSYN_CorrectLength
-[  FAILED  ] PacketBuilderSegmentTest.BuildSYN_AcceptsPacketView
-[  FAILED  ] DataTransferTest.Recv_OutOfOrder_Queued
-
- 3 FAILED TESTS
+[==========] 209 tests from 25 test suites ran. (392 ms total)
+[  PASSED  ] 209 tests.
 
