@@ -1,5 +1,18 @@
 === Working dir: /content/PNTP ===
 W: Skipping acquire of configured file 'main/source/Sources' as repository 'https://r2u.stat.illinois.edu/ubuntu jammy InRelease' does not seem to provide it (sources.list entry misspelt?)
+Selecting previously unselected package googletest.
+(Reading database ... 118280 files and directories currently installed.)
+Preparing to unpack .../googletest_1.11.0-3_all.deb ...
+Unpacking googletest (1.11.0-3) ...
+Selecting previously unselected package libgtest-dev:amd64.
+Preparing to unpack .../libgtest-dev_1.11.0-3_amd64.deb ...
+Unpacking libgtest-dev:amd64 (1.11.0-3) ...
+Selecting previously unselected package libgmock-dev:amd64.
+Preparing to unpack .../libgmock-dev_1.11.0-3_amd64.deb ...
+Unpacking libgmock-dev:amd64 (1.11.0-3) ...
+Setting up googletest (1.11.0-3) ...
+Setting up libgtest-dev:amd64 (1.11.0-3) ...
+Setting up libgmock-dev:amd64 (1.11.0-3) ...
 -- The CXX compiler identification is GNU 11.4.0
 -- The ASM_NASM compiler identification is NASM
 -- Found assembler: /usr/bin/nasm
@@ -9,324 +22,50 @@ W: Skipping acquire of configured file 'main/source/Sources' as repository 'http
 -- Detecting CXX compile features
 -- Detecting CXX compile features - done
 -- Found OpenSSL: /usr/lib/x86_64-linux-gnu/libcrypto.so (found version "3.0.2")
--- Configuring done (0.5s)
+-- Configuring done (1.0s)
 -- Generating done (0.0s)
 -- Build files have been written to: /content/PNTP/build
 ninja: Entering directory `build'
-[18/18] Linking CXX executable test/pntp_tests
-Running main() from ./googletest/src/gtest_main.cc
-[==========] Running 97 tests from 11 test suites.
-[----------] Global test environment set-up.
-[----------] 38 tests from PNTPCoreTest
-[ RUN      ] PNTPCoreTest.GetRDTSC_ReturnsIncreasingValues
-[       OK ] PNTPCoreTest.GetRDTSC_ReturnsIncreasingValues (0 ms)
-[ RUN      ] PNTPCoreTest.GetRDTSC_NonZero
-[       OK ] PNTPCoreTest.GetRDTSC_NonZero (0 ms)
-[ RUN      ] PNTPCoreTest.GetRDTSCSerialized_ReturnsIncreasingValues
-[       OK ] PNTPCoreTest.GetRDTSCSerialized_ReturnsIncreasingValues (0 ms)
-[ RUN      ] PNTPCoreTest.GetRDTSCSerialized_GreaterOrEqual_GetRDTSC
-[       OK ] PNTPCoreTest.GetRDTSCSerialized_GreaterOrEqual_GetRDTSC (0 ms)
-[ RUN      ] PNTPCoreTest.GetRDTSCSerialized_MonotonicUnderConcurrentAccess
-[       OK ] PNTPCoreTest.GetRDTSCSerialized_MonotonicUnderConcurrentAccess (0 ms)
-[ RUN      ] PNTPCoreTest.GetRDTSCP_ReturnsIncreasingValues
-[       OK ] PNTPCoreTest.GetRDTSCP_ReturnsIncreasingValues (0 ms)
-[ RUN      ] PNTPCoreTest.GetRDTSCP_NullPtrs_DoesNotCrash
-[       OK ] PNTPCoreTest.GetRDTSCP_NullPtrs_DoesNotCrash (0 ms)
-[ RUN      ] PNTPCoreTest.MFence_DoesNotCrash
-[       OK ] PNTPCoreTest.MFence_DoesNotCrash (0 ms)
-[ RUN      ] PNTPCoreTest.MFence_OrderingVisible
-[       OK ] PNTPCoreTest.MFence_OrderingVisible (0 ms)
-[ RUN      ] PNTPCoreTest.CacheFlushLine_DoesNotCrash
-[       OK ] PNTPCoreTest.CacheFlushLine_DoesNotCrash (0 ms)
-[ RUN      ] PNTPCoreTest.CacheFlushLine_OnArrayDoesNotCrash
-[       OK ] PNTPCoreTest.CacheFlushLine_OnArrayDoesNotCrash (0 ms)
-[ RUN      ] PNTPCoreTest.CacheFlushLine_NullPtr_DoesNotCrash
-[       OK ] PNTPCoreTest.CacheFlushLine_NullPtr_DoesNotCrash (0 ms)
-[ RUN      ] PNTPCoreTest.AVX2CopyNT_CopiesCorrectly_Aligned
-[       OK ] PNTPCoreTest.AVX2CopyNT_CopiesCorrectly_Aligned (0 ms)
-[ RUN      ] PNTPCoreTest.AVX2CopyNT_ZeroLength
-[       OK ] PNTPCoreTest.AVX2CopyNT_ZeroLength (0 ms)
-[ RUN      ] PNTPCoreTest.AVX2CopyNT_PartialLastBlock
-[       OK ] PNTPCoreTest.AVX2CopyNT_PartialLastBlock (0 ms)
-[ RUN      ] PNTPCoreTest.StealthRand_ReturnsDifferentValues
-[       OK ] PNTPCoreTest.StealthRand_ReturnsDifferentValues (0 ms)
-[ RUN      ] PNTPCoreTest.StealthRand_NonZero
-[       OK ] PNTPCoreTest.StealthRand_NonZero (0 ms)
-[ RUN      ] PNTPCoreTest.StealthRand_Distribution_BitEntropy
-[       OK ] PNTPCoreTest.StealthRand_Distribution_BitEntropy (2 ms)
-[ RUN      ] PNTPCoreTest.InitEntropyPool_LeavesNonZeroData
-[       OK ] PNTPCoreTest.InitEntropyPool_LeavesNonZeroData (0 ms)
-[ RUN      ] PNTPCoreTest.CPUIDString_Leaf0_ReturnsVendorString
-[       OK ] PNTPCoreTest.CPUIDString_Leaf0_ReturnsVendorString (0 ms)
-[ RUN      ] PNTPCoreTest.CPUIDString_Leaf1_ReturnsNonZero
-[       OK ] PNTPCoreTest.CPUIDString_Leaf1_ReturnsNonZero (0 ms)
-[ RUN      ] PNTPCoreTest.CPUIDString_DifferentLeaves_Differ
-[       OK ] PNTPCoreTest.CPUIDString_DifferentLeaves_Differ (0 ms)
-[ RUN      ] PNTPCoreTest.PauseLoop_ZeroCount_ReturnsImmediately
-[       OK ] PNTPCoreTest.PauseLoop_ZeroCount_ReturnsImmediately (0 ms)
-[ RUN      ] PNTPCoreTest.PauseLoop_SmallCount_Completes
-[       OK ] PNTPCoreTest.PauseLoop_SmallCount_Completes (0 ms)
-[ RUN      ] PNTPCoreTest.PauseLoop_LargeCount_Completes
-[       OK ] PNTPCoreTest.PauseLoop_LargeCount_Completes (15 ms)
-[ RUN      ] PNTPCoreTest.PrefetchRange_DoesNotCrash
-[       OK ] PNTPCoreTest.PrefetchRange_DoesNotCrash (0 ms)
-[ RUN      ] PNTPCoreTest.PrefetchRange_ZeroLength
-[       OK ] PNTPCoreTest.PrefetchRange_ZeroLength (0 ms)
-[ RUN      ] PNTPCoreTest.PrefetchRange_LargeBuffer
-[       OK ] PNTPCoreTest.PrefetchRange_LargeBuffer (0 ms)
-[ RUN      ] PNTPCoreTest.PrefetchRange_NullPtr_DoesNotCrash
-[       OK ] PNTPCoreTest.PrefetchRange_NullPtr_DoesNotCrash (0 ms)
-[ RUN      ] PNTPCoreTest.GenerateStealthId_ProducesNonZeroBuffer
-[       OK ] PNTPCoreTest.GenerateStealthId_ProducesNonZeroBuffer (0 ms)
-[ RUN      ] PNTPCoreTest.GenerateStealthId_CPUIDPartIsStable
-[       OK ] PNTPCoreTest.GenerateStealthId_CPUIDPartIsStable (0 ms)
-[ RUN      ] PNTPCoreTest.GenerateStealthId_WritesSixteenBytes
-[       OK ] PNTPCoreTest.GenerateStealthId_WritesSixteenBytes (0 ms)
-[ RUN      ] PNTPCoreTest.CrossCheck_AllTimingFunctions_Monotonic
-[       OK ] PNTPCoreTest.CrossCheck_AllTimingFunctions_Monotonic (0 ms)
-[ RUN      ] PNTPCoreTest.CrossCheck_RDTSC_ElapsedTimeReasonable
-[       OK ] PNTPCoreTest.CrossCheck_RDTSC_ElapsedTimeReasonable (1 ms)
-[ RUN      ] PNTPCoreTest.CrossCheck_StealthRand_AfterEntropyInit
-[       OK ] PNTPCoreTest.CrossCheck_StealthRand_AfterEntropyInit (0 ms)
-[ RUN      ] PNTPCoreTest.CrossCheck_CPUID_Consistency
-[       OK ] PNTPCoreTest.CrossCheck_CPUID_Consistency (0 ms)
-[ RUN      ] PNTPCoreTest.CrossCheck_AVX2Copy_Then_Prefetch
-[       OK ] PNTPCoreTest.CrossCheck_AVX2Copy_Then_Prefetch (0 ms)
-[ RUN      ] PNTPCoreTest.CrossCheck_FlushThenRead_NoFault
-[       OK ] PNTPCoreTest.CrossCheck_FlushThenRead_NoFault (0 ms)
-[----------] 38 tests from PNTPCoreTest (24 ms total)
-
-[----------] 3 tests from PacketViewTest
-[ RUN      ] PacketViewTest.DefaultConstructorIsNull
-[       OK ] PacketViewTest.DefaultConstructorIsNull (0 ms)
-[ RUN      ] PacketViewTest.ValueConstructor
-[       OK ] PacketViewTest.ValueConstructor (0 ms)
-[ RUN      ] PacketViewTest.NullDataPointerIsFalsy
-[       OK ] PacketViewTest.NullDataPointerIsFalsy (0 ms)
-[----------] 3 tests from PacketViewTest (0 ms total)
-
-[----------] 11 tests from HeaderParsingTest
-[ RUN      ] HeaderParsingTest.GetIPv4Header_ReturnsValidPointer
-[       OK ] HeaderParsingTest.GetIPv4Header_ReturnsValidPointer (0 ms)
-[ RUN      ] HeaderParsingTest.GetIPv4Header_RejectsARP
-[       OK ] HeaderParsingTest.GetIPv4Header_RejectsARP (0 ms)
-[ RUN      ] HeaderParsingTest.GetIPv4Header_RejectsTooShort
-[       OK ] HeaderParsingTest.GetIPv4Header_RejectsTooShort (0 ms)
-[ RUN      ] HeaderParsingTest.GetTCPHeader_ReturnsValidPointer
-[       OK ] HeaderParsingTest.GetTCPHeader_ReturnsValidPointer (0 ms)
-[ RUN      ] HeaderParsingTest.GetTCPHeader_RejectsUDP
-[       OK ] HeaderParsingTest.GetTCPHeader_RejectsUDP (0 ms)
-[ RUN      ] HeaderParsingTest.GetUDPHeader_ReturnsValidPointer
-[       OK ] HeaderParsingTest.GetUDPHeader_ReturnsValidPointer (0 ms)
-[ RUN      ] HeaderParsingTest.GetUDPHeader_RejectsTCP
-[       OK ] HeaderParsingTest.GetUDPHeader_RejectsTCP (0 ms)
-[ RUN      ] HeaderParsingTest.GetPayload_TCP_ExtractsCorrectBytes
-[       OK ] HeaderParsingTest.GetPayload_TCP_ExtractsCorrectBytes (0 ms)
-[ RUN      ] HeaderParsingTest.GetPayload_UDP_ExtractsCorrectBytes
-[       OK ] HeaderParsingTest.GetPayload_UDP_ExtractsCorrectBytes (0 ms)
-[ RUN      ] HeaderParsingTest.GetPayload_TCP_NoPayload_ReturnsEmpty
-[       OK ] HeaderParsingTest.GetPayload_TCP_NoPayload_ReturnsEmpty (0 ms)
-[ RUN      ] HeaderParsingTest.GetPayload_EmptyPacket_ReturnsEmpty
-[       OK ] HeaderParsingTest.GetPayload_EmptyPacket_ReturnsEmpty (0 ms)
-[----------] 11 tests from HeaderParsingTest (0 ms total)
-
-[----------] 4 tests from BPFFactoryTest
-[ RUN      ] BPFFactoryTest.MakeBPF_All_ReturnsOneInstruction
-[       OK ] BPFFactoryTest.MakeBPF_All_ReturnsOneInstruction (0 ms)
-[ RUN      ] BPFFactoryTest.MakeBPF_TCPOnly_HasEightInstructions
-[       OK ] BPFFactoryTest.MakeBPF_TCPOnly_HasEightInstructions (0 ms)
-[ RUN      ] BPFFactoryTest.MakeBPF_UDPOnly_HasEightInstructions
-[       OK ] BPFFactoryTest.MakeBPF_UDPOnly_HasEightInstructions (0 ms)
-[ RUN      ] BPFFactoryTest.MakeBPF_PortOnly_HasElevenInstructions
-[       OK ] BPFFactoryTest.MakeBPF_PortOnly_HasElevenInstructions (0 ms)
-[----------] 4 tests from BPFFactoryTest (0 ms total)
-
-[----------] 4 tests from RawSocketHandlerTest
-[ RUN      ] RawSocketHandlerTest.InitFailsOnNonexistentInterface
-[       OK ] RawSocketHandlerTest.InitFailsOnNonexistentInterface (0 ms)
-[ RUN      ] RawSocketHandlerTest.Acquire_OnUninitialized_ReturnsEmpty
-[       OK ] RawSocketHandlerTest.Acquire_OnUninitialized_ReturnsEmpty (0 ms)
-[ RUN      ] RawSocketHandlerTest.Release_DoesNotCrash_OnUninitialized
-[       OK ] RawSocketHandlerTest.Release_DoesNotCrash_OnUninitialized (0 ms)
-[ RUN      ] RawSocketHandlerTest.GetStats_ReturnsZeroes_OnUninitialized
-[       OK ] RawSocketHandlerTest.GetStats_ReturnsZeroes_OnUninitialized (0 ms)
-[----------] 4 tests from RawSocketHandlerTest (0 ms total)
-
-[----------] 11 tests from RawSocketHandlerRootTest
-[ RUN      ] RawSocketHandlerRootTest.InitOnLoopback_Succeeds
-[       OK ] RawSocketHandlerRootTest.InitOnLoopback_Succeeds (26 ms)
-[ RUN      ] RawSocketHandlerRootTest.UsingRing_AfterInit
-[       OK ] RawSocketHandlerRootTest.UsingRing_AfterInit (25 ms)
-[ RUN      ] RawSocketHandlerRootTest.AttachBPF_All_DoesNotCrash
-[       OK ] RawSocketHandlerRootTest.AttachBPF_All_DoesNotCrash (21 ms)
-[ RUN      ] RawSocketHandlerRootTest.AttachBPF_TCPOnly_DoesNotCrash
-[       OK ] RawSocketHandlerRootTest.AttachBPF_TCPOnly_DoesNotCrash (27 ms)
-[ RUN      ] RawSocketHandlerRootTest.SetPromiscuous
-[       OK ] RawSocketHandlerRootTest.SetPromiscuous (35 ms)
-[ RUN      ] RawSocketHandlerRootTest.SetTimeout
-[       OK ] RawSocketHandlerRootTest.SetTimeout (32 ms)
-[ RUN      ] RawSocketHandlerRootTest.InjectAndCapture
-[       OK ] RawSocketHandlerRootTest.InjectAndCapture (27 ms)
-[ RUN      ] RawSocketHandlerRootTest.AcquireRelease_MultipleTimes
-[       OK ] RawSocketHandlerRootTest.AcquireRelease_MultipleTimes (28 ms)
-[ RUN      ] RawSocketHandlerRootTest.StatsAfterAcquire
-[       OK ] RawSocketHandlerRootTest.StatsAfterAcquire (29 ms)
-[ RUN      ] RawSocketHandlerRootTest.SetRingParams
-/content/PNTP/test/test_raw_socket_handler.cpp:414: Skipped
-Reconfiguring ring parameters not supported
-[  SKIPPED ] RawSocketHandlerRootTest.SetRingParams (29 ms)
-[ RUN      ] RawSocketHandlerRootTest.FanoutGroupFails_WithoutMultipleSockets
-[       OK ] RawSocketHandlerRootTest.FanoutGroupFails_WithoutMultipleSockets (33 ms)
-[----------] 11 tests from RawSocketHandlerRootTest (322 ms total)
-
-[----------] 2 tests from TCPEngineTest
-[ RUN      ] TCPEngineTest.InitializeFailsWithoutRoot
-[PNTP] Network engine initialized at layer 3/4.
-[       OK ] TCPEngineTest.InitializeFailsWithoutRoot (0 ms)
-[ RUN      ] TCPEngineTest.TranscendentFetch_ReturnsNonEmpty
-[PNTP] Transcendent fetch initiated for: https://example.com
-[PNTP] Request signed with hardware stealth ID: SIG--68-92-92-17-731600-166400820
-[       OK ] TCPEngineTest.TranscendentFetch_ReturnsNonEmpty (0 ms)
-[----------] 2 tests from TCPEngineTest (0 ms total)
-
-[----------] 5 tests from Http2ParserTest
-[ RUN      ] Http2ParserTest.ParseEmptyData_ReturnsNoFrames
-Http2Parser initialized (conceptual).
-Conceptual HTTP/2 parsing complete. Found 0 frames.
-Http2Parser destroyed.
-[       OK ] Http2ParserTest.ParseEmptyData_ReturnsNoFrames (0 ms)
-[ RUN      ] Http2ParserTest.ParseSingleFrame_RoundTrip
-Http2Parser initialized (conceptual).
-Conceptual HTTP/2 frame serialization complete. Total bytes: 13
-Conceptual HTTP/2 parsing complete. Found 1 frames.
-Http2Parser destroyed.
-[       OK ] Http2ParserTest.ParseSingleFrame_RoundTrip (0 ms)
-[ RUN      ] Http2ParserTest.ParseMultipleFrames
-Http2Parser initialized (conceptual).
-Conceptual HTTP/2 frame serialization complete. Total bytes: 23
-Conceptual HTTP/2 parsing complete. Found 2 frames.
-Http2Parser destroyed.
-[       OK ] Http2ParserTest.ParseMultipleFrames (0 ms)
-[ RUN      ] Http2ParserTest.ParseIncompleteFrame_ReturnsPartial
-Http2Parser initialized (conceptual).
-Error: Incomplete HTTP/2 frame payload. Expected 5 bytes, but only 2 available.
-Warning: Remaining unparsed data after HTTP/2 frame parsing: 2 bytes.
-Conceptual HTTP/2 parsing complete. Found 0 frames.
-Http2Parser destroyed.
-[       OK ] Http2ParserTest.ParseIncompleteFrame_ReturnsPartial (0 ms)
-[ RUN      ] Http2ParserTest.SerializeAndParse_LargePayload
-Http2Parser initialized (conceptual).
-Conceptual HTTP/2 frame serialization complete. Total bytes: 265
-Conceptual HTTP/2 parsing complete. Found 1 frames.
-Http2Parser destroyed.
-[       OK ] Http2ParserTest.SerializeAndParse_LargePayload (0 ms)
-[----------] 5 tests from Http2ParserTest (0 ms total)
-
-[----------] 7 tests from UrlManipulatorTest
-[ RUN      ] UrlManipulatorTest.RewriteUrl_ReturnsOriginal
-UrlManipulator initialized (conceptual).
-Conceptual URL rewriting for: https://learn.udacity.com/course
-[       OK ] UrlManipulatorTest.RewriteUrl_ReturnsOriginal (0 ms)
-[ RUN      ] UrlManipulatorTest.ModifyRequestHeaders_AddsUserAgent
-UrlManipulator initialized (conceptual).
-Conceptual header modification for URL: https://example.com
-  Modified User-Agent header.
-[       OK ] UrlManipulatorTest.ModifyRequestHeaders_AddsUserAgent (0 ms)
-[ RUN      ] UrlManipulatorTest.ModifyRequestHeaders_WithAuthToken
-UrlManipulator initialized (conceptual).
-Authentication token set (conceptual).
-Conceptual header modification for URL: https://example.com
-  Added Authorization header with token.
-  Modified User-Agent header.
-[       OK ] UrlManipulatorTest.ModifyRequestHeaders_WithAuthToken (0 ms)
-[ RUN      ] UrlManipulatorTest.SetAndGetAuthToken
-UrlManipulator initialized (conceptual).
-Authentication token set (conceptual).
-[       OK ] UrlManipulatorTest.SetAndGetAuthToken (0 ms)
-[ RUN      ] UrlManipulatorTest.ShouldIntercept_ReturnsTrueForHttps
-UrlManipulator initialized (conceptual).
-[       OK ] UrlManipulatorTest.ShouldIntercept_ReturnsTrueForHttps (0 ms)
-[ RUN      ] UrlManipulatorTest.ShouldIntercept_ReturnsFalseForHttp
-UrlManipulator initialized (conceptual).
-[       OK ] UrlManipulatorTest.ShouldIntercept_ReturnsFalseForHttp (0 ms)
-[ RUN      ] UrlManipulatorTest.AuthTokenRoundTrip
-UrlManipulator initialized (conceptual).
-Authentication token set (conceptual).
-Conceptual header modification for URL: https://test.com
-  Added Authorization header with token.
-  Modified User-Agent header.
-[       OK ] UrlManipulatorTest.AuthTokenRoundTrip (0 ms)
-[----------] 7 tests from UrlManipulatorTest (0 ms total)
-
-[----------] 7 tests from DataExtractorTest
-[ RUN      ] DataExtractorTest.ExtractHtmlTitle
-DataExtractor initialized (conceptual).
-Conceptual data extraction for Content-Type: text/html
-  Processing as HTML.
-  Found 0 conceptual video URLs.
-  Found 0 conceptual course listings.
-[       OK ] DataExtractorTest.ExtractHtmlTitle (1 ms)
-[ RUN      ] DataExtractorTest.ExtractEmptyHtml
-DataExtractor initialized (conceptual).
-Conceptual data extraction for Content-Type: text/html
-  Processing as HTML.
-  Found 0 conceptual video URLs.
-  Found 0 conceptual course listings.
-[       OK ] DataExtractorTest.ExtractEmptyHtml (1 ms)
-[ RUN      ] DataExtractorTest.FindYoutubeUrl
-DataExtractor initialized (conceptual).
-  Found 1 conceptual video URLs.
-[       OK ] DataExtractorTest.FindYoutubeUrl (0 ms)
-[ RUN      ] DataExtractorTest.FindMultipleYoutubeUrls
-DataExtractor initialized (conceptual).
-  Found 2 conceptual video URLs.
-[       OK ] DataExtractorTest.FindMultipleYoutubeUrls (0 ms)
-[ RUN      ] DataExtractorTest.ExtractJsonCourseName
-DataExtractor initialized (conceptual).
-Conceptual data extraction for Content-Type: application/json
-  Processing as JSON.
-[       OK ] DataExtractorTest.ExtractJsonCourseName (0 ms)
-[ RUN      ] DataExtractorTest.ExtractUnknownContentType
-DataExtractor initialized (conceptual).
-Conceptual data extraction for Content-Type: application/octet-stream
-  Content type not specifically handled for extraction.
-[       OK ] DataExtractorTest.ExtractUnknownContentType (0 ms)
-[ RUN      ] DataExtractorTest.ParseHtmlForElement_ReturnsEmpty
-DataExtractor initialized (conceptual).
-Warning: parseHtmlForElement is a conceptual placeholder. Use a proper HTML parser for robust extraction.
-[       OK ] DataExtractorTest.ParseHtmlForElement_ReturnsEmpty (0 ms)
-[----------] 7 tests from DataExtractorTest (3 ms total)
-
-[----------] 5 tests from PerformanceMonitorTest
-[ RUN      ] PerformanceMonitorTest.StartEndMeasurement_ReturnsPositiveDuration
-PerformanceMonitor initialized.
-Measurement started for: test_event
-Measurement ended for: test_event, Duration: 1.12111 ms
-[       OK ] PerformanceMonitorTest.StartEndMeasurement_ReturnsPositiveDuration (1 ms)
-[ RUN      ] PerformanceMonitorTest.GetDurationMs_UnmeasuredEvent_ReturnsZero
-PerformanceMonitor initialized.
-[       OK ] PerformanceMonitorTest.GetDurationMs_UnmeasuredEvent_ReturnsZero (0 ms)
-[ RUN      ] PerformanceMonitorTest.RecordPacketLoss_AccumulatesCount
-PerformanceMonitor initialized.
-Recorded 1 packet loss(es) for connection: conn1
-Recorded 2 packet loss(es) for connection: conn1
-Recorded 5 packet loss(es) for connection: conn2
-[       OK ] PerformanceMonitorTest.RecordPacketLoss_AccumulatesCount (0 ms)
-[ RUN      ] PerformanceMonitorTest.GetHighPrecisionTimestamp_ReturnsNonZero
-PerformanceMonitor initialized.
-[       OK ] PerformanceMonitorTest.GetHighPrecisionTimestamp_ReturnsNonZero (0 ms)
-[ RUN      ] PerformanceMonitorTest.SequentialMeasurements_Independent
-PerformanceMonitor initialized.
-Measurement started for: event_a
-Measurement started for: event_b
-Measurement ended for: event_b, Duration: 1.09787 ms
-Measurement ended for: event_a, Duration: 1.12746 ms
-[       OK ] PerformanceMonitorTest.SequentialMeasurements_Independent (1 ms)
-[----------] 5 tests from PerformanceMonitorTest (2 ms total)
-
-[----------] Global test environment tear-down
-[==========] 97 tests from 11 test suites ran. (354 ms total)
-[  PASSED  ] 96 tests.
-[  SKIPPED ] 1 test, listed below:
-[  SKIPPED ] RawSocketHandlerRootTest.SetRingParams
+[2/20] Building CXX object test/CMakeFiles/pntp_tests.dir/__/src/packet_builder.cpp.o
+FAILED: test/CMakeFiles/pntp_tests.dir/__/src/packet_builder.cpp.o 
+/usr/bin/c++  -I/content/PNTP/include -std=gnu++20 -fPIE -DGTEST_HAS_PTHREAD=1 -MD -MT test/CMakeFiles/pntp_tests.dir/__/src/packet_builder.cpp.o -MF test/CMakeFiles/pntp_tests.dir/__/src/packet_builder.cpp.o.d -o test/CMakeFiles/pntp_tests.dir/__/src/packet_builder.cpp.o -c /content/PNTP/src/packet_builder.cpp
+In file included from /content/PNTP/src/packet_builder.cpp:1:
+/content/PNTP/include/pntp/packet_builder.h:19:10: error: ‘string’ in namespace ‘std’ does not name a type
+   19 |     std::string toString() const;
+      |          ^~~~~~
+/content/PNTP/include/pntp/packet_builder.h:9:1: note: ‘std::string’ is defined in header ‘<string>’; did you forget to ‘#include <string>’?
+    8 | #include <array>
+  +++ |+#include <string>
+    9 | 
+/content/PNTP/src/packet_builder.cpp:13:6: error: ‘string’ in namespace ‘std’ does not name a type
+   13 | std::string IPv4Addr::toString() const {
+      |      ^~~~~~
+/content/PNTP/src/packet_builder.cpp:3:1: note: ‘std::string’ is defined in header ‘<string>’; did you forget to ‘#include <string>’?
+    2 | #include <arpa/inet.h>
+  +++ |+#include <string>
+    3 | 
+[4/20] Building CXX object test/CMakeFiles/pntp_tests.dir/__/src/tcp_engine.cpp.o
+FAILED: test/CMakeFiles/pntp_tests.dir/__/src/tcp_engine.cpp.o 
+/usr/bin/c++  -I/content/PNTP/include -std=gnu++20 -fPIE -DGTEST_HAS_PTHREAD=1 -MD -MT test/CMakeFiles/pntp_tests.dir/__/src/tcp_engine.cpp.o -MF test/CMakeFiles/pntp_tests.dir/__/src/tcp_engine.cpp.o.d -o test/CMakeFiles/pntp_tests.dir/__/src/tcp_engine.cpp.o -c /content/PNTP/src/tcp_engine.cpp
+/content/PNTP/src/tcp_engine.cpp: In member function ‘bool TCPEngine::initialize(const string&)’:
+/content/PNTP/src/tcp_engine.cpp:127:19: error: invalid conversion from ‘int’ to ‘TCPConnection*’ [-fpermissive]
+  127 |             close(tmp);
+      |                   ^~~
+      |                   |
+      |                   int
+In file included from /content/PNTP/src/tcp_engine.cpp:1:
+/content/PNTP/include/pntp/tcp_engine.h:156:31: note:   initializing argument 1 of ‘void TCPEngine::close(TCPConnection*)’
+  156 |     void close(TCPConnection* conn);
+      |                ~~~~~~~~~~~~~~~^~~~
+/content/PNTP/src/tcp_engine.cpp: In member function ‘bool TCPEngine::send(TCPConnection*, const uint8_t*, size_t)’:
+/content/PNTP/src/tcp_engine.cpp:248:32: error: ‘struct TCPConnection’ has no member named ‘cwnd’; did you mean ‘rcv_wnd’?
+  248 |         uint32_t avail = conn->cwnd.getWindowSize() - (conn->snd_nxt - conn->snd_una);
+      |                                ^~~~
+      |                                rcv_wnd
+/content/PNTP/src/tcp_engine.cpp: In member function ‘void TCPEngine::close(TCPConnection*)’:
+/content/PNTP/src/tcp_engine.cpp:385:22: error: ‘struct TCPConnection’ has no member named ‘TIME_WAIT_MS’; did you mean ‘TIME_WAIT_SECONDS’?
+  385 |         usleep(conn->TIME_WAIT_MS * 1000);
+      |                      ^~~~~~~~~~~~
+      |                      TIME_WAIT_SECONDS
+ninja: build stopped: subcommand failed.
 

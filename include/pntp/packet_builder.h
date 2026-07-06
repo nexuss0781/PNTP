@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <cstddef>
 #include <cstring>
+#include <string>
 #include <vector>
 #include <array>
 

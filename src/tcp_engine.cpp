@@ -124,7 +124,7 @@ bool TCPEngine::initialize(const std::string& interface) {
             if (ioctl(tmp, SIOCGIFADDR, &ifr) == 0) {
                 local_ip = ntohl(reinterpret_cast<struct sockaddr_in*>(&ifr.ifr_addr)->sin_addr.s_addr);
             }
-            close(tmp);
+            ::close(tmp);
         }
     }
     return true;
@@ -245,7 +245,9 @@ bool TCPEngine::send(TCPConnection* conn, const uint8_t* data, size_t len) {
 
     size_t offset = 0;
     while (offset < len) {
-        uint32_t avail = conn->cwnd.getWindowSize() - (conn->snd_nxt - conn->snd_una);
+        uint32_t in_flight = conn->snd_nxt - conn->snd_una;
+        uint32_t win = conn->cubic.getWindowSize();
+        uint32_t avail = (in_flight < win) ? (win - in_flight) : 0u;
         size_t chunk = std::min(static_cast<size_t>(std::min(avail, static_cast<uint32_t>(conn->opts.local_mss))), len - offset);
 
         if (chunk == 0) {
@@ -382,7 +384,7 @@ void TCPEngine::close(TCPConnection* conn) {
     }
 
     if (conn->state == TCPState::TIME_WAIT) {
-        usleep(conn->TIME_WAIT_MS * 1000);
+        usleep(TIME_WAIT_MS * 1000);
         transitionTo(conn, TCPState::CLOSED);
     }
 }

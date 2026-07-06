@@ -1,4 +1,5 @@
 #include "pntp/packet_builder.h"
+#include <string>
 #include <arpa/inet.h>
 
 IPv4Addr IPv4Addr::fromString(const char* str) {
