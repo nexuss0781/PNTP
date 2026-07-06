@@ -132,14 +132,14 @@ std::vector<uint8_t> PacketBuilder::buildTCPHeader(
     uint32_t an = htonl(info.ack_num);
     std::memcpy(hdr.data() + 8, &an, 4);
 
-    uint8_t doff_flags = static_cast<uint8_t>((data_offset << 4) & 0xF0);
-    if (info.flags.fin) doff_flags |= 0x01;
-    if (info.flags.syn) doff_flags |= 0x02;
-    if (info.flags.rst) doff_flags |= 0x04;
-    if (info.flags.psh) doff_flags |= 0x08;
-    if (info.flags.ack) doff_flags |= 0x10;
-    if (info.flags.urg) doff_flags |= 0x20;
-    hdr[12] = doff_flags;
+    hdr[12] = static_cast<uint8_t>((data_offset << 4) & 0xF0);
+    hdr[13] = 0;
+    if (info.flags.fin) hdr[13] |= 0x01;
+    if (info.flags.syn) hdr[13] |= 0x02;
+    if (info.flags.rst) hdr[13] |= 0x04;
+    if (info.flags.psh) hdr[13] |= 0x08;
+    if (info.flags.ack) hdr[13] |= 0x10;
+    if (info.flags.urg) hdr[13] |= 0x20;
 
     uint16_t win = htons(info.window);
     std::memcpy(hdr.data() + 14, &win, 2);
@@ -172,12 +172,10 @@ std::vector<uint8_t> PacketBuilder::buildTCPHeader(
     if (info.options.has_timestamp) {
         hdr[pos] = 0x08;
         hdr[pos + 1] = 0x0A;
-        uint16_t tslen = htons(10);
-        std::memcpy(hdr.data() + pos + 2, &tslen, 2);
         uint32_t tv = htonl(info.options.ts_val);
-        std::memcpy(hdr.data() + pos + 4, &tv, 4);
+        std::memcpy(hdr.data() + pos + 2, &tv, 4);
         uint32_t te = htonl(info.options.ts_ecr);
-        std::memcpy(hdr.data() + pos + 8, &te, 4);
+        std::memcpy(hdr.data() + pos + 6, &te, 4);
         pos += 10;
     }
 

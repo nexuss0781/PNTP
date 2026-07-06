@@ -18,7 +18,7 @@ struct IPv4Addr {
     uint32_t addr{};
     static IPv4Addr fromString(const char* str);
     std::string toString() const;
-    bool isLoopback() const { return (addr & 0xFF) == 0x7F; }
+    bool isLoopback() const { return (addr >> 24) == 0x7F; }
     bool operator==(const IPv4Addr& o) const { return addr == o.addr; }
     bool operator!=(const IPv4Addr& o) const { return addr != o.addr; }
 };

@@ -1,18 +1,5 @@
 === Working dir: /content/PNTP ===
 W: Skipping acquire of configured file 'main/source/Sources' as repository 'https://r2u.stat.illinois.edu/ubuntu jammy InRelease' does not seem to provide it (sources.list entry misspelt?)
-Selecting previously unselected package googletest.
-(Reading database ... 118280 files and directories currently installed.)
-Preparing to unpack .../googletest_1.11.0-3_all.deb ...
-Unpacking googletest (1.11.0-3) ...
-Selecting previously unselected package libgtest-dev:amd64.
-Preparing to unpack .../libgtest-dev_1.11.0-3_amd64.deb ...
-Unpacking libgtest-dev:amd64 (1.11.0-3) ...
-Selecting previously unselected package libgmock-dev:amd64.
-Preparing to unpack .../libgmock-dev_1.11.0-3_amd64.deb ...
-Unpacking libgmock-dev:amd64 (1.11.0-3) ...
-Setting up googletest (1.11.0-3) ...
-Setting up libgtest-dev:amd64 (1.11.0-3) ...
-Setting up libgmock-dev:amd64 (1.11.0-3) ...
 -- The CXX compiler identification is GNU 11.4.0
 -- The ASM_NASM compiler identification is NASM
 -- Found assembler: /usr/bin/nasm
@@ -22,50 +9,777 @@ Setting up libgmock-dev:amd64 (1.11.0-3) ...
 -- Detecting CXX compile features
 -- Detecting CXX compile features - done
 -- Found OpenSSL: /usr/lib/x86_64-linux-gnu/libcrypto.so (found version "3.0.2")
--- Configuring done (1.0s)
+-- Configuring done (0.5s)
 -- Generating done (0.0s)
 -- Build files have been written to: /content/PNTP/build
 ninja: Entering directory `build'
-[2/20] Building CXX object test/CMakeFiles/pntp_tests.dir/__/src/packet_builder.cpp.o
-FAILED: test/CMakeFiles/pntp_tests.dir/__/src/packet_builder.cpp.o 
-/usr/bin/c++  -I/content/PNTP/include -std=gnu++20 -fPIE -DGTEST_HAS_PTHREAD=1 -MD -MT test/CMakeFiles/pntp_tests.dir/__/src/packet_builder.cpp.o -MF test/CMakeFiles/pntp_tests.dir/__/src/packet_builder.cpp.o.d -o test/CMakeFiles/pntp_tests.dir/__/src/packet_builder.cpp.o -c /content/PNTP/src/packet_builder.cpp
-In file included from /content/PNTP/src/packet_builder.cpp:1:
-/content/PNTP/include/pntp/packet_builder.h:19:10: error: ‘string’ in namespace ‘std’ does not name a type
-   19 |     std::string toString() const;
-      |          ^~~~~~
-/content/PNTP/include/pntp/packet_builder.h:9:1: note: ‘std::string’ is defined in header ‘<string>’; did you forget to ‘#include <string>’?
-    8 | #include <array>
-  +++ |+#include <string>
-    9 | 
-/content/PNTP/src/packet_builder.cpp:13:6: error: ‘string’ in namespace ‘std’ does not name a type
-   13 | std::string IPv4Addr::toString() const {
-      |      ^~~~~~
-/content/PNTP/src/packet_builder.cpp:3:1: note: ‘std::string’ is defined in header ‘<string>’; did you forget to ‘#include <string>’?
-    2 | #include <arpa/inet.h>
-  +++ |+#include <string>
-    3 | 
-[4/20] Building CXX object test/CMakeFiles/pntp_tests.dir/__/src/tcp_engine.cpp.o
-FAILED: test/CMakeFiles/pntp_tests.dir/__/src/tcp_engine.cpp.o 
-/usr/bin/c++  -I/content/PNTP/include -std=gnu++20 -fPIE -DGTEST_HAS_PTHREAD=1 -MD -MT test/CMakeFiles/pntp_tests.dir/__/src/tcp_engine.cpp.o -MF test/CMakeFiles/pntp_tests.dir/__/src/tcp_engine.cpp.o.d -o test/CMakeFiles/pntp_tests.dir/__/src/tcp_engine.cpp.o -c /content/PNTP/src/tcp_engine.cpp
-/content/PNTP/src/tcp_engine.cpp: In member function ‘bool TCPEngine::initialize(const string&)’:
-/content/PNTP/src/tcp_engine.cpp:127:19: error: invalid conversion from ‘int’ to ‘TCPConnection*’ [-fpermissive]
-  127 |             close(tmp);
-      |                   ^~~
-      |                   |
-      |                   int
-In file included from /content/PNTP/src/tcp_engine.cpp:1:
-/content/PNTP/include/pntp/tcp_engine.h:156:31: note:   initializing argument 1 of ‘void TCPEngine::close(TCPConnection*)’
-  156 |     void close(TCPConnection* conn);
-      |                ~~~~~~~~~~~~~~~^~~~
-/content/PNTP/src/tcp_engine.cpp: In member function ‘bool TCPEngine::send(TCPConnection*, const uint8_t*, size_t)’:
-/content/PNTP/src/tcp_engine.cpp:248:32: error: ‘struct TCPConnection’ has no member named ‘cwnd’; did you mean ‘rcv_wnd’?
-  248 |         uint32_t avail = conn->cwnd.getWindowSize() - (conn->snd_nxt - conn->snd_una);
-      |                                ^~~~
-      |                                rcv_wnd
-/content/PNTP/src/tcp_engine.cpp: In member function ‘void TCPEngine::close(TCPConnection*)’:
-/content/PNTP/src/tcp_engine.cpp:385:22: error: ‘struct TCPConnection’ has no member named ‘TIME_WAIT_MS’; did you mean ‘TIME_WAIT_SECONDS’?
-  385 |         usleep(conn->TIME_WAIT_MS * 1000);
-      |                      ^~~~~~~~~~~~
-      |                      TIME_WAIT_SECONDS
-ninja: build stopped: subcommand failed.
+[20/20] Linking CXX executable test/pntp_tests
+Running main() from ./googletest/src/gtest_main.cc
+[==========] Running 209 tests from 25 test suites.
+[----------] Global test environment set-up.
+[----------] 38 tests from PNTPCoreTest
+[ RUN      ] PNTPCoreTest.GetRDTSC_ReturnsIncreasingValues
+[       OK ] PNTPCoreTest.GetRDTSC_ReturnsIncreasingValues (0 ms)
+[ RUN      ] PNTPCoreTest.GetRDTSC_NonZero
+[       OK ] PNTPCoreTest.GetRDTSC_NonZero (0 ms)
+[ RUN      ] PNTPCoreTest.GetRDTSCSerialized_ReturnsIncreasingValues
+[       OK ] PNTPCoreTest.GetRDTSCSerialized_ReturnsIncreasingValues (0 ms)
+[ RUN      ] PNTPCoreTest.GetRDTSCSerialized_GreaterOrEqual_GetRDTSC
+[       OK ] PNTPCoreTest.GetRDTSCSerialized_GreaterOrEqual_GetRDTSC (0 ms)
+[ RUN      ] PNTPCoreTest.GetRDTSCSerialized_MonotonicUnderConcurrentAccess
+[       OK ] PNTPCoreTest.GetRDTSCSerialized_MonotonicUnderConcurrentAccess (0 ms)
+[ RUN      ] PNTPCoreTest.GetRDTSCP_ReturnsIncreasingValues
+[       OK ] PNTPCoreTest.GetRDTSCP_ReturnsIncreasingValues (0 ms)
+[ RUN      ] PNTPCoreTest.GetRDTSCP_NullPtrs_DoesNotCrash
+[       OK ] PNTPCoreTest.GetRDTSCP_NullPtrs_DoesNotCrash (0 ms)
+[ RUN      ] PNTPCoreTest.MFence_DoesNotCrash
+[       OK ] PNTPCoreTest.MFence_DoesNotCrash (0 ms)
+[ RUN      ] PNTPCoreTest.MFence_OrderingVisible
+[       OK ] PNTPCoreTest.MFence_OrderingVisible (0 ms)
+[ RUN      ] PNTPCoreTest.CacheFlushLine_DoesNotCrash
+[       OK ] PNTPCoreTest.CacheFlushLine_DoesNotCrash (0 ms)
+[ RUN      ] PNTPCoreTest.CacheFlushLine_OnArrayDoesNotCrash
+[       OK ] PNTPCoreTest.CacheFlushLine_OnArrayDoesNotCrash (0 ms)
+[ RUN      ] PNTPCoreTest.CacheFlushLine_NullPtr_DoesNotCrash
+[       OK ] PNTPCoreTest.CacheFlushLine_NullPtr_DoesNotCrash (0 ms)
+[ RUN      ] PNTPCoreTest.AVX2CopyNT_CopiesCorrectly_Aligned
+[       OK ] PNTPCoreTest.AVX2CopyNT_CopiesCorrectly_Aligned (0 ms)
+[ RUN      ] PNTPCoreTest.AVX2CopyNT_ZeroLength
+[       OK ] PNTPCoreTest.AVX2CopyNT_ZeroLength (0 ms)
+[ RUN      ] PNTPCoreTest.AVX2CopyNT_PartialLastBlock
+[       OK ] PNTPCoreTest.AVX2CopyNT_PartialLastBlock (0 ms)
+[ RUN      ] PNTPCoreTest.StealthRand_ReturnsDifferentValues
+[       OK ] PNTPCoreTest.StealthRand_ReturnsDifferentValues (0 ms)
+[ RUN      ] PNTPCoreTest.StealthRand_NonZero
+[       OK ] PNTPCoreTest.StealthRand_NonZero (0 ms)
+[ RUN      ] PNTPCoreTest.StealthRand_Distribution_BitEntropy
+[       OK ] PNTPCoreTest.StealthRand_Distribution_BitEntropy (2 ms)
+[ RUN      ] PNTPCoreTest.InitEntropyPool_LeavesNonZeroData
+[       OK ] PNTPCoreTest.InitEntropyPool_LeavesNonZeroData (0 ms)
+[ RUN      ] PNTPCoreTest.CPUIDString_Leaf0_ReturnsVendorString
+[       OK ] PNTPCoreTest.CPUIDString_Leaf0_ReturnsVendorString (0 ms)
+[ RUN      ] PNTPCoreTest.CPUIDString_Leaf1_ReturnsNonZero
+[       OK ] PNTPCoreTest.CPUIDString_Leaf1_ReturnsNonZero (0 ms)
+[ RUN      ] PNTPCoreTest.CPUIDString_DifferentLeaves_Differ
+[       OK ] PNTPCoreTest.CPUIDString_DifferentLeaves_Differ (0 ms)
+[ RUN      ] PNTPCoreTest.PauseLoop_ZeroCount_ReturnsImmediately
+[       OK ] PNTPCoreTest.PauseLoop_ZeroCount_ReturnsImmediately (0 ms)
+[ RUN      ] PNTPCoreTest.PauseLoop_SmallCount_Completes
+[       OK ] PNTPCoreTest.PauseLoop_SmallCount_Completes (0 ms)
+[ RUN      ] PNTPCoreTest.PauseLoop_LargeCount_Completes
+[       OK ] PNTPCoreTest.PauseLoop_LargeCount_Completes (15 ms)
+[ RUN      ] PNTPCoreTest.PrefetchRange_DoesNotCrash
+[       OK ] PNTPCoreTest.PrefetchRange_DoesNotCrash (0 ms)
+[ RUN      ] PNTPCoreTest.PrefetchRange_ZeroLength
+[       OK ] PNTPCoreTest.PrefetchRange_ZeroLength (0 ms)
+[ RUN      ] PNTPCoreTest.PrefetchRange_LargeBuffer
+[       OK ] PNTPCoreTest.PrefetchRange_LargeBuffer (0 ms)
+[ RUN      ] PNTPCoreTest.PrefetchRange_NullPtr_DoesNotCrash
+[       OK ] PNTPCoreTest.PrefetchRange_NullPtr_DoesNotCrash (0 ms)
+[ RUN      ] PNTPCoreTest.GenerateStealthId_ProducesNonZeroBuffer
+[       OK ] PNTPCoreTest.GenerateStealthId_ProducesNonZeroBuffer (0 ms)
+[ RUN      ] PNTPCoreTest.GenerateStealthId_CPUIDPartIsStable
+[       OK ] PNTPCoreTest.GenerateStealthId_CPUIDPartIsStable (0 ms)
+[ RUN      ] PNTPCoreTest.GenerateStealthId_WritesSixteenBytes
+[       OK ] PNTPCoreTest.GenerateStealthId_WritesSixteenBytes (0 ms)
+[ RUN      ] PNTPCoreTest.CrossCheck_AllTimingFunctions_Monotonic
+[       OK ] PNTPCoreTest.CrossCheck_AllTimingFunctions_Monotonic (0 ms)
+[ RUN      ] PNTPCoreTest.CrossCheck_RDTSC_ElapsedTimeReasonable
+[       OK ] PNTPCoreTest.CrossCheck_RDTSC_ElapsedTimeReasonable (1 ms)
+[ RUN      ] PNTPCoreTest.CrossCheck_StealthRand_AfterEntropyInit
+[       OK ] PNTPCoreTest.CrossCheck_StealthRand_AfterEntropyInit (0 ms)
+[ RUN      ] PNTPCoreTest.CrossCheck_CPUID_Consistency
+[       OK ] PNTPCoreTest.CrossCheck_CPUID_Consistency (0 ms)
+[ RUN      ] PNTPCoreTest.CrossCheck_AVX2Copy_Then_Prefetch
+[       OK ] PNTPCoreTest.CrossCheck_AVX2Copy_Then_Prefetch (0 ms)
+[ RUN      ] PNTPCoreTest.CrossCheck_FlushThenRead_NoFault
+[       OK ] PNTPCoreTest.CrossCheck_FlushThenRead_NoFault (0 ms)
+[----------] 38 tests from PNTPCoreTest (24 ms total)
+
+[----------] 3 tests from PacketViewTest
+[ RUN      ] PacketViewTest.DefaultConstructorIsNull
+[       OK ] PacketViewTest.DefaultConstructorIsNull (0 ms)
+[ RUN      ] PacketViewTest.ValueConstructor
+[       OK ] PacketViewTest.ValueConstructor (0 ms)
+[ RUN      ] PacketViewTest.NullDataPointerIsFalsy
+[       OK ] PacketViewTest.NullDataPointerIsFalsy (0 ms)
+[----------] 3 tests from PacketViewTest (0 ms total)
+
+[----------] 11 tests from HeaderParsingTest
+[ RUN      ] HeaderParsingTest.GetIPv4Header_ReturnsValidPointer
+[       OK ] HeaderParsingTest.GetIPv4Header_ReturnsValidPointer (0 ms)
+[ RUN      ] HeaderParsingTest.GetIPv4Header_RejectsARP
+[       OK ] HeaderParsingTest.GetIPv4Header_RejectsARP (0 ms)
+[ RUN      ] HeaderParsingTest.GetIPv4Header_RejectsTooShort
+[       OK ] HeaderParsingTest.GetIPv4Header_RejectsTooShort (0 ms)
+[ RUN      ] HeaderParsingTest.GetTCPHeader_ReturnsValidPointer
+[       OK ] HeaderParsingTest.GetTCPHeader_ReturnsValidPointer (0 ms)
+[ RUN      ] HeaderParsingTest.GetTCPHeader_RejectsUDP
+[       OK ] HeaderParsingTest.GetTCPHeader_RejectsUDP (0 ms)
+[ RUN      ] HeaderParsingTest.GetUDPHeader_ReturnsValidPointer
+[       OK ] HeaderParsingTest.GetUDPHeader_ReturnsValidPointer (0 ms)
+[ RUN      ] HeaderParsingTest.GetUDPHeader_RejectsTCP
+[       OK ] HeaderParsingTest.GetUDPHeader_RejectsTCP (0 ms)
+[ RUN      ] HeaderParsingTest.GetPayload_TCP_ExtractsCorrectBytes
+[       OK ] HeaderParsingTest.GetPayload_TCP_ExtractsCorrectBytes (0 ms)
+[ RUN      ] HeaderParsingTest.GetPayload_UDP_ExtractsCorrectBytes
+[       OK ] HeaderParsingTest.GetPayload_UDP_ExtractsCorrectBytes (0 ms)
+[ RUN      ] HeaderParsingTest.GetPayload_TCP_NoPayload_ReturnsEmpty
+[       OK ] HeaderParsingTest.GetPayload_TCP_NoPayload_ReturnsEmpty (0 ms)
+[ RUN      ] HeaderParsingTest.GetPayload_EmptyPacket_ReturnsEmpty
+[       OK ] HeaderParsingTest.GetPayload_EmptyPacket_ReturnsEmpty (0 ms)
+[----------] 11 tests from HeaderParsingTest (0 ms total)
+
+[----------] 4 tests from BPFFactoryTest
+[ RUN      ] BPFFactoryTest.MakeBPF_All_ReturnsOneInstruction
+[       OK ] BPFFactoryTest.MakeBPF_All_ReturnsOneInstruction (0 ms)
+[ RUN      ] BPFFactoryTest.MakeBPF_TCPOnly_HasEightInstructions
+[       OK ] BPFFactoryTest.MakeBPF_TCPOnly_HasEightInstructions (0 ms)
+[ RUN      ] BPFFactoryTest.MakeBPF_UDPOnly_HasEightInstructions
+[       OK ] BPFFactoryTest.MakeBPF_UDPOnly_HasEightInstructions (0 ms)
+[ RUN      ] BPFFactoryTest.MakeBPF_PortOnly_HasElevenInstructions
+[       OK ] BPFFactoryTest.MakeBPF_PortOnly_HasElevenInstructions (0 ms)
+[----------] 4 tests from BPFFactoryTest (0 ms total)
+
+[----------] 4 tests from RawSocketHandlerTest
+[ RUN      ] RawSocketHandlerTest.InitFailsOnNonexistentInterface
+[       OK ] RawSocketHandlerTest.InitFailsOnNonexistentInterface (0 ms)
+[ RUN      ] RawSocketHandlerTest.Acquire_OnUninitialized_ReturnsEmpty
+[       OK ] RawSocketHandlerTest.Acquire_OnUninitialized_ReturnsEmpty (0 ms)
+[ RUN      ] RawSocketHandlerTest.Release_DoesNotCrash_OnUninitialized
+[       OK ] RawSocketHandlerTest.Release_DoesNotCrash_OnUninitialized (0 ms)
+[ RUN      ] RawSocketHandlerTest.GetStats_ReturnsZeroes_OnUninitialized
+[       OK ] RawSocketHandlerTest.GetStats_ReturnsZeroes_OnUninitialized (0 ms)
+[----------] 4 tests from RawSocketHandlerTest (0 ms total)
+
+[----------] 11 tests from RawSocketHandlerRootTest
+[ RUN      ] RawSocketHandlerRootTest.InitOnLoopback_Succeeds
+[       OK ] RawSocketHandlerRootTest.InitOnLoopback_Succeeds (30 ms)
+[ RUN      ] RawSocketHandlerRootTest.UsingRing_AfterInit
+[       OK ] RawSocketHandlerRootTest.UsingRing_AfterInit (27 ms)
+[ RUN      ] RawSocketHandlerRootTest.AttachBPF_All_DoesNotCrash
+[       OK ] RawSocketHandlerRootTest.AttachBPF_All_DoesNotCrash (29 ms)
+[ RUN      ] RawSocketHandlerRootTest.AttachBPF_TCPOnly_DoesNotCrash
+[       OK ] RawSocketHandlerRootTest.AttachBPF_TCPOnly_DoesNotCrash (29 ms)
+[ RUN      ] RawSocketHandlerRootTest.SetPromiscuous
+[       OK ] RawSocketHandlerRootTest.SetPromiscuous (37 ms)
+[ RUN      ] RawSocketHandlerRootTest.SetTimeout
+[       OK ] RawSocketHandlerRootTest.SetTimeout (32 ms)
+[ RUN      ] RawSocketHandlerRootTest.InjectAndCapture
+[       OK ] RawSocketHandlerRootTest.InjectAndCapture (29 ms)
+[ RUN      ] RawSocketHandlerRootTest.AcquireRelease_MultipleTimes
+[       OK ] RawSocketHandlerRootTest.AcquireRelease_MultipleTimes (29 ms)
+[ RUN      ] RawSocketHandlerRootTest.StatsAfterAcquire
+[       OK ] RawSocketHandlerRootTest.StatsAfterAcquire (25 ms)
+[ RUN      ] RawSocketHandlerRootTest.SetRingParams
+[       OK ] RawSocketHandlerRootTest.SetRingParams (29 ms)
+[ RUN      ] RawSocketHandlerRootTest.FanoutGroupFails_WithoutMultipleSockets
+[       OK ] RawSocketHandlerRootTest.FanoutGroupFails_WithoutMultipleSockets (29 ms)
+[----------] 11 tests from RawSocketHandlerRootTest (335 ms total)
+
+[----------] 5 tests from IPv4AddrTest
+[ RUN      ] IPv4AddrTest.FromString_Valid
+[       OK ] IPv4AddrTest.FromString_Valid (0 ms)
+[ RUN      ] IPv4AddrTest.FromString_Loopback
+/content/PNTP/test/test_packet_builder.cpp:16: Failure
+Value of: addr.isLoopback()
+  Actual: false
+Expected: true
+[  FAILED  ] IPv4AddrTest.FromString_Loopback (0 ms)
+[ RUN      ] IPv4AddrTest.FromString_Broadcast
+[       OK ] IPv4AddrTest.FromString_Broadcast (0 ms)
+[ RUN      ] IPv4AddrTest.ToString_RoundTrip
+[       OK ] IPv4AddrTest.ToString_RoundTrip (0 ms)
+[ RUN      ] IPv4AddrTest.Equality
+[       OK ] IPv4AddrTest.Equality (0 ms)
+[----------] 5 tests from IPv4AddrTest (0 ms total)
+
+[----------] 39 tests from PacketBuilderTest
+[ RUN      ] PacketBuilderTest.ComputeChecksum_EmptyData
+[       OK ] PacketBuilderTest.ComputeChecksum_EmptyData (0 ms)
+[ RUN      ] PacketBuilderTest.ComputeChecksum_KnownValue
+[       OK ] PacketBuilderTest.ComputeChecksum_KnownValue (0 ms)
+[ RUN      ] PacketBuilderTest.ComputeChecksum_AllZeros
+[       OK ] PacketBuilderTest.ComputeChecksum_AllZeros (0 ms)
+[ RUN      ] PacketBuilderTest.ComputeTCPChecksum_Deterministic
+[       OK ] PacketBuilderTest.ComputeTCPChecksum_Deterministic (0 ms)
+[ RUN      ] PacketBuilderTest.ComputeTCPChecksum_DiffersWithDifferentIPs
+[       OK ] PacketBuilderTest.ComputeTCPChecksum_DiffersWithDifferentIPs (0 ms)
+[ RUN      ] PacketBuilderTest.BuildEthernetFrame_CorrectLength
+[       OK ] PacketBuilderTest.BuildEthernetFrame_CorrectLength (0 ms)
+[ RUN      ] PacketBuilderTest.BuildEthernetFrame_DstMacCorrect
+[       OK ] PacketBuilderTest.BuildEthernetFrame_DstMacCorrect (0 ms)
+[ RUN      ] PacketBuilderTest.BuildEthernetFrame_SrcMacCorrect
+[       OK ] PacketBuilderTest.BuildEthernetFrame_SrcMacCorrect (0 ms)
+[ RUN      ] PacketBuilderTest.BuildEthernetFrame_EtherTypeCorrect
+[       OK ] PacketBuilderTest.BuildEthernetFrame_EtherTypeCorrect (0 ms)
+[ RUN      ] PacketBuilderTest.BuildEthernetFrame_PayloadCopied
+[       OK ] PacketBuilderTest.BuildEthernetFrame_PayloadCopied (0 ms)
+[ RUN      ] PacketBuilderTest.BuildIPv4Header_CorrectLength
+[       OK ] PacketBuilderTest.BuildIPv4Header_CorrectLength (0 ms)
+[ RUN      ] PacketBuilderTest.BuildIPv4Header_VersionAndIHL
+[       OK ] PacketBuilderTest.BuildIPv4Header_VersionAndIHL (0 ms)
+[ RUN      ] PacketBuilderTest.BuildIPv4Header_TTL
+[       OK ] PacketBuilderTest.BuildIPv4Header_TTL (0 ms)
+[ RUN      ] PacketBuilderTest.BuildIPv4Header_Protocol
+[       OK ] PacketBuilderTest.BuildIPv4Header_Protocol (0 ms)
+[ RUN      ] PacketBuilderTest.BuildIPv4Header_TotalLength
+[       OK ] PacketBuilderTest.BuildIPv4Header_TotalLength (0 ms)
+[ RUN      ] PacketBuilderTest.BuildIPv4Header_SrcIP
+[       OK ] PacketBuilderTest.BuildIPv4Header_SrcIP (0 ms)
+[ RUN      ] PacketBuilderTest.BuildIPv4Header_DstIP
+[       OK ] PacketBuilderTest.BuildIPv4Header_DstIP (0 ms)
+[ RUN      ] PacketBuilderTest.BuildIPv4Header_ChecksumNonZero
+[       OK ] PacketBuilderTest.BuildIPv4Header_ChecksumNonZero (0 ms)
+[ RUN      ] PacketBuilderTest.BuildIPv4Header_ChecksumValid
+[       OK ] PacketBuilderTest.BuildIPv4Header_ChecksumValid (0 ms)
+[ RUN      ] PacketBuilderTest.BuildTCPHeader_MinimalLength
+[       OK ] PacketBuilderTest.BuildTCPHeader_MinimalLength (0 ms)
+[ RUN      ] PacketBuilderTest.BuildTCPHeader_SourcePort
+[       OK ] PacketBuilderTest.BuildTCPHeader_SourcePort (0 ms)
+[ RUN      ] PacketBuilderTest.BuildTCPHeader_DestPort
+[       OK ] PacketBuilderTest.BuildTCPHeader_DestPort (0 ms)
+[ RUN      ] PacketBuilderTest.BuildTCPHeader_SeqNum
+[       OK ] PacketBuilderTest.BuildTCPHeader_SeqNum (0 ms)
+[ RUN      ] PacketBuilderTest.BuildTCPHeader_AckNum
+[       OK ] PacketBuilderTest.BuildTCPHeader_AckNum (0 ms)
+[ RUN      ] PacketBuilderTest.BuildTCPHeader_FlagsSYN
+/content/PNTP/test/test_packet_builder.cpp:258: Failure
+Expected equality of these values:
+  hdr[13] & 0x02
+    Which is: 0
+  0x02
+    Which is: 2
+[  FAILED  ] PacketBuilderTest.BuildTCPHeader_FlagsSYN (0 ms)
+[ RUN      ] PacketBuilderTest.BuildTCPHeader_FlagsACK
+/content/PNTP/test/test_packet_builder.cpp:269: Failure
+Expected equality of these values:
+  hdr[13] & 0x10
+    Which is: 0
+  0x10
+    Which is: 16
+[  FAILED  ] PacketBuilderTest.BuildTCPHeader_FlagsACK (0 ms)
+[ RUN      ] PacketBuilderTest.BuildTCPHeader_FlagsFIN
+/content/PNTP/test/test_packet_builder.cpp:281: Failure
+Expected equality of these values:
+  hdr[13] & 0x01
+    Which is: 0
+  0x01
+    Which is: 1
+[  FAILED  ] PacketBuilderTest.BuildTCPHeader_FlagsFIN (0 ms)
+[ RUN      ] PacketBuilderTest.BuildTCPHeader_FlagsPSH
+/content/PNTP/test/test_packet_builder.cpp:293: Failure
+Expected equality of these values:
+  hdr[13] & 0x08
+    Which is: 0
+  0x08
+    Which is: 8
+[  FAILED  ] PacketBuilderTest.BuildTCPHeader_FlagsPSH (0 ms)
+[ RUN      ] PacketBuilderTest.BuildTCPHeader_FlagsRST
+/content/PNTP/test/test_packet_builder.cpp:304: Failure
+Expected equality of these values:
+  hdr[13] & 0x04
+    Which is: 0
+  0x04
+    Which is: 4
+[  FAILED  ] PacketBuilderTest.BuildTCPHeader_FlagsRST (0 ms)
+[ RUN      ] PacketBuilderTest.BuildTCPHeader_WindowSize
+[       OK ] PacketBuilderTest.BuildTCPHeader_WindowSize (0 ms)
+[ RUN      ] PacketBuilderTest.BuildTCPHeader_ChecksumNonZero
+[       OK ] PacketBuilderTest.BuildTCPHeader_ChecksumNonZero (0 ms)
+[ RUN      ] PacketBuilderTest.TCPOptions_MSS
+[       OK ] PacketBuilderTest.TCPOptions_MSS (0 ms)
+[ RUN      ] PacketBuilderTest.TCPOptions_SACK
+[       OK ] PacketBuilderTest.TCPOptions_SACK (0 ms)
+[ RUN      ] PacketBuilderTest.TCPOptions_WindowScale
+[       OK ] PacketBuilderTest.TCPOptions_WindowScale (0 ms)
+[ RUN      ] PacketBuilderTest.TCPOptions_Timestamp
+/content/PNTP/test/test_packet_builder.cpp:360: Failure
+Expected equality of these values:
+  len
+    Which is: 32
+  28u
+    Which is: 28
+[  FAILED  ] PacketBuilderTest.TCPOptions_Timestamp (0 ms)
+[ RUN      ] PacketBuilderTest.TCPOptions_All
+/content/PNTP/test/test_packet_builder.cpp:372: Failure
+Expected equality of these values:
+  len
+    Which is: 40
+  36u
+    Which is: 36
+[  FAILED  ] PacketBuilderTest.TCPOptions_All (0 ms)
+[ RUN      ] PacketBuilderTest.BuildTCPHeader_WithMSS
+[       OK ] PacketBuilderTest.BuildTCPHeader_WithMSS (0 ms)
+[ RUN      ] PacketBuilderTest.BuildTCPHeader_WithTimestamp
+[       OK ] PacketBuilderTest.BuildTCPHeader_WithTimestamp (0 ms)
+[ RUN      ] PacketBuilderTest.BuildTCPHeader_DataOffsetCorrect
+[       OK ] PacketBuilderTest.BuildTCPHeader_DataOffsetCorrect (0 ms)
+[----------] 39 tests from PacketBuilderTest (0 ms total)
+
+[----------] 13 tests from PacketBuilderSegmentTest
+[ RUN      ] PacketBuilderSegmentTest.BuildSYN_CorrectLength
+/content/PNTP/test/test_packet_builder.cpp:436: Failure
+Expected: (frame.size()) >= (14u + 20u + 24u), actual: 54 vs 58
+[  FAILED  ] PacketBuilderSegmentTest.BuildSYN_CorrectLength (0 ms)
+[ RUN      ] PacketBuilderSegmentTest.BuildSYN_HasSYNFlag
+/content/PNTP/test/test_packet_builder.cpp:442: Failure
+Expected equality of these values:
+  tcp[13] & 0x02
+    Which is: 0
+  0x02
+    Which is: 2
+[  FAILED  ] PacketBuilderSegmentTest.BuildSYN_HasSYNFlag (0 ms)
+[ RUN      ] PacketBuilderSegmentTest.BuildSYN_AcceptsPacketView
+/content/PNTP/test/test_packet_builder.cpp:447: Failure
+Expected: (frame.size()) >= (58u), actual: 54 vs 58
+[  FAILED  ] PacketBuilderSegmentTest.BuildSYN_AcceptsPacketView (0 ms)
+[ RUN      ] PacketBuilderSegmentTest.BuildSYNACK_HasBothFlags
+/content/PNTP/test/test_packet_builder.cpp:453: Failure
+Expected: (tcp[13] & 0x02) != (0), actual: 0 vs 0
+/content/PNTP/test/test_packet_builder.cpp:454: Failure
+Expected: (tcp[13] & 0x10) != (0), actual: 0 vs 0
+[  FAILED  ] PacketBuilderSegmentTest.BuildSYNACK_HasBothFlags (0 ms)
+[ RUN      ] PacketBuilderSegmentTest.BuildACK_HasACKFlag
+/content/PNTP/test/test_packet_builder.cpp:460: Failure
+Expected: (tcp[13] & 0x10) != (0), actual: 0 vs 0
+[  FAILED  ] PacketBuilderSegmentTest.BuildACK_HasACKFlag (0 ms)
+[ RUN      ] PacketBuilderSegmentTest.BuildFIN_ACK_HasBothFlags
+/content/PNTP/test/test_packet_builder.cpp:466: Failure
+Expected: (tcp[13] & 0x01) != (0), actual: 0 vs 0
+/content/PNTP/test/test_packet_builder.cpp:467: Failure
+Expected: (tcp[13] & 0x10) != (0), actual: 0 vs 0
+[  FAILED  ] PacketBuilderSegmentTest.BuildFIN_ACK_HasBothFlags (0 ms)
+[ RUN      ] PacketBuilderSegmentTest.BuildRST_HasRSTFlag
+/content/PNTP/test/test_packet_builder.cpp:473: Failure
+Expected: (tcp[13] & 0x04) != (0), actual: 0 vs 0
+[  FAILED  ] PacketBuilderSegmentTest.BuildRST_HasRSTFlag (0 ms)
+[ RUN      ] PacketBuilderSegmentTest.BuildDataSegment_WithPayload
+[       OK ] PacketBuilderSegmentTest.BuildDataSegment_WithPayload (0 ms)
+[ RUN      ] PacketBuilderSegmentTest.BuildDataSegment_PSHFlagSet
+/content/PNTP/test/test_packet_builder.cpp:490: Failure
+Expected: (tcp[13] & 0x08) != (0), actual: 0 vs 0
+[  FAILED  ] PacketBuilderSegmentTest.BuildDataSegment_PSHFlagSet (0 ms)
+[ RUN      ] PacketBuilderSegmentTest.BuildKeepalive_HasACKFlag
+/content/PNTP/test/test_packet_builder.cpp:496: Failure
+Expected: (tcp[13] & 0x10) != (0), actual: 0 vs 0
+[  FAILED  ] PacketBuilderSegmentTest.BuildKeepalive_HasACKFlag (0 ms)
+[ RUN      ] PacketBuilderSegmentTest.BuildSYN_WithTimestamp
+[       OK ] PacketBuilderSegmentTest.BuildSYN_WithTimestamp (0 ms)
+[ RUN      ] PacketBuilderSegmentTest.BuildSYN_CanBeParsedByRawSocket
+[       OK ] PacketBuilderSegmentTest.BuildSYN_CanBeParsedByRawSocket (0 ms)
+[ RUN      ] PacketBuilderSegmentTest.BuildDataSegment_PayloadParsed
+[       OK ] PacketBuilderSegmentTest.BuildDataSegment_PayloadParsed (0 ms)
+[----------] 13 tests from PacketBuilderSegmentTest (0 ms total)
+
+[----------] 1 test from TCPStateTest
+[ RUN      ] TCPStateTest.StateToString_AllStates
+[       OK ] TCPStateTest.StateToString_AllStates (0 ms)
+[----------] 1 test from TCPStateTest (0 ms total)
+
+[----------] 10 tests from RTTEstimatorTest
+[ RUN      ] RTTEstimatorTest.InitialState
+[       OK ] RTTEstimatorTest.InitialState (0 ms)
+[ RUN      ] RTTEstimatorTest.FirstMeasurement
+[       OK ] RTTEstimatorTest.FirstMeasurement (0 ms)
+[ RUN      ] RTTEstimatorTest.SubsequentMeasurement_Converges
+[       OK ] RTTEstimatorTest.SubsequentMeasurement_Converges (0 ms)
+[ RUN      ] RTTEstimatorTest.RTTVar_IncreasesWithVariation
+[       OK ] RTTEstimatorTest.RTTVar_IncreasesWithVariation (0 ms)
+[ RUN      ] RTTEstimatorTest.RTO_Bounded
+[       OK ] RTTEstimatorTest.RTO_Bounded (0 ms)
+[ RUN      ] RTTEstimatorTest.RTO_MinimumBounded
+[       OK ] RTTEstimatorTest.RTO_MinimumBounded (0 ms)
+[ RUN      ] RTTEstimatorTest.Backoff_Doubles
+[       OK ] RTTEstimatorTest.Backoff_Doubles (0 ms)
+[ RUN      ] RTTEstimatorTest.Backoff_Bounded
+[       OK ] RTTEstimatorTest.Backoff_Bounded (0 ms)
+[ RUN      ] RTTEstimatorTest.Reset
+[       OK ] RTTEstimatorTest.Reset (0 ms)
+[ RUN      ] RTTEstimatorTest.ManyMeasurements_Stable
+[       OK ] RTTEstimatorTest.ManyMeasurements_Stable (0 ms)
+[----------] 10 tests from RTTEstimatorTest (0 ms total)
+
+[----------] 9 tests from CUBICStateTest
+[ RUN      ] CUBICStateTest.InitialState
+[       OK ] CUBICStateTest.InitialState (0 ms)
+[ RUN      ] CUBICStateTest.OnCongestionEvent_SetsRecovery
+[       OK ] CUBICStateTest.OnCongestionEvent_SetsRecovery (0 ms)
+[ RUN      ] CUBICStateTest.OnCongestionEvent_ReducesCwnd
+[       OK ] CUBICStateTest.OnCongestionEvent_ReducesCwnd (0 ms)
+[ RUN      ] CUBICStateTest.OnCongestionEvent_SetsWMax
+[       OK ] CUBICStateTest.OnCongestionEvent_SetsWMax (0 ms)
+[ RUN      ] CUBICStateTest.OnAck_InSlowStart_IncreasesLinearly
+[       OK ] CUBICStateTest.OnAck_InSlowStart_IncreasesLinearly (0 ms)
+[ RUN      ] CUBICStateTest.OnAck_InRecovery_Increases
+[       OK ] CUBICStateTest.OnAck_InRecovery_Increases (0 ms)
+[ RUN      ] CUBICStateTest.OnAck_RecoveryComplete
+[       OK ] CUBICStateTest.OnAck_RecoveryComplete (0 ms)
+[ RUN      ] CUBICStateTest.CubicFunction_Increasing
+[       OK ] CUBICStateTest.CubicFunction_Increasing (0 ms)
+[ RUN      ] CUBICStateTest.GetWindowSize
+[       OK ] CUBICStateTest.GetWindowSize (0 ms)
+[----------] 9 tests from CUBICStateTest (0 ms total)
+
+[----------] 8 tests from TCPConnectionTest
+[ RUN      ] TCPConnectionTest.DefaultState_CLOSED
+[       OK ] TCPConnectionTest.DefaultState_CLOSED (0 ms)
+[ RUN      ] TCPConnectionTest.SequenceNumbers_InitiallyZero
+[       OK ] TCPConnectionTest.SequenceNumbers_InitiallyZero (0 ms)
+[ RUN      ] TCPConnectionTest.WindowSizes_Default
+[       OK ] TCPConnectionTest.WindowSizes_Default (0 ms)
+[ RUN      ] TCPConnectionTest.MSS_Default
+[       OK ] TCPConnectionTest.MSS_Default (0 ms)
+[ RUN      ] TCPConnectionTest.SendQueue_Empty
+[       OK ] TCPConnectionTest.SendQueue_Empty (0 ms)
+[ RUN      ] TCPConnectionTest.RetransmitQueue_Empty
+[       OK ] TCPConnectionTest.RetransmitQueue_Empty (0 ms)
+[ RUN      ] TCPConnectionTest.OOOQueue_Empty
+[       OK ] TCPConnectionTest.OOOQueue_Empty (0 ms)
+[ RUN      ] TCPConnectionTest.FINFlags_Default
+[       OK ] TCPConnectionTest.FINFlags_Default (0 ms)
+[----------] 8 tests from TCPConnectionTest (0 ms total)
+
+[----------] 6 tests from TCPEngineTest
+[ RUN      ] TCPEngineTest.GetState_ClosedConn
+[       OK ] TCPEngineTest.GetState_ClosedConn (0 ms)
+[ RUN      ] TCPEngineTest.TranscendentFetch_EmptyUrl
+[       OK ] TCPEngineTest.TranscendentFetch_EmptyUrl (0 ms)
+[ RUN      ] TCPEngineTest.Open_BadHost_ReturnsNull
+[       OK ] TCPEngineTest.Open_BadHost_ReturnsNull (12 ms)
+[ RUN      ] TCPEngineTest.ProcessIncomingPacket_NonTCP_ReturnsFalse
+[       OK ] TCPEngineTest.ProcessIncomingPacket_NonTCP_ReturnsFalse (0 ms)
+[ RUN      ] TCPEngineTest.ProcessIncomingPacket_WrongPorts_ReturnsFalse
+[       OK ] TCPEngineTest.ProcessIncomingPacket_WrongPorts_ReturnsFalse (0 ms)
+[ RUN      ] TCPEngineTest.ProcessIncomingPacket_RST_ClosesConn
+/content/PNTP/test/test_tcp_engine.cpp:290: Failure
+Expected equality of these values:
+  conn.state
+    Which is: 1-byte object <04>
+  TCPState::CLOSED
+    Which is: 1-byte object <00>
+[  FAILED  ] TCPEngineTest.ProcessIncomingPacket_RST_ClosesConn (0 ms)
+[----------] 6 tests from TCPEngineTest (13 ms total)
+
+[----------] 2 tests from RTTIntegrationTest
+[ RUN      ] RTTIntegrationTest.RTTUsedInConnection
+[       OK ] RTTIntegrationTest.RTTUsedInConnection (0 ms)
+[ RUN      ] RTTIntegrationTest.CUBICUsedInConnection
+[       OK ] RTTIntegrationTest.CUBICUsedInConnection (0 ms)
+[----------] 2 tests from RTTIntegrationTest (0 ms total)
+
+[----------] 2 tests from HandshakeSimulationTest
+[ RUN      ] HandshakeSimulationTest.SimulateThreeWayHandshake
+/content/PNTP/test/test_tcp_engine.cpp:355: Failure
+Value of: result
+  Actual: false
+Expected: true
+/content/PNTP/test/test_tcp_engine.cpp:356: Failure
+Expected equality of these values:
+  conn.state
+    Which is: 1-byte object <02>
+  TCPState::ESTABLISHED
+    Which is: 1-byte object <04>
+/content/PNTP/test/test_tcp_engine.cpp:357: Failure
+Expected equality of these values:
+  conn.rcv_nxt
+    Which is: 0
+  5001u
+    Which is: 5001
+/content/PNTP/test/test_tcp_engine.cpp:358: Failure
+Expected equality of these values:
+  conn.snd_una
+    Which is: 1000
+  conn.iss + 1
+    Which is: 1001
+[  FAILED  ] HandshakeSimulationTest.SimulateThreeWayHandshake (0 ms)
+[ RUN      ] HandshakeSimulationTest.SimulateSYN_BadAck_ClosesConn
+/content/PNTP/test/test_tcp_engine.cpp:382: Failure
+Expected equality of these values:
+  conn.state
+    Which is: 1-byte object <02>
+  TCPState::CLOSED
+    Which is: 1-byte object <00>
+[  FAILED  ] HandshakeSimulationTest.SimulateSYN_BadAck_ClosesConn (0 ms)
+[----------] 2 tests from HandshakeSimulationTest (0 ms total)
+
+[----------] 3 tests from DataTransferTest
+[ RUN      ] DataTransferTest.Recv_InOrderData_Delivered
+[       OK ] DataTransferTest.Recv_InOrderData_Delivered (0 ms)
+[ RUN      ] DataTransferTest.Recv_OutOfOrder_Queued
+/content/PNTP/test/test_tcp_engine.cpp:461: Failure
+Expected equality of these values:
+  conn.rcv_nxt
+    Which is: 5002
+  5006u
+    Which is: 5006
+[  FAILED  ] DataTransferTest.Recv_OutOfOrder_Queued (0 ms)
+[ RUN      ] DataTransferTest.Recv_DupACK_IncrementsCounter
+/content/PNTP/test/test_tcp_engine.cpp:475: Failure
+Expected equality of these values:
+  conn.dup_ack_count
+    Which is: 0
+  1u
+    Which is: 1
+[  FAILED  ] DataTransferTest.Recv_DupACK_IncrementsCounter (0 ms)
+[----------] 3 tests from DataTransferTest (0 ms total)
+
+[----------] 3 tests from CloseSimulationTest
+[ RUN      ] CloseSimulationTest.RecvFIN_SendsACK_GoesToCloseWait
+/content/PNTP/test/test_tcp_engine.cpp:518: Failure
+Value of: result
+  Actual: false
+Expected: true
+/content/PNTP/test/test_tcp_engine.cpp:519: Failure
+Expected equality of these values:
+  conn.state
+    Which is: 1-byte object <04>
+  TCPState::CLOSE_WAIT
+    Which is: 1-byte object <07>
+/content/PNTP/test/test_tcp_engine.cpp:520: Failure
+Value of: conn.fin_received
+  Actual: false
+Expected: true
+/content/PNTP/test/test_tcp_engine.cpp:521: Failure
+Expected equality of these values:
+  conn.rcv_nxt
+    Which is: 5000
+  5001u
+    Which is: 5001
+[  FAILED  ] CloseSimulationTest.RecvFIN_SendsACK_GoesToCloseWait (0 ms)
+[ RUN      ] CloseSimulationTest.FINWAIT1_RecvFIN_GoesToCLOSING
+/content/PNTP/test/test_tcp_engine.cpp:539: Failure
+Expected equality of these values:
+  conn.state
+    Which is: 1-byte object <05>
+  TCPState::CLOSING
+    Which is: 1-byte object <08>
+[  FAILED  ] CloseSimulationTest.FINWAIT1_RecvFIN_GoesToCLOSING (0 ms)
+[ RUN      ] CloseSimulationTest.FINWAIT2_RecvFIN_GoesToTIMEWAIT
+/content/PNTP/test/test_tcp_engine.cpp:554: Failure
+Expected equality of these values:
+  conn.state
+    Which is: 1-byte object <06>
+  TCPState::TIME_WAIT
+    Which is: 1-byte object <0A>
+[  FAILED  ] CloseSimulationTest.FINWAIT2_RecvFIN_GoesToTIMEWAIT (0 ms)
+[----------] 3 tests from CloseSimulationTest (0 ms total)
+
+[----------] 2 tests from ChecksumValidationTest
+[ RUN      ] ChecksumValidationTest.BuildSYN_IPChecksumValid
+[       OK ] ChecksumValidationTest.BuildSYN_IPChecksumValid (0 ms)
+[ RUN      ] ChecksumValidationTest.BuildDataSegment_TCPChecksumNonZero
+[       OK ] ChecksumValidationTest.BuildDataSegment_TCPChecksumNonZero (0 ms)
+[----------] 2 tests from ChecksumValidationTest (0 ms total)
+
+[----------] 5 tests from PacketVerifyTest
+[ RUN      ] PacketVerifyTest.SYN_ParsesCorrectly
+/content/PNTP/test/test_tcp_engine.cpp:606: Failure
+Expected: (tcp->syn) != (0), actual: 0 vs 0
+[  FAILED  ] PacketVerifyTest.SYN_ParsesCorrectly (0 ms)
+[ RUN      ] PacketVerifyTest.SYNACK_ParsesCorrectly
+/content/PNTP/test/test_tcp_engine.cpp:624: Failure
+Expected: (tcp->syn) != (0), actual: 0 vs 0
+/content/PNTP/test/test_tcp_engine.cpp:625: Failure
+Expected: (tcp->ack) != (0), actual: 0 vs 0
+[  FAILED  ] PacketVerifyTest.SYNACK_ParsesCorrectly (0 ms)
+[ RUN      ] PacketVerifyTest.DataSegment_PayloadMatches
+[       OK ] PacketVerifyTest.DataSegment_PayloadMatches (0 ms)
+[ RUN      ] PacketVerifyTest.RST_ParsesCorrectly
+/content/PNTP/test/test_tcp_engine.cpp:662: Failure
+Expected: (tcp->rst) != (0), actual: 0 vs 0
+[  FAILED  ] PacketVerifyTest.RST_ParsesCorrectly (0 ms)
+[ RUN      ] PacketVerifyTest.FIN_ACK_ParsesCorrectly
+/content/PNTP/test/test_tcp_engine.cpp:674: Failure
+Expected: (tcp->fin) != (0), actual: 0 vs 0
+/content/PNTP/test/test_tcp_engine.cpp:675: Failure
+Expected: (tcp->ack) != (0), actual: 0 vs 0
+[  FAILED  ] PacketVerifyTest.FIN_ACK_ParsesCorrectly (0 ms)
+[----------] 5 tests from PacketVerifyTest (0 ms total)
+
+[----------] 6 tests from EdgeCaseTest
+[ RUN      ] EdgeCaseTest.ZeroLengthDataSegment
+[       OK ] EdgeCaseTest.ZeroLengthDataSegment (0 ms)
+[ RUN      ] EdgeCaseTest.MaxSeqNum
+[       OK ] EdgeCaseTest.MaxSeqNum (0 ms)
+[ RUN      ] EdgeCaseTest.MaxAckNum
+[       OK ] EdgeCaseTest.MaxAckNum (0 ms)
+[ RUN      ] EdgeCaseTest.RTT_MeasurementNearZero
+[       OK ] EdgeCaseTest.RTT_MeasurementNearZero (0 ms)
+[ RUN      ] EdgeCaseTest.RTT_MeasurementVeryLarge
+[       OK ] EdgeCaseTest.RTT_MeasurementVeryLarge (0 ms)
+[ RUN      ] EdgeCaseTest.CUBIC_ZeroBytesAcked
+[       OK ] EdgeCaseTest.CUBIC_ZeroBytesAcked (0 ms)
+[----------] 6 tests from EdgeCaseTest (0 ms total)
+
+[----------] 5 tests from Http2ParserTest
+[ RUN      ] Http2ParserTest.ParseEmptyData_ReturnsNoFrames
+Http2Parser initialized (conceptual).
+Conceptual HTTP/2 parsing complete. Found 0 frames.
+Http2Parser destroyed.
+[       OK ] Http2ParserTest.ParseEmptyData_ReturnsNoFrames (0 ms)
+[ RUN      ] Http2ParserTest.ParseSingleFrame_RoundTrip
+Http2Parser initialized (conceptual).
+Conceptual HTTP/2 frame serialization complete. Total bytes: 13
+Conceptual HTTP/2 parsing complete. Found 1 frames.
+Http2Parser destroyed.
+[       OK ] Http2ParserTest.ParseSingleFrame_RoundTrip (0 ms)
+[ RUN      ] Http2ParserTest.ParseMultipleFrames
+Http2Parser initialized (conceptual).
+Conceptual HTTP/2 frame serialization complete. Total bytes: 23
+Conceptual HTTP/2 parsing complete. Found 2 frames.
+Http2Parser destroyed.
+[       OK ] Http2ParserTest.ParseMultipleFrames (0 ms)
+[ RUN      ] Http2ParserTest.ParseIncompleteFrame_ReturnsPartial
+Http2Parser initialized (conceptual).
+Error: Incomplete HTTP/2 frame payload. Expected 5 bytes, but only 2 available.
+Warning: Remaining unparsed data after HTTP/2 frame parsing: 2 bytes.
+Conceptual HTTP/2 parsing complete. Found 0 frames.
+Http2Parser destroyed.
+[       OK ] Http2ParserTest.ParseIncompleteFrame_ReturnsPartial (0 ms)
+[ RUN      ] Http2ParserTest.SerializeAndParse_LargePayload
+Http2Parser initialized (conceptual).
+Conceptual HTTP/2 frame serialization complete. Total bytes: 265
+Conceptual HTTP/2 parsing complete. Found 1 frames.
+Http2Parser destroyed.
+[       OK ] Http2ParserTest.SerializeAndParse_LargePayload (0 ms)
+[----------] 5 tests from Http2ParserTest (0 ms total)
+
+[----------] 7 tests from UrlManipulatorTest
+[ RUN      ] UrlManipulatorTest.RewriteUrl_ReturnsOriginal
+UrlManipulator initialized (conceptual).
+Conceptual URL rewriting for: https://learn.udacity.com/course
+[       OK ] UrlManipulatorTest.RewriteUrl_ReturnsOriginal (0 ms)
+[ RUN      ] UrlManipulatorTest.ModifyRequestHeaders_AddsUserAgent
+UrlManipulator initialized (conceptual).
+Conceptual header modification for URL: https://example.com
+  Modified User-Agent header.
+[       OK ] UrlManipulatorTest.ModifyRequestHeaders_AddsUserAgent (0 ms)
+[ RUN      ] UrlManipulatorTest.ModifyRequestHeaders_WithAuthToken
+UrlManipulator initialized (conceptual).
+Authentication token set (conceptual).
+Conceptual header modification for URL: https://example.com
+  Added Authorization header with token.
+  Modified User-Agent header.
+[       OK ] UrlManipulatorTest.ModifyRequestHeaders_WithAuthToken (0 ms)
+[ RUN      ] UrlManipulatorTest.SetAndGetAuthToken
+UrlManipulator initialized (conceptual).
+Authentication token set (conceptual).
+[       OK ] UrlManipulatorTest.SetAndGetAuthToken (0 ms)
+[ RUN      ] UrlManipulatorTest.ShouldIntercept_ReturnsTrueForHttps
+UrlManipulator initialized (conceptual).
+[       OK ] UrlManipulatorTest.ShouldIntercept_ReturnsTrueForHttps (0 ms)
+[ RUN      ] UrlManipulatorTest.ShouldIntercept_ReturnsFalseForHttp
+UrlManipulator initialized (conceptual).
+[       OK ] UrlManipulatorTest.ShouldIntercept_ReturnsFalseForHttp (0 ms)
+[ RUN      ] UrlManipulatorTest.AuthTokenRoundTrip
+UrlManipulator initialized (conceptual).
+Authentication token set (conceptual).
+Conceptual header modification for URL: https://test.com
+  Added Authorization header with token.
+  Modified User-Agent header.
+[       OK ] UrlManipulatorTest.AuthTokenRoundTrip (0 ms)
+[----------] 7 tests from UrlManipulatorTest (0 ms total)
+
+[----------] 7 tests from DataExtractorTest
+[ RUN      ] DataExtractorTest.ExtractHtmlTitle
+DataExtractor initialized (conceptual).
+Conceptual data extraction for Content-Type: text/html
+  Processing as HTML.
+  Found 0 conceptual video URLs.
+  Found 0 conceptual course listings.
+[       OK ] DataExtractorTest.ExtractHtmlTitle (1 ms)
+[ RUN      ] DataExtractorTest.ExtractEmptyHtml
+DataExtractor initialized (conceptual).
+Conceptual data extraction for Content-Type: text/html
+  Processing as HTML.
+  Found 0 conceptual video URLs.
+  Found 0 conceptual course listings.
+[       OK ] DataExtractorTest.ExtractEmptyHtml (1 ms)
+[ RUN      ] DataExtractorTest.FindYoutubeUrl
+DataExtractor initialized (conceptual).
+  Found 1 conceptual video URLs.
+[       OK ] DataExtractorTest.FindYoutubeUrl (0 ms)
+[ RUN      ] DataExtractorTest.FindMultipleYoutubeUrls
+DataExtractor initialized (conceptual).
+  Found 2 conceptual video URLs.
+[       OK ] DataExtractorTest.FindMultipleYoutubeUrls (0 ms)
+[ RUN      ] DataExtractorTest.ExtractJsonCourseName
+DataExtractor initialized (conceptual).
+Conceptual data extraction for Content-Type: application/json
+  Processing as JSON.
+[       OK ] DataExtractorTest.ExtractJsonCourseName (0 ms)
+[ RUN      ] DataExtractorTest.ExtractUnknownContentType
+DataExtractor initialized (conceptual).
+Conceptual data extraction for Content-Type: application/octet-stream
+  Content type not specifically handled for extraction.
+[       OK ] DataExtractorTest.ExtractUnknownContentType (0 ms)
+[ RUN      ] DataExtractorTest.ParseHtmlForElement_ReturnsEmpty
+DataExtractor initialized (conceptual).
+Warning: parseHtmlForElement is a conceptual placeholder. Use a proper HTML parser for robust extraction.
+[       OK ] DataExtractorTest.ParseHtmlForElement_ReturnsEmpty (0 ms)
+[----------] 7 tests from DataExtractorTest (3 ms total)
+
+[----------] 5 tests from PerformanceMonitorTest
+[ RUN      ] PerformanceMonitorTest.StartEndMeasurement_ReturnsPositiveDuration
+PerformanceMonitor initialized.
+Measurement started for: test_event
+Measurement ended for: test_event, Duration: 1.10815 ms
+[       OK ] PerformanceMonitorTest.StartEndMeasurement_ReturnsPositiveDuration (1 ms)
+[ RUN      ] PerformanceMonitorTest.GetDurationMs_UnmeasuredEvent_ReturnsZero
+PerformanceMonitor initialized.
+[       OK ] PerformanceMonitorTest.GetDurationMs_UnmeasuredEvent_ReturnsZero (0 ms)
+[ RUN      ] PerformanceMonitorTest.RecordPacketLoss_AccumulatesCount
+PerformanceMonitor initialized.
+Recorded 1 packet loss(es) for connection: conn1
+Recorded 2 packet loss(es) for connection: conn1
+Recorded 5 packet loss(es) for connection: conn2
+[       OK ] PerformanceMonitorTest.RecordPacketLoss_AccumulatesCount (0 ms)
+[ RUN      ] PerformanceMonitorTest.GetHighPrecisionTimestamp_ReturnsNonZero
+PerformanceMonitor initialized.
+[       OK ] PerformanceMonitorTest.GetHighPrecisionTimestamp_ReturnsNonZero (0 ms)
+[ RUN      ] PerformanceMonitorTest.SequentialMeasurements_Independent
+PerformanceMonitor initialized.
+Measurement started for: event_a
+Measurement started for: event_b
+Measurement ended for: event_b, Duration: 1.16986 ms
+Measurement ended for: event_a, Duration: 1.20933 ms
+[       OK ] PerformanceMonitorTest.SequentialMeasurements_Independent (1 ms)
+[----------] 5 tests from PerformanceMonitorTest (2 ms total)
+
+[----------] Global test environment tear-down
+[==========] 209 tests from 25 test suites ran. (388 ms total)
+[  PASSED  ] 180 tests.
+[  FAILED  ] 29 tests, listed below:
+[  FAILED  ] IPv4AddrTest.FromString_Loopback
+[  FAILED  ] PacketBuilderTest.BuildTCPHeader_FlagsSYN
+[  FAILED  ] PacketBuilderTest.BuildTCPHeader_FlagsACK
+[  FAILED  ] PacketBuilderTest.BuildTCPHeader_FlagsFIN
+[  FAILED  ] PacketBuilderTest.BuildTCPHeader_FlagsPSH
+[  FAILED  ] PacketBuilderTest.BuildTCPHeader_FlagsRST
+[  FAILED  ] PacketBuilderTest.TCPOptions_Timestamp
+[  FAILED  ] PacketBuilderTest.TCPOptions_All
+[  FAILED  ] PacketBuilderSegmentTest.BuildSYN_CorrectLength
+[  FAILED  ] PacketBuilderSegmentTest.BuildSYN_HasSYNFlag
+[  FAILED  ] PacketBuilderSegmentTest.BuildSYN_AcceptsPacketView
+[  FAILED  ] PacketBuilderSegmentTest.BuildSYNACK_HasBothFlags
+[  FAILED  ] PacketBuilderSegmentTest.BuildACK_HasACKFlag
+[  FAILED  ] PacketBuilderSegmentTest.BuildFIN_ACK_HasBothFlags
+[  FAILED  ] PacketBuilderSegmentTest.BuildRST_HasRSTFlag
+[  FAILED  ] PacketBuilderSegmentTest.BuildDataSegment_PSHFlagSet
+[  FAILED  ] PacketBuilderSegmentTest.BuildKeepalive_HasACKFlag
+[  FAILED  ] TCPEngineTest.ProcessIncomingPacket_RST_ClosesConn
+[  FAILED  ] HandshakeSimulationTest.SimulateThreeWayHandshake
+[  FAILED  ] HandshakeSimulationTest.SimulateSYN_BadAck_ClosesConn
+[  FAILED  ] DataTransferTest.Recv_OutOfOrder_Queued
+[  FAILED  ] DataTransferTest.Recv_DupACK_IncrementsCounter
+[  FAILED  ] CloseSimulationTest.RecvFIN_SendsACK_GoesToCloseWait
+[  FAILED  ] CloseSimulationTest.FINWAIT1_RecvFIN_GoesToCLOSING
+[  FAILED  ] CloseSimulationTest.FINWAIT2_RecvFIN_GoesToTIMEWAIT
+[  FAILED  ] PacketVerifyTest.SYN_ParsesCorrectly
+[  FAILED  ] PacketVerifyTest.SYNACK_ParsesCorrectly
+[  FAILED  ] PacketVerifyTest.RST_ParsesCorrectly
+[  FAILED  ] PacketVerifyTest.FIN_ACK_ParsesCorrectly
+
+29 FAILED TESTS
 

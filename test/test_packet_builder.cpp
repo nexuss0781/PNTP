@@ -357,7 +357,7 @@ TEST(PacketBuilderTest, TCPOptions_Timestamp) {
     opts.ts_val = 12345;
     opts.ts_ecr = 67890;
     size_t len = PacketBuilder::tcpHeaderWithOptionsLen(opts);
-    EXPECT_EQ(len, 28u);
+    EXPECT_EQ(len, 32u);
 }
 
 TEST(PacketBuilderTest, TCPOptions_All) {
@@ -369,7 +369,7 @@ TEST(PacketBuilderTest, TCPOptions_All) {
     opts.ts_val = 12345;
     opts.ts_ecr = 67890;
     size_t len = PacketBuilder::tcpHeaderWithOptionsLen(opts);
-    EXPECT_EQ(len, 36u);
+    EXPECT_EQ(len, 40u);
 }
 
 TEST(PacketBuilderTest, BuildTCPHeader_WithMSS) {
@@ -398,12 +398,12 @@ TEST(PacketBuilderTest, BuildTCPHeader_WithTimestamp) {
     info.options.ts_ecr = 0x9ABCDEF0;
 
     auto hdr = PacketBuilder::buildTCPHeader(info, 0x0A000001, 0x0A000002);
-    EXPECT_GE(hdr.size(), 30u);
+    EXPECT_GE(hdr.size(), 32u);
     size_t ts_offset = 20;
     EXPECT_EQ(hdr[ts_offset], 0x08);
     EXPECT_EQ(hdr[ts_offset + 1], 0x0A);
     uint32_t ts_val;
-    std::memcpy(&ts_val, hdr.data() + ts_offset + 4, 4);
+    std::memcpy(&ts_val, hdr.data() + ts_offset + 2, 4);
     EXPECT_EQ(ntohl(ts_val), 0x12345678u);
 }
 
