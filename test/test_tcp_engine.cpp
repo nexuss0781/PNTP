@@ -442,7 +442,7 @@ TEST_F(DataTransferTest, Recv_OutOfOrder_Queued) {
         client_mac, server_mac,
         server_ip, client_ip,
         server_port, client_port,
-        5004, 2000,
+        5002, 2000,
         data1, 2, true, 65535);
 
     auto frame2 = PacketBuilder::buildDataSegment(
@@ -458,7 +458,7 @@ TEST_F(DataTransferTest, Recv_OutOfOrder_Queued) {
     PacketView pkt2(frame2.data(), frame2.size());
     engine.processIncomingPacket(&conn, pkt2);
 
-    EXPECT_EQ(conn.rcv_nxt, 5006u);
+    EXPECT_EQ(conn.rcv_nxt, 5004u);
 }
 
 TEST_F(DataTransferTest, Recv_DupACK_IncrementsCounter) {

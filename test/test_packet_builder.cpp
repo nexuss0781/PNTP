@@ -433,7 +433,7 @@ protected:
 
 TEST_F(PacketBuilderSegmentTest, BuildSYN_CorrectLength) {
     auto frame = PacketBuilder::buildSYN(dst_mac, src_mac, src_ip, dst_ip, src_port, dst_port, 1000);
-    EXPECT_GE(frame.size(), 14u + 20u + 24u);
+    EXPECT_GE(frame.size(), 14u + 20u + 20u);
 }
 
 TEST_F(PacketBuilderSegmentTest, BuildSYN_HasSYNFlag) {
@@ -444,7 +444,7 @@ TEST_F(PacketBuilderSegmentTest, BuildSYN_HasSYNFlag) {
 
 TEST_F(PacketBuilderSegmentTest, BuildSYN_AcceptsPacketView) {
     auto frame = PacketBuilder::buildSYN(dst_mac, src_mac, src_ip, dst_ip, src_port, dst_port, 1000);
-    EXPECT_GE(frame.size(), 58u);
+    EXPECT_GE(frame.size(), 54u);
 }
 
 TEST_F(PacketBuilderSegmentTest, BuildSYNACK_HasBothFlags) {

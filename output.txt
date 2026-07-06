@@ -94,7 +94,7 @@ Running main() from ./googletest/src/gtest_main.cc
 [       OK ] PNTPCoreTest.CrossCheck_AVX2Copy_Then_Prefetch (0 ms)
 [ RUN      ] PNTPCoreTest.CrossCheck_FlushThenRead_NoFault
 [       OK ] PNTPCoreTest.CrossCheck_FlushThenRead_NoFault (0 ms)
-[----------] 38 tests from PNTPCoreTest (24 ms total)
+[----------] 38 tests from PNTPCoreTest (23 ms total)
 
 [----------] 3 tests from PacketViewTest
 [ RUN      ] PacketViewTest.DefaultConstructorIsNull
@@ -154,7 +154,7 @@ Running main() from ./googletest/src/gtest_main.cc
 
 [----------] 11 tests from RawSocketHandlerRootTest
 [ RUN      ] RawSocketHandlerRootTest.InitOnLoopback_Succeeds
-[       OK ] RawSocketHandlerRootTest.InitOnLoopback_Succeeds (30 ms)
+[       OK ] RawSocketHandlerRootTest.InitOnLoopback_Succeeds (27 ms)
 [ RUN      ] RawSocketHandlerRootTest.UsingRing_AfterInit
 [       OK ] RawSocketHandlerRootTest.UsingRing_AfterInit (27 ms)
 [ RUN      ] RawSocketHandlerRootTest.AttachBPF_All_DoesNotCrash
@@ -162,30 +162,26 @@ Running main() from ./googletest/src/gtest_main.cc
 [ RUN      ] RawSocketHandlerRootTest.AttachBPF_TCPOnly_DoesNotCrash
 [       OK ] RawSocketHandlerRootTest.AttachBPF_TCPOnly_DoesNotCrash (29 ms)
 [ RUN      ] RawSocketHandlerRootTest.SetPromiscuous
-[       OK ] RawSocketHandlerRootTest.SetPromiscuous (37 ms)
+[       OK ] RawSocketHandlerRootTest.SetPromiscuous (32 ms)
 [ RUN      ] RawSocketHandlerRootTest.SetTimeout
-[       OK ] RawSocketHandlerRootTest.SetTimeout (32 ms)
+[       OK ] RawSocketHandlerRootTest.SetTimeout (27 ms)
 [ RUN      ] RawSocketHandlerRootTest.InjectAndCapture
-[       OK ] RawSocketHandlerRootTest.InjectAndCapture (29 ms)
+[       OK ] RawSocketHandlerRootTest.InjectAndCapture (28 ms)
 [ RUN      ] RawSocketHandlerRootTest.AcquireRelease_MultipleTimes
-[       OK ] RawSocketHandlerRootTest.AcquireRelease_MultipleTimes (29 ms)
+[       OK ] RawSocketHandlerRootTest.AcquireRelease_MultipleTimes (30 ms)
 [ RUN      ] RawSocketHandlerRootTest.StatsAfterAcquire
-[       OK ] RawSocketHandlerRootTest.StatsAfterAcquire (25 ms)
+[       OK ] RawSocketHandlerRootTest.StatsAfterAcquire (29 ms)
 [ RUN      ] RawSocketHandlerRootTest.SetRingParams
 [       OK ] RawSocketHandlerRootTest.SetRingParams (29 ms)
 [ RUN      ] RawSocketHandlerRootTest.FanoutGroupFails_WithoutMultipleSockets
-[       OK ] RawSocketHandlerRootTest.FanoutGroupFails_WithoutMultipleSockets (29 ms)
-[----------] 11 tests from RawSocketHandlerRootTest (335 ms total)
+[       OK ] RawSocketHandlerRootTest.FanoutGroupFails_WithoutMultipleSockets (31 ms)
+[----------] 11 tests from RawSocketHandlerRootTest (328 ms total)
 
 [----------] 5 tests from IPv4AddrTest
 [ RUN      ] IPv4AddrTest.FromString_Valid
 [       OK ] IPv4AddrTest.FromString_Valid (0 ms)
 [ RUN      ] IPv4AddrTest.FromString_Loopback
-/content/PNTP/test/test_packet_builder.cpp:16: Failure
-Value of: addr.isLoopback()
-  Actual: false
-Expected: true
-[  FAILED  ] IPv4AddrTest.FromString_Loopback (0 ms)
+[       OK ] IPv4AddrTest.FromString_Loopback (0 ms)
 [ RUN      ] IPv4AddrTest.FromString_Broadcast
 [       OK ] IPv4AddrTest.FromString_Broadcast (0 ms)
 [ RUN      ] IPv4AddrTest.ToString_RoundTrip
@@ -244,45 +240,15 @@ Expected: true
 [ RUN      ] PacketBuilderTest.BuildTCPHeader_AckNum
 [       OK ] PacketBuilderTest.BuildTCPHeader_AckNum (0 ms)
 [ RUN      ] PacketBuilderTest.BuildTCPHeader_FlagsSYN
-/content/PNTP/test/test_packet_builder.cpp:258: Failure
-Expected equality of these values:
-  hdr[13] & 0x02
-    Which is: 0
-  0x02
-    Which is: 2
-[  FAILED  ] PacketBuilderTest.BuildTCPHeader_FlagsSYN (0 ms)
+[       OK ] PacketBuilderTest.BuildTCPHeader_FlagsSYN (0 ms)
 [ RUN      ] PacketBuilderTest.BuildTCPHeader_FlagsACK
-/content/PNTP/test/test_packet_builder.cpp:269: Failure
-Expected equality of these values:
-  hdr[13] & 0x10
-    Which is: 0
-  0x10
-    Which is: 16
-[  FAILED  ] PacketBuilderTest.BuildTCPHeader_FlagsACK (0 ms)
+[       OK ] PacketBuilderTest.BuildTCPHeader_FlagsACK (0 ms)
 [ RUN      ] PacketBuilderTest.BuildTCPHeader_FlagsFIN
-/content/PNTP/test/test_packet_builder.cpp:281: Failure
-Expected equality of these values:
-  hdr[13] & 0x01
-    Which is: 0
-  0x01
-    Which is: 1
-[  FAILED  ] PacketBuilderTest.BuildTCPHeader_FlagsFIN (0 ms)
+[       OK ] PacketBuilderTest.BuildTCPHeader_FlagsFIN (0 ms)
 [ RUN      ] PacketBuilderTest.BuildTCPHeader_FlagsPSH
-/content/PNTP/test/test_packet_builder.cpp:293: Failure
-Expected equality of these values:
-  hdr[13] & 0x08
-    Which is: 0
-  0x08
-    Which is: 8
-[  FAILED  ] PacketBuilderTest.BuildTCPHeader_FlagsPSH (0 ms)
+[       OK ] PacketBuilderTest.BuildTCPHeader_FlagsPSH (0 ms)
 [ RUN      ] PacketBuilderTest.BuildTCPHeader_FlagsRST
-/content/PNTP/test/test_packet_builder.cpp:304: Failure
-Expected equality of these values:
-  hdr[13] & 0x04
-    Which is: 0
-  0x04
-    Which is: 4
-[  FAILED  ] PacketBuilderTest.BuildTCPHeader_FlagsRST (0 ms)
+[       OK ] PacketBuilderTest.BuildTCPHeader_FlagsRST (0 ms)
 [ RUN      ] PacketBuilderTest.BuildTCPHeader_WindowSize
 [       OK ] PacketBuilderTest.BuildTCPHeader_WindowSize (0 ms)
 [ RUN      ] PacketBuilderTest.BuildTCPHeader_ChecksumNonZero
@@ -294,21 +260,9 @@ Expected equality of these values:
 [ RUN      ] PacketBuilderTest.TCPOptions_WindowScale
 [       OK ] PacketBuilderTest.TCPOptions_WindowScale (0 ms)
 [ RUN      ] PacketBuilderTest.TCPOptions_Timestamp
-/content/PNTP/test/test_packet_builder.cpp:360: Failure
-Expected equality of these values:
-  len
-    Which is: 32
-  28u
-    Which is: 28
-[  FAILED  ] PacketBuilderTest.TCPOptions_Timestamp (0 ms)
+[       OK ] PacketBuilderTest.TCPOptions_Timestamp (0 ms)
 [ RUN      ] PacketBuilderTest.TCPOptions_All
-/content/PNTP/test/test_packet_builder.cpp:372: Failure
-Expected equality of these values:
-  len
-    Which is: 40
-  36u
-    Which is: 36
-[  FAILED  ] PacketBuilderTest.TCPOptions_All (0 ms)
+[       OK ] PacketBuilderTest.TCPOptions_All (0 ms)
 [ RUN      ] PacketBuilderTest.BuildTCPHeader_WithMSS
 [       OK ] PacketBuilderTest.BuildTCPHeader_WithMSS (0 ms)
 [ RUN      ] PacketBuilderTest.BuildTCPHeader_WithTimestamp
@@ -323,47 +277,25 @@ Expected equality of these values:
 Expected: (frame.size()) >= (14u + 20u + 24u), actual: 54 vs 58
 [  FAILED  ] PacketBuilderSegmentTest.BuildSYN_CorrectLength (0 ms)
 [ RUN      ] PacketBuilderSegmentTest.BuildSYN_HasSYNFlag
-/content/PNTP/test/test_packet_builder.cpp:442: Failure
-Expected equality of these values:
-  tcp[13] & 0x02
-    Which is: 0
-  0x02
-    Which is: 2
-[  FAILED  ] PacketBuilderSegmentTest.BuildSYN_HasSYNFlag (0 ms)
+[       OK ] PacketBuilderSegmentTest.BuildSYN_HasSYNFlag (0 ms)
 [ RUN      ] PacketBuilderSegmentTest.BuildSYN_AcceptsPacketView
 /content/PNTP/test/test_packet_builder.cpp:447: Failure
 Expected: (frame.size()) >= (58u), actual: 54 vs 58
 [  FAILED  ] PacketBuilderSegmentTest.BuildSYN_AcceptsPacketView (0 ms)
 [ RUN      ] PacketBuilderSegmentTest.BuildSYNACK_HasBothFlags
-/content/PNTP/test/test_packet_builder.cpp:453: Failure
-Expected: (tcp[13] & 0x02) != (0), actual: 0 vs 0
-/content/PNTP/test/test_packet_builder.cpp:454: Failure
-Expected: (tcp[13] & 0x10) != (0), actual: 0 vs 0
-[  FAILED  ] PacketBuilderSegmentTest.BuildSYNACK_HasBothFlags (0 ms)
+[       OK ] PacketBuilderSegmentTest.BuildSYNACK_HasBothFlags (0 ms)
 [ RUN      ] PacketBuilderSegmentTest.BuildACK_HasACKFlag
-/content/PNTP/test/test_packet_builder.cpp:460: Failure
-Expected: (tcp[13] & 0x10) != (0), actual: 0 vs 0
-[  FAILED  ] PacketBuilderSegmentTest.BuildACK_HasACKFlag (0 ms)
+[       OK ] PacketBuilderSegmentTest.BuildACK_HasACKFlag (0 ms)
 [ RUN      ] PacketBuilderSegmentTest.BuildFIN_ACK_HasBothFlags
-/content/PNTP/test/test_packet_builder.cpp:466: Failure
-Expected: (tcp[13] & 0x01) != (0), actual: 0 vs 0
-/content/PNTP/test/test_packet_builder.cpp:467: Failure
-Expected: (tcp[13] & 0x10) != (0), actual: 0 vs 0
-[  FAILED  ] PacketBuilderSegmentTest.BuildFIN_ACK_HasBothFlags (0 ms)
+[       OK ] PacketBuilderSegmentTest.BuildFIN_ACK_HasBothFlags (0 ms)
 [ RUN      ] PacketBuilderSegmentTest.BuildRST_HasRSTFlag
-/content/PNTP/test/test_packet_builder.cpp:473: Failure
-Expected: (tcp[13] & 0x04) != (0), actual: 0 vs 0
-[  FAILED  ] PacketBuilderSegmentTest.BuildRST_HasRSTFlag (0 ms)
+[       OK ] PacketBuilderSegmentTest.BuildRST_HasRSTFlag (0 ms)
 [ RUN      ] PacketBuilderSegmentTest.BuildDataSegment_WithPayload
 [       OK ] PacketBuilderSegmentTest.BuildDataSegment_WithPayload (0 ms)
 [ RUN      ] PacketBuilderSegmentTest.BuildDataSegment_PSHFlagSet
-/content/PNTP/test/test_packet_builder.cpp:490: Failure
-Expected: (tcp[13] & 0x08) != (0), actual: 0 vs 0
-[  FAILED  ] PacketBuilderSegmentTest.BuildDataSegment_PSHFlagSet (0 ms)
+[       OK ] PacketBuilderSegmentTest.BuildDataSegment_PSHFlagSet (0 ms)
 [ RUN      ] PacketBuilderSegmentTest.BuildKeepalive_HasACKFlag
-/content/PNTP/test/test_packet_builder.cpp:496: Failure
-Expected: (tcp[13] & 0x10) != (0), actual: 0 vs 0
-[  FAILED  ] PacketBuilderSegmentTest.BuildKeepalive_HasACKFlag (0 ms)
+[       OK ] PacketBuilderSegmentTest.BuildKeepalive_HasACKFlag (0 ms)
 [ RUN      ] PacketBuilderSegmentTest.BuildSYN_WithTimestamp
 [       OK ] PacketBuilderSegmentTest.BuildSYN_WithTimestamp (0 ms)
 [ RUN      ] PacketBuilderSegmentTest.BuildSYN_CanBeParsedByRawSocket
@@ -446,20 +378,14 @@ Expected: (tcp[13] & 0x10) != (0), actual: 0 vs 0
 [ RUN      ] TCPEngineTest.TranscendentFetch_EmptyUrl
 [       OK ] TCPEngineTest.TranscendentFetch_EmptyUrl (0 ms)
 [ RUN      ] TCPEngineTest.Open_BadHost_ReturnsNull
-[       OK ] TCPEngineTest.Open_BadHost_ReturnsNull (12 ms)
+[       OK ] TCPEngineTest.Open_BadHost_ReturnsNull (21 ms)
 [ RUN      ] TCPEngineTest.ProcessIncomingPacket_NonTCP_ReturnsFalse
 [       OK ] TCPEngineTest.ProcessIncomingPacket_NonTCP_ReturnsFalse (0 ms)
 [ RUN      ] TCPEngineTest.ProcessIncomingPacket_WrongPorts_ReturnsFalse
 [       OK ] TCPEngineTest.ProcessIncomingPacket_WrongPorts_ReturnsFalse (0 ms)
 [ RUN      ] TCPEngineTest.ProcessIncomingPacket_RST_ClosesConn
-/content/PNTP/test/test_tcp_engine.cpp:290: Failure
-Expected equality of these values:
-  conn.state
-    Which is: 1-byte object <04>
-  TCPState::CLOSED
-    Which is: 1-byte object <00>
-[  FAILED  ] TCPEngineTest.ProcessIncomingPacket_RST_ClosesConn (0 ms)
-[----------] 6 tests from TCPEngineTest (13 ms total)
+[       OK ] TCPEngineTest.ProcessIncomingPacket_RST_ClosesConn (0 ms)
+[----------] 6 tests from TCPEngineTest (21 ms total)
 
 [----------] 2 tests from RTTIntegrationTest
 [ RUN      ] RTTIntegrationTest.RTTUsedInConnection
@@ -470,37 +396,9 @@ Expected equality of these values:
 
 [----------] 2 tests from HandshakeSimulationTest
 [ RUN      ] HandshakeSimulationTest.SimulateThreeWayHandshake
-/content/PNTP/test/test_tcp_engine.cpp:355: Failure
-Value of: result
-  Actual: false
-Expected: true
-/content/PNTP/test/test_tcp_engine.cpp:356: Failure
-Expected equality of these values:
-  conn.state
-    Which is: 1-byte object <02>
-  TCPState::ESTABLISHED
-    Which is: 1-byte object <04>
-/content/PNTP/test/test_tcp_engine.cpp:357: Failure
-Expected equality of these values:
-  conn.rcv_nxt
-    Which is: 0
-  5001u
-    Which is: 5001
-/content/PNTP/test/test_tcp_engine.cpp:358: Failure
-Expected equality of these values:
-  conn.snd_una
-    Which is: 1000
-  conn.iss + 1
-    Which is: 1001
-[  FAILED  ] HandshakeSimulationTest.SimulateThreeWayHandshake (0 ms)
+[       OK ] HandshakeSimulationTest.SimulateThreeWayHandshake (0 ms)
 [ RUN      ] HandshakeSimulationTest.SimulateSYN_BadAck_ClosesConn
-/content/PNTP/test/test_tcp_engine.cpp:382: Failure
-Expected equality of these values:
-  conn.state
-    Which is: 1-byte object <02>
-  TCPState::CLOSED
-    Which is: 1-byte object <00>
-[  FAILED  ] HandshakeSimulationTest.SimulateSYN_BadAck_ClosesConn (0 ms)
+[       OK ] HandshakeSimulationTest.SimulateSYN_BadAck_ClosesConn (0 ms)
 [----------] 2 tests from HandshakeSimulationTest (0 ms total)
 
 [----------] 3 tests from DataTransferTest
@@ -515,54 +413,16 @@ Expected equality of these values:
     Which is: 5006
 [  FAILED  ] DataTransferTest.Recv_OutOfOrder_Queued (0 ms)
 [ RUN      ] DataTransferTest.Recv_DupACK_IncrementsCounter
-/content/PNTP/test/test_tcp_engine.cpp:475: Failure
-Expected equality of these values:
-  conn.dup_ack_count
-    Which is: 0
-  1u
-    Which is: 1
-[  FAILED  ] DataTransferTest.Recv_DupACK_IncrementsCounter (0 ms)
+[       OK ] DataTransferTest.Recv_DupACK_IncrementsCounter (0 ms)
 [----------] 3 tests from DataTransferTest (0 ms total)
 
 [----------] 3 tests from CloseSimulationTest
 [ RUN      ] CloseSimulationTest.RecvFIN_SendsACK_GoesToCloseWait
-/content/PNTP/test/test_tcp_engine.cpp:518: Failure
-Value of: result
-  Actual: false
-Expected: true
-/content/PNTP/test/test_tcp_engine.cpp:519: Failure
-Expected equality of these values:
-  conn.state
-    Which is: 1-byte object <04>
-  TCPState::CLOSE_WAIT
-    Which is: 1-byte object <07>
-/content/PNTP/test/test_tcp_engine.cpp:520: Failure
-Value of: conn.fin_received
-  Actual: false
-Expected: true
-/content/PNTP/test/test_tcp_engine.cpp:521: Failure
-Expected equality of these values:
-  conn.rcv_nxt
-    Which is: 5000
-  5001u
-    Which is: 5001
-[  FAILED  ] CloseSimulationTest.RecvFIN_SendsACK_GoesToCloseWait (0 ms)
+[       OK ] CloseSimulationTest.RecvFIN_SendsACK_GoesToCloseWait (0 ms)
 [ RUN      ] CloseSimulationTest.FINWAIT1_RecvFIN_GoesToCLOSING
-/content/PNTP/test/test_tcp_engine.cpp:539: Failure
-Expected equality of these values:
-  conn.state
-    Which is: 1-byte object <05>
-  TCPState::CLOSING
-    Which is: 1-byte object <08>
-[  FAILED  ] CloseSimulationTest.FINWAIT1_RecvFIN_GoesToCLOSING (0 ms)
+[       OK ] CloseSimulationTest.FINWAIT1_RecvFIN_GoesToCLOSING (0 ms)
 [ RUN      ] CloseSimulationTest.FINWAIT2_RecvFIN_GoesToTIMEWAIT
-/content/PNTP/test/test_tcp_engine.cpp:554: Failure
-Expected equality of these values:
-  conn.state
-    Which is: 1-byte object <06>
-  TCPState::TIME_WAIT
-    Which is: 1-byte object <0A>
-[  FAILED  ] CloseSimulationTest.FINWAIT2_RecvFIN_GoesToTIMEWAIT (0 ms)
+[       OK ] CloseSimulationTest.FINWAIT2_RecvFIN_GoesToTIMEWAIT (0 ms)
 [----------] 3 tests from CloseSimulationTest (0 ms total)
 
 [----------] 2 tests from ChecksumValidationTest
@@ -574,27 +434,15 @@ Expected equality of these values:
 
 [----------] 5 tests from PacketVerifyTest
 [ RUN      ] PacketVerifyTest.SYN_ParsesCorrectly
-/content/PNTP/test/test_tcp_engine.cpp:606: Failure
-Expected: (tcp->syn) != (0), actual: 0 vs 0
-[  FAILED  ] PacketVerifyTest.SYN_ParsesCorrectly (0 ms)
+[       OK ] PacketVerifyTest.SYN_ParsesCorrectly (0 ms)
 [ RUN      ] PacketVerifyTest.SYNACK_ParsesCorrectly
-/content/PNTP/test/test_tcp_engine.cpp:624: Failure
-Expected: (tcp->syn) != (0), actual: 0 vs 0
-/content/PNTP/test/test_tcp_engine.cpp:625: Failure
-Expected: (tcp->ack) != (0), actual: 0 vs 0
-[  FAILED  ] PacketVerifyTest.SYNACK_ParsesCorrectly (0 ms)
+[       OK ] PacketVerifyTest.SYNACK_ParsesCorrectly (0 ms)
 [ RUN      ] PacketVerifyTest.DataSegment_PayloadMatches
 [       OK ] PacketVerifyTest.DataSegment_PayloadMatches (0 ms)
 [ RUN      ] PacketVerifyTest.RST_ParsesCorrectly
-/content/PNTP/test/test_tcp_engine.cpp:662: Failure
-Expected: (tcp->rst) != (0), actual: 0 vs 0
-[  FAILED  ] PacketVerifyTest.RST_ParsesCorrectly (0 ms)
+[       OK ] PacketVerifyTest.RST_ParsesCorrectly (0 ms)
 [ RUN      ] PacketVerifyTest.FIN_ACK_ParsesCorrectly
-/content/PNTP/test/test_tcp_engine.cpp:674: Failure
-Expected: (tcp->fin) != (0), actual: 0 vs 0
-/content/PNTP/test/test_tcp_engine.cpp:675: Failure
-Expected: (tcp->ack) != (0), actual: 0 vs 0
-[  FAILED  ] PacketVerifyTest.FIN_ACK_ParsesCorrectly (0 ms)
+[       OK ] PacketVerifyTest.FIN_ACK_ParsesCorrectly (0 ms)
 [----------] 5 tests from PacketVerifyTest (0 ms total)
 
 [----------] 6 tests from EdgeCaseTest
@@ -643,7 +491,7 @@ Conceptual HTTP/2 frame serialization complete. Total bytes: 265
 Conceptual HTTP/2 parsing complete. Found 1 frames.
 Http2Parser destroyed.
 [       OK ] Http2ParserTest.SerializeAndParse_LargePayload (0 ms)
-[----------] 5 tests from Http2ParserTest (0 ms total)
+[----------] 5 tests from Http2ParserTest (65 ms total)
 
 [----------] 7 tests from UrlManipulatorTest
 [ RUN      ] UrlManipulatorTest.RewriteUrl_ReturnsOriginal
@@ -695,7 +543,7 @@ Conceptual data extraction for Content-Type: text/html
   Processing as HTML.
   Found 0 conceptual video URLs.
   Found 0 conceptual course listings.
-[       OK ] DataExtractorTest.ExtractEmptyHtml (1 ms)
+[       OK ] DataExtractorTest.ExtractEmptyHtml (2 ms)
 [ RUN      ] DataExtractorTest.FindYoutubeUrl
 DataExtractor initialized (conceptual).
   Found 1 conceptual video URLs.
@@ -718,13 +566,13 @@ Conceptual data extraction for Content-Type: application/octet-stream
 DataExtractor initialized (conceptual).
 Warning: parseHtmlForElement is a conceptual placeholder. Use a proper HTML parser for robust extraction.
 [       OK ] DataExtractorTest.ParseHtmlForElement_ReturnsEmpty (0 ms)
-[----------] 7 tests from DataExtractorTest (3 ms total)
+[----------] 7 tests from DataExtractorTest (5 ms total)
 
 [----------] 5 tests from PerformanceMonitorTest
 [ RUN      ] PerformanceMonitorTest.StartEndMeasurement_ReturnsPositiveDuration
 PerformanceMonitor initialized.
 Measurement started for: test_event
-Measurement ended for: test_event, Duration: 1.10815 ms
+Measurement ended for: test_event, Duration: 1.1234 ms
 [       OK ] PerformanceMonitorTest.StartEndMeasurement_ReturnsPositiveDuration (1 ms)
 [ RUN      ] PerformanceMonitorTest.GetDurationMs_UnmeasuredEvent_ReturnsZero
 PerformanceMonitor initialized.
@@ -742,44 +590,18 @@ PerformanceMonitor initialized.
 PerformanceMonitor initialized.
 Measurement started for: event_a
 Measurement started for: event_b
-Measurement ended for: event_b, Duration: 1.16986 ms
-Measurement ended for: event_a, Duration: 1.20933 ms
+Measurement ended for: event_b, Duration: 1.11191 ms
+Measurement ended for: event_a, Duration: 1.15173 ms
 [       OK ] PerformanceMonitorTest.SequentialMeasurements_Independent (1 ms)
 [----------] 5 tests from PerformanceMonitorTest (2 ms total)
 
 [----------] Global test environment tear-down
-[==========] 209 tests from 25 test suites ran. (388 ms total)
-[  PASSED  ] 180 tests.
-[  FAILED  ] 29 tests, listed below:
-[  FAILED  ] IPv4AddrTest.FromString_Loopback
-[  FAILED  ] PacketBuilderTest.BuildTCPHeader_FlagsSYN
-[  FAILED  ] PacketBuilderTest.BuildTCPHeader_FlagsACK
-[  FAILED  ] PacketBuilderTest.BuildTCPHeader_FlagsFIN
-[  FAILED  ] PacketBuilderTest.BuildTCPHeader_FlagsPSH
-[  FAILED  ] PacketBuilderTest.BuildTCPHeader_FlagsRST
-[  FAILED  ] PacketBuilderTest.TCPOptions_Timestamp
-[  FAILED  ] PacketBuilderTest.TCPOptions_All
+[==========] 209 tests from 25 test suites ran. (450 ms total)
+[  PASSED  ] 206 tests.
+[  FAILED  ] 3 tests, listed below:
 [  FAILED  ] PacketBuilderSegmentTest.BuildSYN_CorrectLength
-[  FAILED  ] PacketBuilderSegmentTest.BuildSYN_HasSYNFlag
 [  FAILED  ] PacketBuilderSegmentTest.BuildSYN_AcceptsPacketView
-[  FAILED  ] PacketBuilderSegmentTest.BuildSYNACK_HasBothFlags
-[  FAILED  ] PacketBuilderSegmentTest.BuildACK_HasACKFlag
-[  FAILED  ] PacketBuilderSegmentTest.BuildFIN_ACK_HasBothFlags
-[  FAILED  ] PacketBuilderSegmentTest.BuildRST_HasRSTFlag
-[  FAILED  ] PacketBuilderSegmentTest.BuildDataSegment_PSHFlagSet
-[  FAILED  ] PacketBuilderSegmentTest.BuildKeepalive_HasACKFlag
-[  FAILED  ] TCPEngineTest.ProcessIncomingPacket_RST_ClosesConn
-[  FAILED  ] HandshakeSimulationTest.SimulateThreeWayHandshake
-[  FAILED  ] HandshakeSimulationTest.SimulateSYN_BadAck_ClosesConn
 [  FAILED  ] DataTransferTest.Recv_OutOfOrder_Queued
-[  FAILED  ] DataTransferTest.Recv_DupACK_IncrementsCounter
-[  FAILED  ] CloseSimulationTest.RecvFIN_SendsACK_GoesToCloseWait
-[  FAILED  ] CloseSimulationTest.FINWAIT1_RecvFIN_GoesToCLOSING
-[  FAILED  ] CloseSimulationTest.FINWAIT2_RecvFIN_GoesToTIMEWAIT
-[  FAILED  ] PacketVerifyTest.SYN_ParsesCorrectly
-[  FAILED  ] PacketVerifyTest.SYNACK_ParsesCorrectly
-[  FAILED  ] PacketVerifyTest.RST_ParsesCorrectly
-[  FAILED  ] PacketVerifyTest.FIN_ACK_ParsesCorrectly
 
-29 FAILED TESTS
+ 3 FAILED TESTS
 
