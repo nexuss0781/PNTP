@@ -49,6 +49,7 @@ include_directories(${CMAKE_SOURCE_DIR}/include)
 set(PNTP_SOURCES
     src/pntp_core.asm
     src/raw_socket_handler.cpp
+    src/packet_builder.cpp
     src/tcp_engine.cpp
     src/stealth_ensemble.cpp
     src/tls_interceptor.cpp

@@ -18,6 +18,7 @@ endif()
 set(PNTP_TEST_SOURCES
     ${CMAKE_SOURCE_DIR}/src/pntp_core.asm
     ${CMAKE_SOURCE_DIR}/src/raw_socket_handler.cpp
+    ${CMAKE_SOURCE_DIR}/src/packet_builder.cpp
     ${CMAKE_SOURCE_DIR}/src/tcp_engine.cpp
     ${CMAKE_SOURCE_DIR}/src/stealth_ensemble.cpp
     ${CMAKE_SOURCE_DIR}/src/tls_interceptor.cpp
@@ -28,6 +29,7 @@ set(PNTP_TEST_SOURCES
     ${CMAKE_SOURCE_DIR}/src/performance_monitor.cpp
     test_pntp_core.cpp
     test_raw_socket_handler.cpp
+    test_packet_builder.cpp
     test_tcp_engine.cpp
     test_http2_parser.cpp
     test_url_manipulator.cpp
