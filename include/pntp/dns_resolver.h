@@ -9,6 +9,7 @@
 #include <list>
 #include <unordered_map>
 #include <mutex>
+#include <memory>
 #include <atomic>
 
 namespace pntp {
@@ -59,7 +60,7 @@ private:
     std::unordered_map<std::string,
         std::list<std::pair<std::string, Entry>>::iterator> map_;
     std::list<std::pair<std::string, Entry>> list_;
-    mutable std::mutex mutex_;
+    mutable std::unique_ptr<std::mutex> mutex_;
 };
 
 class DNSResolver {
@@ -83,6 +84,21 @@ public:
                       RecordType type = RecordType::A,
                       uint32_t timeout_ms = 5000);
 
+    // Wire-format utilities (exposed for testing and direct use)
+    static std::vector<uint8_t> buildQuery(const std::string& host,
+                                            RecordType type, uint16_t id);
+
+    static bool parseResponse(const uint8_t* data, size_t len,
+                               uint16_t expected_id,
+                               std::vector<uint32_t>& ipv4,
+                               std::vector<std::array<uint8_t, 16>>& ipv6,
+                               uint32_t& ttl);
+
+    static std::vector<uint8_t> encodeName(const std::string& host);
+    static std::string decodeName(const uint8_t* data, size_t len,
+                                   size_t& offset);
+    static size_t skipName(const uint8_t* data, size_t len, size_t offset);
+
     void setDNSServers(const std::vector<std::string>& servers);
     std::vector<std::string> getDNSServers() const;
 
@@ -105,19 +121,7 @@ private:
                             RecordType type, uint32_t timeout_ms);
     DNSResult resolveViaSystem(const std::string& host, RecordType type);
 
-    std::vector<uint8_t> buildQuery(const std::string& host,
-                                     RecordType type, uint16_t id);
-
-    bool parseResponse(const uint8_t* data, size_t len,
-                       uint16_t expected_id,
-                       std::vector<uint32_t>& ipv4,
-                       std::vector<std::array<uint8_t, 16>>& ipv6,
-                       uint32_t& ttl);
-
-    static std::vector<uint8_t> encodeName(const std::string& host);
-    static std::string decodeName(const uint8_t* data, size_t len,
-                                   size_t& offset);
-    static size_t skipName(const uint8_t* data, size_t len, size_t offset);
+    uint16_t allocateId();
 
     void cacheResult(const std::string& host, const DNSResult& result);
     DNSResult checkCache(const std::string& host);

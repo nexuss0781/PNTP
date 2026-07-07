@@ -24,13 +24,14 @@ namespace pntp {
 
 // ── DNSCache ─────────────────────────────────────────────────────────
 
-DNSCache::DNSCache(size_t max_entries) : max_entries_(max_entries) {}
+DNSCache::DNSCache(size_t max_entries)
+    : max_entries_(max_entries), mutex_(std::make_unique<std::mutex>()) {}
 
 void DNSCache::put(const std::string& host,
                    const std::vector<uint32_t>& ipv4,
                    const std::vector<std::array<uint8_t, 16>>& ipv6,
                    uint32_t ttl_seconds) {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(*mutex_);
 
     uint64_t expiry = 0;
     if (ttl_seconds > 0) {
@@ -65,7 +66,7 @@ void DNSCache::put(const std::string& host,
 bool DNSCache::get(const std::string& host,
                    std::vector<uint32_t>& ipv4,
                    std::vector<std::array<uint8_t, 16>>& ipv6) {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(*mutex_);
 
     auto it = map_.find(host);
     if (it == map_.end()) return false;
@@ -88,7 +89,7 @@ bool DNSCache::get(const std::string& host,
 }
 
 void DNSCache::sweep() {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(*mutex_);
 
     uint64_t now_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(
         std::chrono::steady_clock::now().time_since_epoch()).count();
@@ -105,13 +106,13 @@ void DNSCache::sweep() {
 }
 
 void DNSCache::clear() {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(*mutex_);
     map_.clear();
     list_.clear();
 }
 
 size_t DNSCache::size() const {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(*mutex_);
     return list_.size();
 }
 

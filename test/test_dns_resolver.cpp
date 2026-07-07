@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <thread>
 #include <chrono>
+#include <arpa/inet.h>
 
 #include "pntp/dns_resolver.h"
 
@@ -425,6 +426,7 @@ TEST_F(DNSCacheTest, UpdateExisting) {
     cache->put("host", ipv4_b, ipv6, 300);
 
     std::vector<uint32_t> out_ipv4;
+    std::vector<std::array<uint8_t, 16>> out_ipv6;
     EXPECT_TRUE(cache->get("host", out_ipv4, out_ipv6));
     ASSERT_EQ(out_ipv4.size(), 1);
     EXPECT_EQ(out_ipv4[0], 0x05060708);
