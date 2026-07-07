@@ -1,5 +1,6 @@
 #include "pntp/dns_resolver.h"
 #include "pntp/pntp_core.h"
+#include "pntp/tls_interceptor.h"
 
 #include <cstring>
 #include <cstdlib>
@@ -16,8 +17,7 @@
 #include <poll.h>
 
 #ifdef PNTP_HAVE_OPENSSL
-#include <openssl/ssl.h>
-#include <openssl/err.h>
+#include <openssl/evp.h>
 #endif
 
 namespace pntp {
@@ -355,8 +355,8 @@ DNSResult DNSResolver::resolveViaUDP(const std::string& host,
 // ── DoH Transport (TLS gap: refactor to use TLSInterceptor when Phase 5 is complete) ──
 
 DNSResult DNSResolver::resolveViaDoH(const std::string& host,
-                                      RecordType type,
-                                      uint32_t timeout_ms) {
+                                       RecordType type,
+                                       uint32_t timeout_ms) {
     DNSResult result;
 #ifndef PNTP_HAVE_OPENSSL
     (void)host;
@@ -366,53 +366,15 @@ DNSResult DNSResolver::resolveViaDoH(const std::string& host,
 #else
     if (doh_host_.empty() || doh_path_.empty()) return result;
 
-    SSL_CTX* ctx = SSL_CTX_new(TLS_client_method());
-    if (!ctx) return result;
-    SSL_CTX_set_verify(ctx, SSL_VERIFY_NONE, nullptr);
-
-    struct addrinfo hints{}, *ai = nullptr;
-    hints.ai_family = AF_INET;
-    hints.ai_socktype = SOCK_STREAM;
-    if (getaddrinfo(doh_host_.c_str(), "443", &hints, &ai) != 0 || !ai) {
-        SSL_CTX_free(ctx);
-        return result;
+    // Lazily initialize TLS interceptor
+    if (!tls_) {
+        tls_ = std::make_unique<TLSInterceptor>();
+        if (!tls_->initialize()) return result;
     }
 
-    int sock = socket(ai->ai_family, ai->ai_socktype, ai->ai_protocol);
-    if (sock < 0) {
-        freeaddrinfo(ai);
-        SSL_CTX_free(ctx);
-        return result;
-    }
-
-    struct timeval tv{};
-    tv.tv_sec = static_cast<time_t>(timeout_ms / 1000);
-    tv.tv_usec = static_cast<suseconds_t>((timeout_ms % 1000) * 1000);
-    setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
-    setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, &tv, sizeof(tv));
-
-    if (connect(sock, ai->ai_addr, ai->ai_addrlen) < 0) {
-        freeaddrinfo(ai);
-        close(sock);
-        SSL_CTX_free(ctx);
-        return result;
-    }
-    freeaddrinfo(ai);
-
-    SSL* ssl = SSL_new(ctx);
-    if (!ssl) {
-        close(sock);
-        SSL_CTX_free(ctx);
-        return result;
-    }
-    SSL_set_fd(ssl, sock);
-
-    if (SSL_connect(ssl) != 1) {
-        SSL_free(ssl);
-        close(sock);
-        SSL_CTX_free(ctx);
-        return result;
-    }
+    // Connect to DoH server via TLSInterceptor
+    auto conn = tls_->connect(doh_host_, 443, timeout_ms);
+    if (!conn || !conn->connected) return result;
 
     uint16_t id = allocateId();
     auto query = buildQuery(host, type, id);
@@ -426,35 +388,29 @@ DNSResult DNSResolver::resolveViaDoH(const std::string& host,
         "Content-Length: " + std::to_string(body.size()) + "\r\n"
         "Connection: close\r\n\r\n";
 
-    if (SSL_write(ssl, http_request.data(),
-                  static_cast<int>(http_request.size())) <= 0) {
-        SSL_shutdown(ssl);
-        SSL_free(ssl);
-        close(sock);
-        SSL_CTX_free(ctx);
+    // Send HTTP header
+    if (!tls_->writeData(conn.get(),
+                          reinterpret_cast<const uint8_t*>(http_request.data()),
+                          http_request.size())) {
+        tls_->disconnect(conn.get());
         return result;
     }
 
-    if (SSL_write(ssl, query.data(),
-                  static_cast<int>(query.size())) <= 0) {
-        SSL_shutdown(ssl);
-        SSL_free(ssl);
-        close(sock);
-        SSL_CTX_free(ctx);
+    // Send DNS query
+    if (!tls_->writeData(conn.get(), query.data(), query.size())) {
+        tls_->disconnect(conn.get());
         return result;
     }
 
+    // Read response
     std::vector<uint8_t> http_response;
-    char buf[4096];
-    int n;
-    while ((n = SSL_read(ssl, buf, sizeof(buf))) > 0) {
-        http_response.insert(http_response.end(), buf, buf + n);
+    while (true) {
+        auto chunk = tls_->readData(conn.get(), timeout_ms);
+        if (chunk.empty()) break;
+        http_response.insert(http_response.end(), chunk.begin(), chunk.end());
     }
 
-    SSL_shutdown(ssl);
-    SSL_free(ssl);
-    close(sock);
-    SSL_CTX_free(ctx);
+    tls_->disconnect(conn.get());
 
     // Find HTTP body after \r\n\r\n
     auto it = std::search(http_response.begin(), http_response.end(),

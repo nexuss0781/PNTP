@@ -14,10 +14,12 @@ add_executable(pntp_bench
     ${CMAKE_SOURCE_DIR}/src/http2_parser.cpp
     ${CMAKE_SOURCE_DIR}/src/url_manipulator.cpp
     ${CMAKE_SOURCE_DIR}/src/dns_resolver.cpp
+    ${CMAKE_SOURCE_DIR}/src/tls_interceptor.cpp
     bench_pntp_core.cpp
     bench_raw_socket.cpp
     bench_http2_parser.cpp
     bench_tcp_engine.cpp
+    bench_tls_interceptor.cpp
 )
 
 target_link_libraries(pntp_bench PRIVATE benchmark::benchmark OpenSSL::SSL OpenSSL::Crypto)

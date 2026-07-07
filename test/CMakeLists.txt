@@ -14,12 +14,12 @@ else()
     set(GTEST_LIBRARIES GTest::gtest GTest::gtest_main)
 endif()
 
-# Phase 4 only: DNS Resolver tests
-# Add other phase tests back when their phase is active
 set(PNTP_TEST_SOURCES
     ${CMAKE_SOURCE_DIR}/src/pntp_core.asm
     ${CMAKE_SOURCE_DIR}/src/dns_resolver.cpp
+    ${CMAKE_SOURCE_DIR}/src/tls_interceptor.cpp
     test_dns_resolver.cpp
+    test_tls_interceptor.cpp
 )
 
 add_executable(pntp_tests ${PNTP_TEST_SOURCES})

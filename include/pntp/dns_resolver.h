@@ -12,6 +12,8 @@
 #include <memory>
 #include <atomic>
 
+class TLSInterceptor;
+
 namespace pntp {
 
 enum class RecordType : uint16_t {
@@ -141,6 +143,7 @@ private:
     mutable std::mutex stats_mutex_;
     Stats stats_;
     std::atomic<uint16_t> next_id_{1};
+    std::unique_ptr<TLSInterceptor> tls_;
 };
 
 } // namespace pntp
