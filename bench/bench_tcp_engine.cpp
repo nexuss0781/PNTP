@@ -442,4 +442,4 @@ static void BM_FullDataTransferSimulated(benchmark::State& state) {
 }
 BENCHMARK(BM_FullDataTransferSimulated);
 
-BENCHMARK_MAIN();
+// BENCHMARK_MAIN removed - defined in bench_pntp_core.cpp

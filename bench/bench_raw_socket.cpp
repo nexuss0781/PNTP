@@ -129,4 +129,4 @@ static void BM_PacketView_Construct(benchmark::State& state) {
 }
 BENCHMARK(BM_PacketView_Construct);
 
-BENCHMARK_MAIN();
+// BENCHMARK_MAIN removed - defined in bench_pntp_core.cpp

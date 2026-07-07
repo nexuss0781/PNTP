@@ -40,6 +40,13 @@ static void initOpenSSL() {
     });
 }
 
+// ── HandshakeState Destructor ─────────────────────────────────────────
+
+HandshakeState::~HandshakeState() {
+    if (mitm_privkey) EVP_PKEY_free(mitm_privkey);
+    if (mitm_server_privkey) EVP_PKEY_free(mitm_server_privkey);
+}
+
 // ── Helpers ──────────────────────────────────────────────────────────
 
 static std::string _hexStr(const uint8_t* data, size_t len) {
@@ -321,9 +328,10 @@ HskClientHello TLSInterceptor::parseClientHello(const uint8_t* data,
     ch.version = readUint16(data + offset);
     offset += 2;
 
-    auto random = readVar(data, offset, 32, len);
-    if (random.size() != 32) return ch;
-    ch.random = std::move(random);
+    // Random: fixed 32 bytes (not variable-length encoded)
+    if (offset + 32 > len) return ch;
+    ch.random.assign(data + offset, data + offset + 32);
+    offset += 32;
 
     auto sid = readVar(data, offset, 1, len);
     ch.session_id = std::move(sid);
@@ -477,9 +485,10 @@ HskServerHello TLSInterceptor::parseServerHello(const uint8_t* data,
     sh.version = readUint16(data);
     offset += 2;
 
-    auto random = readVar(data, offset, 32, len);
-    if (random.size() != 32) return sh;
-    sh.random = std::move(random);
+    // Random: fixed 32 bytes (not variable-length encoded)
+    if (offset + 32 > len) return sh;
+    sh.random.assign(data + offset, data + offset + 32);
+    offset += 32;
 
     auto sid = readVar(data, offset, 1, len);
     sh.session_id = std::move(sid);
@@ -817,17 +826,20 @@ std::vector<uint8_t> TLSInterceptor::serializeSupportedVersionsExtension(
 
     std::vector<uint8_t> ext;
 
+    // Extension type (2 bytes)
     uint8_t etype[2];
     writeUint16(etype,
                 static_cast<uint16_t>(ExtensionType::SUPPORTED_VERSIONS));
     ext.insert(ext.end(), etype, etype + 2);
 
-    // ServerHello: 2 bytes data length, 2 bytes version
-    uint8_t data[4] = {0, 2, 0, 0};
-    writeUint16(data + 2, version);
+    // Extension data length: 2 bytes (ServerHello format)
     uint8_t elen[2] = {0, 2};
     ext.insert(ext.end(), elen, elen + 2);
-    ext.insert(ext.end(), data, data + 4);
+
+    // Selected version (ServerHello: just the 2-byte version, no list prefix)
+    uint8_t ver[2];
+    writeUint16(ver, version);
+    ext.insert(ext.end(), ver, ver + 2);
 
     return ext;
 }
@@ -1160,9 +1172,9 @@ bool TLSInterceptor::generateCA() {
     BASIC_CONSTRAINTS_free(bc);
 
     // Key usage: keyCertSign, cRLSign
+    unsigned char key_usage_data[] = {0x03, 0x02, 0x05, 0xa0};
     X509_add1_ext_i2d(cert, NID_key_usage,
-                      reinterpret_cast<const char*>(
-                          "\x03\x02\x05\xa0"), // digitalSignature + keyCertSign + cRLSign
+                      key_usage_data,
                       0, X509V3_ADD_DEFAULT);
 
     // Sign
@@ -1212,10 +1224,24 @@ CertEntry* TLSInterceptor::generateDomainCert(const std::string& domain) {
     X509_set_issuer_name(cert, X509_get_subject_name(ca_cert_));
 
     // Subject Alternative Name: domain
-    std::string san = "DNS:" + domain;
-    X509_add1_ext_i2d(cert, NID_subject_alt_name,
-                      reinterpret_cast<const char*>(san.c_str()),
-                      0, X509V3_ADD_DEFAULT);
+    // Build GENERAL_NAMES properly instead of passing raw string
+    GENERAL_NAMES* sans = sk_GENERAL_NAME_new_null();
+    if (sans) {
+        GENERAL_NAME* san = GENERAL_NAME_new();
+        if (san) {
+            ASN1_IA5STRING* ia5 = ASN1_IA5STRING_new();
+            if (ia5) {
+                ASN1_STRING_set(ia5, domain.c_str(),
+                                static_cast<int>(domain.size()));
+                GENERAL_NAME_set0_value(san, GEN_DNS, ia5);
+                // ia5 now owned by san, don't free separately
+            }
+            sk_GENERAL_NAME_push(sans, san); // sans takes ownership
+        }
+        X509_add1_ext_i2d(cert, NID_subject_alt_name, sans,
+                          0, X509V3_ADD_DEFAULT);
+        GENERAL_NAMES_free(sans); // safe even if sans is empty
+    }
 
     // Sign with CA key
     if (!X509_sign(cert, ca_key_, EVP_sha256())) {

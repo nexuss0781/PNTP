@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <cstddef>
+#include <cstring>
 #include <string>
 #include <vector>
 #include <unordered_map>
@@ -194,10 +195,7 @@ struct HandshakeState {
     std::vector<uint8_t> hello_retry_request;
     bool early_data_accepted = false;
 
-    ~HandshakeState() {
-        if (mitm_privkey) EVP_PKEY_free(mitm_privkey);
-        if (mitm_server_privkey) EVP_PKEY_free(mitm_server_privkey);
-    }
+    ~HandshakeState();
 };
 
 // ── Session Ticket ──────────────────────────────────────────────────
@@ -286,8 +284,10 @@ public:
 
     void setMaxCertCache(size_t max) { max_cert_cache_ = max; }
 
-private:
-    // ── Record Layer ───────────────────────────────────────────────
+public:
+    // ── Testing Support ────────────────────────────────────────────
+    // Exposed as public for unit testing. These are core protocol
+    // primitives that must be independently verifiable.
     TLSRecord readRecord(int fd);
     bool writeRecord(int fd, uint8_t type, const uint8_t* data, size_t len);
     bool writeRecordVec(int fd, uint8_t type,
@@ -368,6 +368,12 @@ private:
     EVP_PKEY* importPeerPublicKey(const uint8_t* data, size_t len,
                                    NamedGroup group);
 
+public:
+    // ── Transcript Hash (exposed for testing) ──────────────────────
+    std::vector<uint8_t> computeTranscriptHash(
+        const std::vector<uint8_t>& messages, CipherSuite suite);
+
+private:
     // ── Certificate Generation ─────────────────────────────────────
     bool generateCA();
     CertEntry* generateDomainCert(const std::string& domain);
@@ -379,8 +385,6 @@ private:
     bool completeClientHandshake(HandshakeState& state, int client_fd);
     bool completeServerHandshake(HandshakeState& state, int server_fd);
     void deriveAllKeys(HandshakeState& state);
-    std::vector<uint8_t> computeTranscriptHash(
-        const std::vector<uint8_t>& messages, CipherSuite suite);
 
     // ── Proxy listener ─────────────────────────────────────────────
     void acceptLoop();

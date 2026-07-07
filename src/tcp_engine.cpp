@@ -149,7 +149,7 @@ uint32_t TCPEngine::generateISS() {
 }
 
 bool TCPEngine::resolveHost(const std::string& host, uint32_t& out_ip, MAC& out_mac) {
-    auto dns_result = dns_resolver_.resolve(host, RecordType::A, 5000);
+    auto dns_result = dns_resolver_.resolve(host, pntp::RecordType::A, 5000);
     if (!dns_result.success || dns_result.ipv4_addresses.empty()) {
         return false;
     }

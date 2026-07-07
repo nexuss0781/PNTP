@@ -164,4 +164,4 @@ static void BM_Resolve_Hot(benchmark::State& state) {
 }
 BENCHMARK(BM_Resolve_Hot);
 
-BENCHMARK_MAIN();
+// BENCHMARK_MAIN removed - defined in bench_pntp_core.cpp

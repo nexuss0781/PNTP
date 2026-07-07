@@ -10,18 +10,27 @@
 // ── X25519 Key Exchange ─────────────────────────────────────────────
 
 static void BM_X25519KeyExchange(benchmark::State& state) {
-    uint8_t base[32];
-    base[0] = 9;
-    memset(base + 1, 0, 31);
-    uint8_t priv_a[32], priv_b[32], pub_a[32], pub_b[32], shared[32];
-
     for (auto _ : state) {
-        RAND_bytes(priv_a, 32);
-        RAND_bytes(priv_b, 32);
-        X25519(pub_a, priv_a, base);
-        X25519(pub_b, priv_b, base);
-        X25519(shared, priv_a, pub_b);
+        EVP_PKEY_CTX* actx = EVP_PKEY_CTX_new_id(EVP_PKEY_X25519, nullptr);
+        EVP_PKEY* a = nullptr;
+        EVP_PKEY_keygen_init(actx);
+        EVP_PKEY_keygen(actx, &a);
+        EVP_PKEY_CTX_free(actx);
+        EVP_PKEY_CTX* bctx = EVP_PKEY_CTX_new_id(EVP_PKEY_X25519, nullptr);
+        EVP_PKEY* b = nullptr;
+        EVP_PKEY_keygen_init(bctx);
+        EVP_PKEY_keygen(bctx, &b);
+        EVP_PKEY_CTX_free(bctx);
+        EVP_PKEY_CTX* derive = EVP_PKEY_CTX_new(a, nullptr);
+        EVP_PKEY_derive_init(derive);
+        EVP_PKEY_derive_set_peer(derive, b);
+        size_t slen = 32;
+        uint8_t shared[32];
+        EVP_PKEY_derive(derive, shared, &slen);
         benchmark::DoNotOptimize(shared);
+        EVP_PKEY_CTX_free(derive);
+        EVP_PKEY_free(a);
+        EVP_PKEY_free(b);
     }
 }
 BENCHMARK(BM_X25519KeyExchange);
@@ -37,21 +46,20 @@ static void BM_AES128GCMEncrypt(benchmark::State& state) {
     std::vector<uint8_t> pt(pt_len);
     RAND_bytes(pt.data(), pt_len);
 
-    EVP_AEAD* aead = EVP_AEAD_fetch(nullptr, "AES-128-GCM", nullptr);
-    EVP_AEAD_CTX* ctx = EVP_AEAD_CTX_new(aead, key, 16, 0);
-
-    std::vector<uint8_t> ct(pt_len + 16);
-    size_t ct_len;
-    uint8_t tag[16];
+    std::vector<uint8_t> ct(pt_len + 32);
 
     for (auto _ : state) {
-        EVP_AEAD_CTX_seal(ctx, ct.data(), &ct_len, ct.size(),
-                          iv, 12, pt.data(), pt_len, nullptr, 0, nullptr, 0);
+        EVP_CIPHER_CTX* ctx = EVP_CIPHER_CTX_new();
+        EVP_EncryptInit_ex(ctx, EVP_aes_128_gcm(), nullptr, key, iv);
+        int out_len = 0;
+        EVP_EncryptUpdate(ctx, ct.data(), &out_len, pt.data(), pt_len);
+        int tmp = 0;
+        EVP_EncryptFinal_ex(ctx, ct.data() + out_len, &tmp);
+        out_len += tmp;
+        EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_GET_TAG, 16, ct.data() + out_len);
         benchmark::DoNotOptimize(ct.data());
+        EVP_CIPHER_CTX_free(ctx);
     }
-
-    EVP_AEAD_CTX_free(ctx);
-    EVP_AEAD_free(aead);
 }
 BENCHMARK(BM_AES128GCMEncrypt)->Arg(256)->Arg(1500)->Arg(16384);
 
@@ -66,25 +74,33 @@ static void BM_AES128GCMDecrypt(benchmark::State& state) {
     std::vector<uint8_t> pt(pt_len);
     RAND_bytes(pt.data(), pt_len);
 
-    EVP_AEAD* aead = EVP_AEAD_fetch(nullptr, "AES-128-GCM", nullptr);
-    EVP_AEAD_CTX* ctx = EVP_AEAD_CTX_new(aead, key, 16, 0);
-
-    std::vector<uint8_t> ct(pt_len + 16);
-    size_t ct_len;
-    EVP_AEAD_CTX_seal(ctx, ct.data(), &ct_len, ct.size(),
-                      iv, 12, pt.data(), pt_len, nullptr, 0, nullptr, 0);
-
-    std::vector<uint8_t> out(pt_len);
-    size_t out_len;
-
-    for (auto _ : state) {
-        EVP_AEAD_CTX_open(ctx, out.data(), &out_len, out.size(),
-                          iv, 12, ct.data(), ct_len, nullptr, 0, nullptr, 0);
-        benchmark::DoNotOptimize(out.data());
+    std::vector<uint8_t> ct(pt_len + 32);
+    int ct_len = 0;
+    {
+        EVP_CIPHER_CTX* ctx = EVP_CIPHER_CTX_new();
+        EVP_EncryptInit_ex(ctx, EVP_aes_128_gcm(), nullptr, key, iv);
+        EVP_EncryptUpdate(ctx, ct.data(), &ct_len, pt.data(), pt_len);
+        int tmp = 0;
+        EVP_EncryptFinal_ex(ctx, ct.data() + ct_len, &tmp);
+        ct_len += tmp;
+        EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_GET_TAG, 16, ct.data() + ct_len);
+        ct_len += 16;
+        EVP_CIPHER_CTX_free(ctx);
     }
 
-    EVP_AEAD_CTX_free(ctx);
-    EVP_AEAD_free(aead);
+    std::vector<uint8_t> out(pt_len);
+
+    for (auto _ : state) {
+        EVP_CIPHER_CTX* ctx = EVP_CIPHER_CTX_new();
+        EVP_DecryptInit_ex(ctx, EVP_aes_128_gcm(), nullptr, key, iv);
+        int out_len = 0;
+        EVP_DecryptUpdate(ctx, out.data(), &out_len, ct.data(), ct_len - 16);
+        EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_SET_TAG, 16, ct.data() + ct_len - 16);
+        int tmp = 0;
+        EVP_DecryptFinal_ex(ctx, out.data() + out_len, &tmp);
+        benchmark::DoNotOptimize(out.data());
+        EVP_CIPHER_CTX_free(ctx);
+    }
 }
 BENCHMARK(BM_AES128GCMDecrypt)->Arg(256)->Arg(1500)->Arg(16384);
 
@@ -206,4 +222,4 @@ static void BM_RecordLayer(benchmark::State& state) {
 }
 BENCHMARK(BM_RecordLayer)->Arg(64)->Arg(1500)->Arg(65535);
 
-BENCHMARK_MAIN();
+// BENCHMARK_MAIN removed - defined in bench_pntp_core.cpp

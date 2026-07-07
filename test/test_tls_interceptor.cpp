@@ -7,7 +7,9 @@
 
 #include "pntp/tls_interceptor.h"
 
-using namespace pntp;
+// Forward declarations
+static void writeUint16(uint8_t* data, uint16_t val);
+static void writeUint32(uint8_t* data, uint32_t val);
 
 // ═════════════════════════════════════════════════════════════════════
 // Test Helpers
@@ -287,13 +289,12 @@ TEST_F(HandshakeParseTest, ParseServerHello_Minimal) {
 
     // Extensions
     std::vector<uint8_t> ext;
-    // supported_versions
+    // supported_versions (ServerHello: just 2-byte version, not list)
     uint8_t sv_type[2] = {0, 43};
     ext.insert(ext.end(), sv_type, sv_type + 2);
-    uint8_t sv_data[4] = {0, 2, 0x03, 0x04};
-    uint8_t sv_len[2] = {0, 4};
+    uint8_t sv_len[2] = {0, 2};
     ext.insert(ext.end(), sv_len, sv_len + 2);
-    ext.insert(ext.end(), sv_data, sv_data + 4);
+    ext.push_back(0x03); ext.push_back(0x04);
 
     uint16_t ext_total = static_cast<uint16_t>(ext.size());
     data.push_back(static_cast<uint8_t>((ext_total >> 8) & 0xFF));
@@ -779,9 +780,12 @@ TEST_F(KeyShareExtTest, SerializeKeyShareExtension) {
     // Extension type should be key_share (51)
     EXPECT_EQ(ext[0], 0);
     EXPECT_EQ(ext[1], 51);
-    // Group should be X25519 (0x001D)
+    // Group should be X25519 (0x001D) at bytes 4-5
+    EXPECT_EQ(ext[4], 0);
+    EXPECT_EQ(ext[5], 0x1D);
+    // Key exchange length should be 32 at bytes 6-7
     EXPECT_EQ(ext[6], 0);
-    EXPECT_EQ(ext[7], 0x1D);
+    EXPECT_EQ(ext[7], 32);
 }
 
 // ═════════════════════════════════════════════════════════════════════
@@ -1013,11 +1017,12 @@ TEST_F(GoalValidationTest, ClientHelloParsing_AllExtensions) {
 
     std::vector<uint8_t> ext_data;
 
-    // SNI
+    // SNI (RFC 6066): type + ext_len + list_len + name_type + name_len + name
     std::string host = "test.com";
-    uint8_t sni[] = {0x00, 0x00, 0x00, 0x0A, 0x00, 0x08, 0x00, 0x00,
+    // ServerNameList length = name_type(1) + name_len(2) + host(8) = 11
+    uint8_t sni[] = {0x00, 0x00, 0x00, 0x0D, 0x00, 0x0B, 0x00,
                      0x00, 0x08};
-    ext_data.insert(ext_data.end(), sni, sni + 10);
+    ext_data.insert(ext_data.end(), sni, sni + 9);
     ext_data.insert(ext_data.end(), host.begin(), host.end());
 
     // ALPN: h2
