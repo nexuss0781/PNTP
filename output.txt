@@ -1,18 +1,5 @@
-=== Working dir: /content/PNTP ===
+=== Working dir: /content/PNTP/PNTP ===
 W: Skipping acquire of configured file 'main/source/Sources' as repository 'https://r2u.stat.illinois.edu/ubuntu jammy InRelease' does not seem to provide it (sources.list entry misspelt?)
-Selecting previously unselected package googletest.
-(Reading database ... 118280 files and directories currently installed.)
-Preparing to unpack .../googletest_1.11.0-3_all.deb ...
-Unpacking googletest (1.11.0-3) ...
-Selecting previously unselected package libgtest-dev:amd64.
-Preparing to unpack .../libgtest-dev_1.11.0-3_amd64.deb ...
-Unpacking libgtest-dev:amd64 (1.11.0-3) ...
-Selecting previously unselected package libgmock-dev:amd64.
-Preparing to unpack .../libgmock-dev_1.11.0-3_amd64.deb ...
-Unpacking libgmock-dev:amd64 (1.11.0-3) ...
-Setting up googletest (1.11.0-3) ...
-Setting up libgtest-dev:amd64 (1.11.0-3) ...
-Setting up libgmock-dev:amd64 (1.11.0-3) ...
 -- The CXX compiler identification is GNU 11.4.0
 -- The ASM_NASM compiler identification is NASM
 -- Found assembler: /usr/bin/nasm
@@ -22,195 +9,175 @@ Setting up libgmock-dev:amd64 (1.11.0-3) ...
 -- Detecting CXX compile features
 -- Detecting CXX compile features - done
 -- Found OpenSSL: /usr/lib/x86_64-linux-gnu/libcrypto.so (found version "3.0.2")
--- Configuring done (1.0s)
+-- Configuring done (0.7s)
 -- Generating done (0.0s)
--- Build files have been written to: /content/PNTP/build
+-- Build files have been written to: /content/PNTP/PNTP/build
 ninja: Entering directory `build'
-[2/4] Building CXX object test/CMakeFiles/pntp_tests.dir/__/src/dns_resolver.cpp.o
-FAILED: test/CMakeFiles/pntp_tests.dir/__/src/dns_resolver.cpp.o 
-/usr/bin/c++  -I/content/PNTP/include -std=gnu++20 -fPIE -DGTEST_HAS_PTHREAD=1 -MD -MT test/CMakeFiles/pntp_tests.dir/__/src/dns_resolver.cpp.o -MF test/CMakeFiles/pntp_tests.dir/__/src/dns_resolver.cpp.o.d -o test/CMakeFiles/pntp_tests.dir/__/src/dns_resolver.cpp.o -c /content/PNTP/src/dns_resolver.cpp
-/content/PNTP/src/dns_resolver.cpp:185:10: error: no declaration matches ‘uint16_t pntp::DNSResolver::allocateId()’
-  185 | uint16_t DNSResolver::allocateId() {
-      |          ^~~~~~~~~~~
-/content/PNTP/src/dns_resolver.cpp:185:10: note: no functions named ‘uint16_t pntp::DNSResolver::allocateId()’
-In file included from /content/PNTP/src/dns_resolver.cpp:1:
-/content/PNTP/include/pntp/dns_resolver.h:65:7: note: ‘class pntp::DNSResolver’ defined here
-   65 | class DNSResolver {
-      |       ^~~~~~~~~~~
-/content/PNTP/src/dns_resolver.cpp: In member function ‘pntp::DNSResult pntp::DNSResolver::resolveViaUDP(const string&, pntp::RecordType, uint32_t)’:
-/content/PNTP/src/dns_resolver.cpp:300:23: error: ‘allocateId’ was not declared in this scope; did you mean ‘alloca’?
-  300 |         uint16_t id = allocateId();
-      |                       ^~~~~~~~~~
-      |                       alloca
-/content/PNTP/src/dns_resolver.cpp: In member function ‘void pntp::DNSResolver::setCacheSize(size_t)’:
-/content/PNTP/src/dns_resolver.cpp:646:34: error: use of deleted function ‘pntp::DNSCache& pntp::DNSCache::operator=(pntp::DNSCache&&)’
-  646 |     cache_ = DNSCache(max_entries);
-      |                                  ^
-In file included from /content/PNTP/src/dns_resolver.cpp:1:
-/content/PNTP/include/pntp/dns_resolver.h:33:7: note: ‘pntp::DNSCache& pntp::DNSCache::operator=(pntp::DNSCache&&)’ is implicitly deleted because the default definition would be ill-formed:
-   33 | class DNSCache {
-      |       ^~~~~~~~
-/content/PNTP/include/pntp/dns_resolver.h:33:7: error: use of deleted function ‘std::mutex& std::mutex::operator=(const std::mutex&)’
-In file included from /usr/include/c++/11/mutex:43,
-                 from /content/PNTP/include/pntp/dns_resolver.h:11,
-                 from /content/PNTP/src/dns_resolver.cpp:1:
-/usr/include/c++/11/bits/std_mutex.h:95:12: note: declared here
-   95 |     mutex& operator=(const mutex&) = delete;
-      |            ^~~~~~~~
-[3/4] Building CXX object test/CMakeFiles/pntp_tests.dir/test_dns_resolver.cpp.o
-FAILED: test/CMakeFiles/pntp_tests.dir/test_dns_resolver.cpp.o 
-/usr/bin/c++  -I/content/PNTP/include -std=gnu++20 -fPIE -DGTEST_HAS_PTHREAD=1 -MD -MT test/CMakeFiles/pntp_tests.dir/test_dns_resolver.cpp.o -MF test/CMakeFiles/pntp_tests.dir/test_dns_resolver.cpp.o.d -o test/CMakeFiles/pntp_tests.dir/test_dns_resolver.cpp.o -c /content/PNTP/test/test_dns_resolver.cpp
-/content/PNTP/test/test_dns_resolver.cpp: In member function ‘virtual void DNSWireFormatTest_EncodeName_Simple_Test::TestBody()’:
-/content/PNTP/test/test_dns_resolver.cpp:14:43: error: ‘static std::vector<unsigned char> pntp::DNSResolver::encodeName(const string&)’ is private within this context
-   14 |     auto encoded = DNSResolver::encodeName("example.com");
-      |                    ~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~
-In file included from /content/PNTP/test/test_dns_resolver.cpp:5:
-/content/PNTP/include/pntp/dns_resolver.h:117:33: note: declared private here
-  117 |     static std::vector<uint8_t> encodeName(const std::string& host);
-      |                                 ^~~~~~~~~~
-/content/PNTP/test/test_dns_resolver.cpp: In member function ‘virtual void DNSWireFormatTest_EncodeName_MultiLevel_Test::TestBody()’:
-/content/PNTP/test/test_dns_resolver.cpp:29:43: error: ‘static std::vector<unsigned char> pntp::DNSResolver::encodeName(const string&)’ is private within this context
-   29 |     auto encoded = DNSResolver::encodeName("sub.domain.example.com");
-      |                    ~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~
-In file included from /content/PNTP/test/test_dns_resolver.cpp:5:
-/content/PNTP/include/pntp/dns_resolver.h:117:33: note: declared private here
-  117 |     static std::vector<uint8_t> encodeName(const std::string& host);
-      |                                 ^~~~~~~~~~
-/content/PNTP/test/test_dns_resolver.cpp: In member function ‘virtual void DNSWireFormatTest_EncodeName_SingleLabel_Test::TestBody()’:
-/content/PNTP/test/test_dns_resolver.cpp:37:43: error: ‘static std::vector<unsigned char> pntp::DNSResolver::encodeName(const string&)’ is private within this context
-   37 |     auto encoded = DNSResolver::encodeName("localhost");
-      |                    ~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~
-In file included from /content/PNTP/test/test_dns_resolver.cpp:5:
-/content/PNTP/include/pntp/dns_resolver.h:117:33: note: declared private here
-  117 |     static std::vector<uint8_t> encodeName(const std::string& host);
-      |                                 ^~~~~~~~~~
-/content/PNTP/test/test_dns_resolver.cpp: In member function ‘virtual void DNSWireFormatTest_DecodeName_Simple_Test::TestBody()’:
-/content/PNTP/test/test_dns_resolver.cpp:46:47: error: ‘static std::string pntp::DNSResolver::decodeName(const uint8_t*, size_t, size_t&)’ is private within this context
-   46 |     std::string name = DNSResolver::decodeName(data, sizeof(data), offset);
-      |                        ~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~
-In file included from /content/PNTP/test/test_dns_resolver.cpp:5:
-/content/PNTP/include/pntp/dns_resolver.h:118:24: note: declared private here
-  118 |     static std::string decodeName(const uint8_t* data, size_t len,
-      |                        ^~~~~~~~~~
-/content/PNTP/test/test_dns_resolver.cpp: In member function ‘virtual void DNSWireFormatTest_DecodeName_Pointer_Test::TestBody()’:
-/content/PNTP/test/test_dns_resolver.cpp:57:47: error: ‘static std::string pntp::DNSResolver::decodeName(const uint8_t*, size_t, size_t&)’ is private within this context
-   57 |     std::string name = DNSResolver::decodeName(data, sizeof(data), offset);
-      |                        ~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~
-In file included from /content/PNTP/test/test_dns_resolver.cpp:5:
-/content/PNTP/include/pntp/dns_resolver.h:118:24: note: declared private here
-  118 |     static std::string decodeName(const uint8_t* data, size_t len,
-      |                        ^~~~~~~~~~
-/content/PNTP/test/test_dns_resolver.cpp: In member function ‘virtual void DNSWireFormatTest_EncodeDecode_RoundTrip_Test::TestBody()’:
-/content/PNTP/test/test_dns_resolver.cpp:71:47: error: ‘static std::vector<unsigned char> pntp::DNSResolver::encodeName(const string&)’ is private within this context
-   71 |         auto encoded = DNSResolver::encodeName(host);
-      |                        ~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
-In file included from /content/PNTP/test/test_dns_resolver.cpp:5:
-/content/PNTP/include/pntp/dns_resolver.h:117:33: note: declared private here
-  117 |     static std::vector<uint8_t> encodeName(const std::string& host);
-      |                                 ^~~~~~~~~~
-/content/PNTP/test/test_dns_resolver.cpp:73:54: error: ‘static std::string pntp::DNSResolver::decodeName(const uint8_t*, size_t, size_t&)’ is private within this context
-   73 |         std::string decoded = DNSResolver::decodeName(encoded.data(), encoded.size(), offset);
-      |                               ~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-In file included from /content/PNTP/test/test_dns_resolver.cpp:5:
-/content/PNTP/include/pntp/dns_resolver.h:118:24: note: declared private here
-  118 |     static std::string decodeName(const uint8_t* data, size_t len,
-      |                        ^~~~~~~~~~
-/content/PNTP/test/test_dns_resolver.cpp: In member function ‘virtual void DNSQueryBuilderTest_BuildQuery_ValidHeader_Test::TestBody()’:
-/content/PNTP/test/test_dns_resolver.cpp:83:41: error: cannot call member function ‘std::vector<unsigned char> pntp::DNSResolver::buildQuery(const string&, pntp::RecordType, uint16_t)’ without object
-   83 |     auto query = DNSResolver::buildQuery("example.com", RecordType::A, 0x1234);
-      |                  ~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/content/PNTP/test/test_dns_resolver.cpp: In member function ‘virtual void DNSQueryBuilderTest_BuildQuery_QuestionSection_Test::TestBody()’:
-/content/PNTP/test/test_dns_resolver.cpp:96:41: error: cannot call member function ‘std::vector<unsigned char> pntp::DNSResolver::buildQuery(const string&, pntp::RecordType, uint16_t)’ without object
-   96 |     auto query = DNSResolver::buildQuery("example.com", RecordType::A, 1);
-      |                  ~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/content/PNTP/test/test_dns_resolver.cpp: In member function ‘virtual void DNSQueryBuilderTest_BuildQuery_AAAAType_Test::TestBody()’:
-/content/PNTP/test/test_dns_resolver.cpp:114:41: error: cannot call member function ‘std::vector<unsigned char> pntp::DNSResolver::buildQuery(const string&, pntp::RecordType, uint16_t)’ without object
-  114 |     auto query = DNSResolver::buildQuery("example.com", RecordType::AAAA, 1);
-      |                  ~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/content/PNTP/test/test_dns_resolver.cpp: In member function ‘virtual void DNSQueryBuilderTest_BuildQuery_DifferentIDs_Test::TestBody()’:
-/content/PNTP/test/test_dns_resolver.cpp:121:38: error: cannot call member function ‘std::vector<unsigned char> pntp::DNSResolver::buildQuery(const string&, pntp::RecordType, uint16_t)’ without object
-  121 |     auto q1 = DNSResolver::buildQuery("test.com", RecordType::A, 0xAAAA);
-      |               ~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/content/PNTP/test/test_dns_resolver.cpp:122:38: error: cannot call member function ‘std::vector<unsigned char> pntp::DNSResolver::buildQuery(const string&, pntp::RecordType, uint16_t)’ without object
-  122 |     auto q2 = DNSResolver::buildQuery("test.com", RecordType::A, 0xBBBB);
-      |               ~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/content/PNTP/test/test_dns_resolver.cpp: In member function ‘std::vector<unsigned char> DNSResponseParserTest::makeMultiAResponse()’:
-/content/PNTP/test/test_dns_resolver.cpp:227:28: error: ‘htonl’ was not declared in this scope
-  227 |             uint32_t ttl = htonl(300 + static_cast<uint32_t>(i));
-      |                            ^~~~~
-In file included from /usr/include/gtest/gtest.h:62,
-                 from /content/PNTP/test/test_dns_resolver.cpp:1:
-/content/PNTP/test/test_dns_resolver.cpp: In member function ‘virtual void DNSResponseParserTest_ParseARecord_Test::TestBody()’:
-/content/PNTP/test/test_dns_resolver.cpp:245:43: error: cannot call member function ‘bool pntp::DNSResolver::parseResponse(const uint8_t*, size_t, uint16_t, std::vector<unsigned int>&, std::vector<std::array<unsigned char, 16> >&, uint32_t&)’ without object
-  245 |     EXPECT_TRUE(DNSResolver::parseResponse(resp.data(), resp.size(),
-      |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~
-  246 |                                             0x1234, ipv4, ipv6, ttl));
-      |                                             ~~~~~~~~~~~~~~~~~~~~~~~~
-/content/PNTP/test/test_dns_resolver.cpp: In member function ‘virtual void DNSResponseParserTest_ParseAAAARecord_Test::TestBody()’:
-/content/PNTP/test/test_dns_resolver.cpp:258:43: error: cannot call member function ‘bool pntp::DNSResolver::parseResponse(const uint8_t*, size_t, uint16_t, std::vector<unsigned int>&, std::vector<std::array<unsigned char, 16> >&, uint32_t&)’ without object
-  258 |     EXPECT_TRUE(DNSResolver::parseResponse(resp.data(), resp.size(),
-      |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~
-  259 |                                             0x5678, ipv4, ipv6, ttl));
-      |                                             ~~~~~~~~~~~~~~~~~~~~~~~~
-/content/PNTP/test/test_dns_resolver.cpp: In member function ‘virtual void DNSResponseParserTest_ParseNXDOMAIN_Test::TestBody()’:
-/content/PNTP/test/test_dns_resolver.cpp:272:44: error: cannot call member function ‘bool pntp::DNSResolver::parseResponse(const uint8_t*, size_t, uint16_t, std::vector<unsigned int>&, std::vector<std::array<unsigned char, 16> >&, uint32_t&)’ without object
-  272 |     EXPECT_FALSE(DNSResolver::parseResponse(resp.data(), resp.size(),
-      |                  ~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~
-  273 |                                              0x1235, ipv4, ipv6, ttl));
-      |                                              ~~~~~~~~~~~~~~~~~~~~~~~~
-/content/PNTP/test/test_dns_resolver.cpp: In member function ‘virtual void DNSResponseParserTest_ParseWrongTransactionID_Test::TestBody()’:
-/content/PNTP/test/test_dns_resolver.cpp:283:44: error: cannot call member function ‘bool pntp::DNSResolver::parseResponse(const uint8_t*, size_t, uint16_t, std::vector<unsigned int>&, std::vector<std::array<unsigned char, 16> >&, uint32_t&)’ without object
-  283 |     EXPECT_FALSE(DNSResolver::parseResponse(resp.data(), resp.size(),
-      |                  ~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~
-  284 |                                              0xDEAD, ipv4, ipv6, ttl));
-      |                                              ~~~~~~~~~~~~~~~~~~~~~~~~
-/content/PNTP/test/test_dns_resolver.cpp: In member function ‘virtual void DNSResponseParserTest_ParseEmptyResponse_Test::TestBody()’:
-/content/PNTP/test/test_dns_resolver.cpp:293:44: error: cannot call member function ‘bool pntp::DNSResolver::parseResponse(const uint8_t*, size_t, uint16_t, std::vector<unsigned int>&, std::vector<std::array<unsigned char, 16> >&, uint32_t&)’ without object
-  293 |     EXPECT_FALSE(DNSResolver::parseResponse(empty.data(), empty.size(),
-      |                  ~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  294 |                                              1, ipv4, ipv6, ttl));
-      |                                              ~~~~~~~~~~~~~~~~~~~
-/content/PNTP/test/test_dns_resolver.cpp: In member function ‘virtual void DNSResponseParserTest_ParseTruncatedResponse_Test::TestBody()’:
-/content/PNTP/test/test_dns_resolver.cpp:303:44: error: cannot call member function ‘bool pntp::DNSResolver::parseResponse(const uint8_t*, size_t, uint16_t, std::vector<unsigned int>&, std::vector<std::array<unsigned char, 16> >&, uint32_t&)’ without object
-  303 |     EXPECT_FALSE(DNSResolver::parseResponse(truncated.data(), truncated.size(),
-      |                  ~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  304 |                                              0x1234, ipv4, ipv6, ttl));
-      |                                              ~~~~~~~~~~~~~~~~~~~~~~~~
-/content/PNTP/test/test_dns_resolver.cpp: In member function ‘virtual void DNSResponseParserTest_ParseMultipleARecords_Test::TestBody()’:
-/content/PNTP/test/test_dns_resolver.cpp:313:43: error: cannot call member function ‘bool pntp::DNSResolver::parseResponse(const uint8_t*, size_t, uint16_t, std::vector<unsigned int>&, std::vector<std::array<unsigned char, 16> >&, uint32_t&)’ without object
-  313 |     EXPECT_TRUE(DNSResolver::parseResponse(resp.data(), resp.size(),
-      |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~
-  314 |                                             0xABCD, ipv4, ipv6, ttl));
-      |                                             ~~~~~~~~~~~~~~~~~~~~~~~~
-/content/PNTP/test/test_dns_resolver.cpp: In member function ‘virtual void DNSCacheTest_UpdateExisting_Test::TestBody()’:
-/content/PNTP/test/test_dns_resolver.cpp:428:46: error: ‘out_ipv6’ was not declared in this scope; did you mean ‘out_ipv4’?
-  428 |     EXPECT_TRUE(cache->get("host", out_ipv4, out_ipv6));
-      |                                              ^~~~~~~~
-/content/PNTP/test/test_dns_resolver.cpp: In member function ‘virtual void DNSGoalValidationTest_Goal_RawWireFormat_NoGetaddrinfo_Test::TestBody()’:
-/content/PNTP/test/test_dns_resolver.cpp:609:41: error: cannot call member function ‘std::vector<unsigned char> pntp::DNSResolver::buildQuery(const string&, pntp::RecordType, uint16_t)’ without object
-  609 |     auto query = DNSResolver::buildQuery("test.example", RecordType::A, 1);
-      |                  ~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/content/PNTP/test/test_dns_resolver.cpp: In member function ‘virtual void DNSGoalValidationTest_Goal_NameCompressionHandling_Test::TestBody()’:
-/content/PNTP/test/test_dns_resolver.cpp:622:47: error: ‘static std::string pntp::DNSResolver::decodeName(const uint8_t*, size_t, size_t&)’ is private within this context
-  622 |     std::string name = DNSResolver::decodeName(data, sizeof(data), offset);
-      |                        ~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~
-In file included from /content/PNTP/test/test_dns_resolver.cpp:5:
-/content/PNTP/include/pntp/dns_resolver.h:118:24: note: declared private here
-  118 |     static std::string decodeName(const uint8_t* data, size_t len,
-      |                        ^~~~~~~~~~
-In file included from /usr/include/gtest/gtest.h:62,
-                 from /content/PNTP/test/test_dns_resolver.cpp:1:
-/content/PNTP/test/test_dns_resolver.cpp: In member function ‘virtual void DNSGoalValidationTest_Goal_MultipleARecords_Test::TestBody()’:
-/content/PNTP/test/test_dns_resolver.cpp:670:43: error: cannot call member function ‘bool pntp::DNSResolver::parseResponse(const uint8_t*, size_t, uint16_t, std::vector<unsigned int>&, std::vector<std::array<unsigned char, 16> >&, uint32_t&)’ without object
-  670 |     EXPECT_TRUE(DNSResolver::parseResponse(resp.data(), resp.size(),
-      |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~
-  671 |                                             1, ipv4, ipv6, ttl));
-      |                                             ~~~~~~~~~~~~~~~~~~~
-/content/PNTP/test/test_dns_resolver.cpp: In member function ‘virtual void DNSGoalValidationTest_Goal_TTLTracking_Test::TestBody()’:
-/content/PNTP/test/test_dns_resolver.cpp:719:43: error: cannot call member function ‘bool pntp::DNSResolver::parseResponse(const uint8_t*, size_t, uint16_t, std::vector<unsigned int>&, std::vector<std::array<unsigned char, 16> >&, uint32_t&)’ without object
-  719 |     EXPECT_TRUE(DNSResolver::parseResponse(resp.data(), resp.size(),
-      |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~
-  720 |                                             0x1234, ipv4, ipv6, ttl));
-      |                                             ~~~~~~~~~~~~~~~~~~~~~~~~
-ninja: build stopped: subcommand failed.
+[4/4] Linking CXX executable test/pntp_tests
+
+=== Phase 4: DNS Resolver Tests ===
+Running main() from ./googletest/src/gtest_main.cc
+[==========] Running 47 tests from 7 test suites.
+[----------] Global test environment set-up.
+[----------] 6 tests from DNSWireFormatTest
+[ RUN      ] DNSWireFormatTest.EncodeName_Simple
+/content/PNTP/PNTP/test/test_dns_resolver.cpp:17: Failure
+Expected equality of these values:
+  encoded.size()
+    Which is: 13
+  14
+[  FAILED  ] DNSWireFormatTest.EncodeName_Simple (0 ms)
+[ RUN      ] DNSWireFormatTest.EncodeName_MultiLevel
+[       OK ] DNSWireFormatTest.EncodeName_MultiLevel (0 ms)
+[ RUN      ] DNSWireFormatTest.EncodeName_SingleLabel
+/content/PNTP/PNTP/test/test_dns_resolver.cpp:39: Failure
+Expected equality of these values:
+  encoded.size()
+    Which is: 11
+  10
+[  FAILED  ] DNSWireFormatTest.EncodeName_SingleLabel (0 ms)
+[ RUN      ] DNSWireFormatTest.DecodeName_Simple
+[       OK ] DNSWireFormatTest.DecodeName_Simple (0 ms)
+[ RUN      ] DNSWireFormatTest.DecodeName_Pointer
+/content/PNTP/PNTP/test/test_dns_resolver.cpp:59: Failure
+Expected equality of these values:
+  name
+    Which is: ""
+  "example.com"
+/content/PNTP/PNTP/test/test_dns_resolver.cpp:60: Failure
+Expected equality of these values:
+  offset
+    Which is: 7
+  9
+[  FAILED  ] DNSWireFormatTest.DecodeName_Pointer (0 ms)
+[ RUN      ] DNSWireFormatTest.EncodeDecode_RoundTrip
+[       OK ] DNSWireFormatTest.EncodeDecode_RoundTrip (0 ms)
+[----------] 6 tests from DNSWireFormatTest (0 ms total)
+
+[----------] 4 tests from DNSQueryBuilderTest
+[ RUN      ] DNSQueryBuilderTest.BuildQuery_ValidHeader
+[       OK ] DNSQueryBuilderTest.BuildQuery_ValidHeader (0 ms)
+[ RUN      ] DNSQueryBuilderTest.BuildQuery_QuestionSection
+[       OK ] DNSQueryBuilderTest.BuildQuery_QuestionSection (0 ms)
+[ RUN      ] DNSQueryBuilderTest.BuildQuery_AAAAType
+[       OK ] DNSQueryBuilderTest.BuildQuery_AAAAType (0 ms)
+[ RUN      ] DNSQueryBuilderTest.BuildQuery_DifferentIDs
+[       OK ] DNSQueryBuilderTest.BuildQuery_DifferentIDs (0 ms)
+[----------] 4 tests from DNSQueryBuilderTest (0 ms total)
+
+[----------] 7 tests from DNSResponseParserTest
+[ RUN      ] DNSResponseParserTest.ParseARecord
+[       OK ] DNSResponseParserTest.ParseARecord (0 ms)
+[ RUN      ] DNSResponseParserTest.ParseAAAARecord
+[       OK ] DNSResponseParserTest.ParseAAAARecord (0 ms)
+[ RUN      ] DNSResponseParserTest.ParseNXDOMAIN
+[       OK ] DNSResponseParserTest.ParseNXDOMAIN (0 ms)
+[ RUN      ] DNSResponseParserTest.ParseWrongTransactionID
+[       OK ] DNSResponseParserTest.ParseWrongTransactionID (0 ms)
+[ RUN      ] DNSResponseParserTest.ParseEmptyResponse
+[       OK ] DNSResponseParserTest.ParseEmptyResponse (0 ms)
+[ RUN      ] DNSResponseParserTest.ParseTruncatedResponse
+[       OK ] DNSResponseParserTest.ParseTruncatedResponse (0 ms)
+[ RUN      ] DNSResponseParserTest.ParseMultipleARecords
+[       OK ] DNSResponseParserTest.ParseMultipleARecords (0 ms)
+[----------] 7 tests from DNSResponseParserTest (0 ms total)
+
+[----------] 8 tests from DNSCacheTest
+[ RUN      ] DNSCacheTest.PutAndGet
+[       OK ] DNSCacheTest.PutAndGet (0 ms)
+[ RUN      ] DNSCacheTest.GetMissing
+[       OK ] DNSCacheTest.GetMissing (0 ms)
+[ RUN      ] DNSCacheTest.TTLExpiry
+[       OK ] DNSCacheTest.TTLExpiry (2000 ms)
+[ RUN      ] DNSCacheTest.TTLZeroNeverCached
+/content/PNTP/PNTP/test/test_dns_resolver.cpp:370: Failure
+Value of: cache->get("no-cache.example", out_ipv4, out_ipv6)
+  Actual: true
+Expected: false
+[  FAILED  ] DNSCacheTest.TTLZeroNeverCached (0 ms)
+[ RUN      ] DNSCacheTest.LRUEviction
+[       OK ] DNSCacheTest.LRUEviction (0 ms)
+[ RUN      ] DNSCacheTest.LRUAccessPromotion
+[       OK ] DNSCacheTest.LRUAccessPromotion (0 ms)
+[ RUN      ] DNSCacheTest.Clear
+[       OK ] DNSCacheTest.Clear (0 ms)
+[ RUN      ] DNSCacheTest.UpdateExisting
+[       OK ] DNSCacheTest.UpdateExisting (0 ms)
+[----------] 8 tests from DNSCacheTest (2000 ms total)
+
+[----------] 8 tests from DNSResolverIntegrationTest
+[ RUN      ] DNSResolverIntegrationTest.ResolveExampleComViaUDP
+/content/PNTP/PNTP/test/test_dns_resolver.cpp:457: Failure
+Value of: found
+  Actual: false
+Expected: true
+Expected 93.184.216.34 for example.com
+[  FAILED  ] DNSResolverIntegrationTest.ResolveExampleComViaUDP (5 ms)
+[ RUN      ] DNSResolverIntegrationTest.ResolveViaCache
+[       OK ] DNSResolverIntegrationTest.ResolveViaCache (4 ms)
+[ RUN      ] DNSResolverIntegrationTest.ResolveInvalidHost
+[       OK ] DNSResolverIntegrationTest.ResolveInvalidHost (30 ms)
+[ RUN      ] DNSResolverIntegrationTest.ResolveMultipleServers
+[       OK ] DNSResolverIntegrationTest.ResolveMultipleServers (2 ms)
+[ RUN      ] DNSResolverIntegrationTest.AAAAQuery
+[       OK ] DNSResolverIntegrationTest.AAAAQuery (5 ms)
+[ RUN      ] DNSResolverIntegrationTest.CachePerformance
+[       OK ] DNSResolverIntegrationTest.CachePerformance (2 ms)
+[ RUN      ] DNSResolverIntegrationTest.ResolveOrderUDPFallback
+[       OK ] DNSResolverIntegrationTest.ResolveOrderUDPFallback (2 ms)
+[ RUN      ] DNSResolverIntegrationTest.ClearCacheBetweenResolves
+[       OK ] DNSResolverIntegrationTest.ClearCacheBetweenResolves (6 ms)
+[----------] 8 tests from DNSResolverIntegrationTest (60 ms total)
+
+[----------] 7 tests from DNSResolverConfigTest
+[ RUN      ] DNSResolverConfigTest.DefaultServers
+[       OK ] DNSResolverConfigTest.DefaultServers (0 ms)
+[ RUN      ] DNSResolverConfigTest.CustomServers
+[       OK ] DNSResolverConfigTest.CustomServers (0 ms)
+[ RUN      ] DNSResolverConfigTest.DoHServerParsing
+[       OK ] DNSResolverConfigTest.DoHServerParsing (0 ms)
+[ RUN      ] DNSResolverConfigTest.DoHEnableDisable
+[       OK ] DNSResolverConfigTest.DoHEnableDisable (0 ms)
+[ RUN      ] DNSResolverConfigTest.StatsInitialState
+[       OK ] DNSResolverConfigTest.StatsInitialState (0 ms)
+[ RUN      ] DNSResolverConfigTest.ResetStats
+[       OK ] DNSResolverConfigTest.ResetStats (26 ms)
+[ RUN      ] DNSResolverConfigTest.CacheSizeConfig
+[       OK ] DNSResolverConfigTest.CacheSizeConfig (6 ms)
+[----------] 7 tests from DNSResolverConfigTest (33 ms total)
+
+[----------] 7 tests from DNSGoalValidationTest
+[ RUN      ] DNSGoalValidationTest.Goal_RawWireFormat_NoGetaddrinfo
+[       OK ] DNSGoalValidationTest.Goal_RawWireFormat_NoGetaddrinfo (0 ms)
+[ RUN      ] DNSGoalValidationTest.Goal_NameCompressionHandling
+/content/PNTP/PNTP/test/test_dns_resolver.cpp:626: Failure
+Expected equality of these values:
+  offset
+    Which is: 12
+  7
+[  FAILED  ] DNSGoalValidationTest.Goal_NameCompressionHandling (0 ms)
+[ RUN      ] DNSGoalValidationTest.Goal_CacheBypassesResolution
+[       OK ] DNSGoalValidationTest.Goal_CacheBypassesResolution (3 ms)
+[ RUN      ] DNSGoalValidationTest.Goal_MultipleARecords
+[       OK ] DNSGoalValidationTest.Goal_MultipleARecords (0 ms)
+[ RUN      ] DNSGoalValidationTest.Goal_CacheLRUPreventsUnboundedGrowth
+[       OK ] DNSGoalValidationTest.Goal_CacheLRUPreventsUnboundedGrowth (0 ms)
+[ RUN      ] DNSGoalValidationTest.Goal_ConfigurableServers
+[       OK ] DNSGoalValidationTest.Goal_ConfigurableServers (0 ms)
+[ RUN      ] DNSGoalValidationTest.Goal_TTLTracking
+[       OK ] DNSGoalValidationTest.Goal_TTLTracking (0 ms)
+[----------] 7 tests from DNSGoalValidationTest (4 ms total)
+
+[----------] Global test environment tear-down
+[==========] 47 tests from 7 test suites ran. (2098 ms total)
+[  PASSED  ] 41 tests.
+[  FAILED  ] 6 tests, listed below:
+[  FAILED  ] DNSWireFormatTest.EncodeName_Simple
+[  FAILED  ] DNSWireFormatTest.EncodeName_SingleLabel
+[  FAILED  ] DNSWireFormatTest.DecodeName_Pointer
+[  FAILED  ] DNSCacheTest.TTLZeroNeverCached
+[  FAILED  ] DNSResolverIntegrationTest.ResolveExampleComViaUDP
+[  FAILED  ] DNSGoalValidationTest.Goal_NameCompressionHandling
+
+ 6 FAILED TESTS
 
