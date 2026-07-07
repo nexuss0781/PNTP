@@ -35,7 +35,7 @@ endif()
 # ── Warnings ────────────────────────────────────────────────────────
 set(PNTP_WARNING_FLAGS -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion)
 if(PNTP_WERROR)
-    set(PNTP_WARNING_FLAGS ${PNTP_WARNING_FLAGS} -Werror)
+    list(APPEND PNTP_WARNING_FLAGS -Werror)
 endif()
 
 # ── Dependencies ────────────────────────────────────────────────────
@@ -65,7 +65,7 @@ set(PNTP_SOURCES
 # ── Main executable ─────────────────────────────────────────────────
 add_executable(pntp_v4 ${PNTP_SOURCES})
 
-target_compile_options(pntp_v4 PRIVATE ${PNTP_WARNING_FLAGS})
+target_compile_options(pntp_v4 PRIVATE $<$<COMPILE_LANGUAGE:CXX>:${PNTP_WARNING_FLAGS}>)
 
 target_link_libraries(pntp_v4 PRIVATE
     OpenSSL::SSL
@@ -83,7 +83,7 @@ add_executable(pntp_test_raw_socket
     src/raw_socket_handler.cpp
     src/test_raw_socket.cpp
 )
-target_compile_options(pntp_test_raw_socket PRIVATE ${PNTP_WARNING_FLAGS})
+target_compile_options(pntp_test_raw_socket PRIVATE $<$<COMPILE_LANGUAGE:CXX>:${PNTP_WARNING_FLAGS}>)
 target_link_libraries(pntp_test_raw_socket PRIVATE)
 
 # ── Tests ───────────────────────────────────────────────────────────
