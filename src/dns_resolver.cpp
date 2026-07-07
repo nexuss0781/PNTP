@@ -31,6 +31,7 @@ void DNSCache::put(const std::string& host,
                    const std::vector<uint32_t>& ipv4,
                    const std::vector<std::array<uint8_t, 16>>& ipv6,
                    uint32_t ttl_seconds) {
+    if (ttl_seconds == 0) return;
     std::lock_guard<std::mutex> lock(*mutex_);
 
     uint64_t expiry = 0;
