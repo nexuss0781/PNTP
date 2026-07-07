@@ -9,11 +9,6 @@ rm -rf build
 cmake -S . -B build -G Ninja -DPNTP_WERROR=OFF -DPNTP_BUILD_TESTS=ON -DPNTP_BUILD_BENCH=OFF 2>&1
 ninja -C build pntp_tests 2>&1
 
-# Run only Phase 4 (DNS Resolver) tests
 echo ""
 echo "=== Phase 4: DNS Resolver Tests ==="
-./build/test/pntp_tests --gtest_filter="DNSWireFormatTest.*:DNSQueryBuilderTest.*:DNSResponseParserTest.*:DNSCacheTest.*:DNSResolverConfigTest.*:DNSGoalValidationTest.*" 2>&1
-
-echo ""
-echo "=== Phase 4: Integration Tests (requires network) ==="
-./build/test/pntp_tests --gtest_filter="DNSResolverIntegrationTest.*" 2>&1 || echo "[SKIP] Integration tests require network access"
+./build/test/pntp_tests 2>&1
