@@ -90,3 +90,12 @@ Transform `pntp_core.asm` from 2 naive functions (`get_rdtsc`, `generate_stealth
 - **Cloud VMs**: RDRAND may return 0 (Colab, AWS, GCP). `stealth_rand` falls back to entropy-pool XOR on bits 0-15; upper bits depend on RDRAND.
 - **Build system**: `find_package(GTest)` with FetchContent fallback works best across different environments.
 - **Phase 0 base**: CMake with `-DPNTP_WERROR=OFF` avoids NASM warning-flag issues with older NASM.
+
+## File Reference
+
+| File | Lines | Purpose |
+|------|-------|---------|
+| `src/pntp_core.asm` | 224 | 12 production-quality assembly primitives: RDTSC, serialized timing, memory fencing, cache control, AVX2 non-temporal copy, entropy pool, CPUID, spin-loop, prefetch |
+| `include/pntp/pntp_core.h` | 25 | `extern "C"` declarations for all assembly symbols + `PNTP_ENTROPY_POOL_SIZE` |
+| `test/test_pntp_core.cpp` | 364 | 38 tests covering all assembly functions + cross-function integrations |
+| `bench/bench_pntp_core.cpp` | 21 | Performance benchmarks for assembly primitives |

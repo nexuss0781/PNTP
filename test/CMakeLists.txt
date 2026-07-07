@@ -35,6 +35,7 @@ set(PNTP_TEST_SOURCES
     test_url_manipulator.cpp
     test_data_extractor.cpp
     test_performance_monitor.cpp
+    test_dns_resolver.cpp
 )
 
 add_executable(pntp_tests ${PNTP_TEST_SOURCES})

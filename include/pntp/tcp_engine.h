@@ -11,6 +11,7 @@
 #include "pntp/raw_socket_handler.h"
 #include "pntp/packet_builder.h"
 #include "pntp/pntp_core.h"
+#include "pntp/dns_resolver.h"
 
 enum class TCPState : uint8_t {
     CLOSED = 0,
@@ -161,10 +162,12 @@ public:
     TCPState getState(const TCPConnection* conn) const;
     std::string transcendentFetch(const std::string& url);
 
+    DNSResolver* getDNSResolver() { return &dns_resolver_; }
     RawSocketHandler* getRawSocket() { return &raw_sock; }
 
 private:
     RawSocketHandler raw_sock;
+    DNSResolver dns_resolver_;
     MAC local_mac;
     uint32_t local_ip = 0;
     uint16_t ip_id_counter = 0;

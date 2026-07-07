@@ -13,6 +13,7 @@ add_executable(pntp_bench
     ${CMAKE_SOURCE_DIR}/src/tcp_engine.cpp
     ${CMAKE_SOURCE_DIR}/src/http2_parser.cpp
     ${CMAKE_SOURCE_DIR}/src/url_manipulator.cpp
+    ${CMAKE_SOURCE_DIR}/src/dns_resolver.cpp
     bench_pntp_core.cpp
     bench_raw_socket.cpp
     bench_http2_parser.cpp

@@ -149,18 +149,12 @@ uint32_t TCPEngine::generateISS() {
 }
 
 bool TCPEngine::resolveHost(const std::string& host, uint32_t& out_ip, MAC& out_mac) {
-    struct addrinfo hints{}, *result = nullptr;
-    hints.ai_family = AF_INET;
-    hints.ai_socktype = SOCK_STREAM;
-
-    if (getaddrinfo(host.c_str(), nullptr, &hints, &result) != 0 || !result) {
+    auto dns_result = dns_resolver_.resolve(host, RecordType::A, 5000);
+    if (!dns_result.success || dns_result.ipv4_addresses.empty()) {
         return false;
     }
 
-    auto* addr = reinterpret_cast<struct sockaddr_in*>(result->ai_addr);
-    out_ip = ntohl(addr->sin_addr.s_addr);
-    freeaddrinfo(result);
-
+    out_ip = dns_result.ipv4_addresses[0];
     out_mac.bytes = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
     return true;
 }

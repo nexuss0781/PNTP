@@ -57,6 +57,7 @@ set(PNTP_SOURCES
     src/url_manipulator.cpp
     src/data_extractor.cpp
     src/transcendence_engine.cpp
+    src/dns_resolver.cpp
     src/performance_monitor.cpp
     src/main.cpp
 )

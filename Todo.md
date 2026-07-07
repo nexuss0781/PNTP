@@ -112,16 +112,16 @@
 ## Phase 4 — DNS Resolver
 
 ```
-[ ] P4-001: Implement raw UDP DNS query: build question section, sendto port 53 (2h)
-[ ] P4-002: Implement DNS response parser: header/flags, questions, answers (2h)
-[ ] P4-003: Support A (type 1) and AAAA (type 28) record extraction (0.5h)
-[ ] P4-004: Implement DNSCache: LRU map with TTL expiry via background sweep (2h)
-[ ] P4-005: Implement DoH resolver: raw TLS GET to application/dns-message (2h)
-[ ] P4-006: Implement resolver order: cache → DoH → raw UDP → system fallback (1h)
-[ ] P4-007: Add configurable DNS servers (default: Cloudflare 1.1.1.1 / 8.8.8.8) (0.5h)
-[ ] P4-008: Write unit test: resolve("example.com") returns 93.184.216.34 (0.5h)
-[ ] P4-009: Write unit test: cache hit returns cached entry, cache miss queries (0.5h)
-[ ] P4-010: Write benchmark: DNS resolution time with cache hot vs cold (0.5h)
+[x] P4-001: Implement raw UDP DNS query: build question section, sendto port 53 (2h)
+[x] P4-002: Implement DNS response parser: header/flags, questions, answers (2h)
+[x] P4-003: Support A (type 1) and AAAA (type 28) record extraction (0.5h)
+[x] P4-004: Implement DNSCache: LRU map with TTL expiry via background sweep (2h)
+[x] P4-005: Implement DoH resolver: raw TLS GET to application/dns-message (2h)
+[x] P4-006: Implement resolver order: cache → DoH → raw UDP → system fallback (1h)
+[x] P4-007: Add configurable DNS servers (default: Cloudflare 1.1.1.1 / 8.8.8.8) (0.5h)
+[x] P4-008: Write unit test: resolve("example.com") returns 93.184.216.34 (0.5h)
+[x] P4-009: Write unit test: cache hit returns cached entry, cache miss queries (0.5h)
+[x] P4-010: Write benchmark: DNS resolution time with cache hot vs cold (0.5h)
 ```
 
 **Total:** 11.5h
@@ -409,7 +409,7 @@
 | P1: Assembly | 8.25 | 2 |
 | P2: Raw Socket | 14.00 | 2 |
 | P3: TCP Engine | 31.25 [x] | 2 |
-| P4: DNS Resolver | 11.50 | 2 |
+| P4: DNS Resolver | 11.50 [x] | 2 |
 | P5: TLS Interceptor | 29.00 | 2 |
 | P6: HTTP/2 | 40.00 | 2 |
 | P7: HTTP/1.1 | 10.50 | 2 |
