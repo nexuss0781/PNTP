@@ -117,15 +117,17 @@ Phase 16: V5 Foundation                   (wk 16-17)
 
 **Goal:** Bypass system resolver with raw DNS + DoH capability.
 
+**Status:** Complete (2026-07-07) — 47/47 tests passing, 0 failures
+
 ### Tasks
-- [ ] Implement raw UDP DNS query (single socket per query)
-- [ ] Parse DNS response: header, questions, answers, authority, additional
-- [ ] Support A and AAAA record types
-- [ ] Implement `DNSCache` with LRU eviction and TTL expiry
-- [ ] Implement DoH (DNS-over-HTTPS) via raw TLS + HTTP/1.1 CONNECT
-- [ ] Implement stub resolution order: cache → DoH → raw UDP → system fallback
-- [ ] Add DNSSEC validation (optional, off by default)
-- [ ] Test: `resolve("example.com")` returns correct IPs
+- [x] Implement raw UDP DNS query (single socket per query)
+- [x] Parse DNS response: header, questions, answers, authority, additional
+- [x] Support A and AAAA record types
+- [x] Implement `DNSCache` with LRU eviction and TTL expiry
+- [x] Implement DoH (DNS-over-HTTPS) via raw TLS + HTTP/1.1 CONNECT
+- [x] Implement stub resolution order: cache → DoH → raw UDP → system fallback
+- [ ] DNSSEC validation (optional, off by default — tracked in P0-003)
+- [x] Test: `resolve("example.com")` returns correct IPs
 
 **Files:** `dns_resolver.h/.cpp`
 

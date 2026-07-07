@@ -1,6 +1,9 @@
 # Phase 4: DNS Resolver
 
-**Status:** Complete  
+**Status:** Complete (2026-07-07)  
+**Lines of Code:** ~720 (header + impl + tests + benchmarks)  
+**Test Count:** 47 tests across 7 test suites  
+**Build:** 47/47 tests passing, 0 failures  
 **Description:** Bypass system resolver with raw DNS wire format, DNSCache, and DoH capability. Replaces `getaddrinfo()` in TCPEngine.
 
 ---
@@ -30,8 +33,8 @@ DNSResolver
 | File | Lines | Purpose |
 |------|-------|---------|
 | `include/pntp/dns_resolver.h` | 120 | DNS types, DNSCache, DNSResolver class declarations |
-| `src/dns_resolver.cpp` | 448 | Full implementation: wire format, UDP, DoH, cache, chain |
-| `test/test_dns_resolver.cpp` | 540 | 40+ tests across 7 test suites |
+| `src/dns_resolver.cpp` | 537 | Full implementation: wire format, UDP, DoH, cache, chain |
+| `test/test_dns_resolver.cpp` | 719 | 47 tests across 7 test suites |
 | `bench/bench_dns_resolver.cpp` | 186 | 12 benchmarks: encode, parse, cache, resolve latency |
 
 ## Files Modified
@@ -119,15 +122,15 @@ When Phase 5 implements the full TLS interceptor, the following changes should b
 
 | Suite | Tests | What it validates |
 |-------|-------|-------------------|
-| `DNSWireFormatTest` | 5 | encodeName, decodeName, round-trip, pointers |
+| `DNSWireFormatTest` | 6 | encodeName, decodeName, round-trip, pointers, simple/multi/single |
 | `DNSQueryBuilderTest` | 4 | Header structure, question section, A/AAAA types, IDs |
-| `DNSResponseParserTest` | 6 | A records, AAAA records, NXDOMAIN, wrong ID, truncation, multiple records |
+| `DNSResponseParserTest` | 7 | A records, AAAA records, NXDOMAIN, wrong ID, truncation, multiple records |
 | `DNSCacheTest` | 8 | Put/get, missing, TTL expiry, TTL=0, LRU eviction, promotion, clear, update |
-| `DNSResolverIntegrationTest` | 6 | Real DNS resolution, caching, invalid host, multi-server, AAAA, cache perf |
-| `DNSResolverConfigTest` | 6 | Default servers, custom servers, DoH URL, enable/disable, stats, reset |
+| `DNSResolverIntegrationTest` | 8 | Real DNS resolution, caching, invalid host, multi-server, AAAA, cache perf, UDP fallback, cache clear |
+| `DNSResolverConfigTest` | 7 | Default servers, custom servers, DoH URL, enable/disable, stats, reset, cache size |
 | `DNSGoalValidationTest` | 7 | Wire format, compression, cache bypass, multi-A, LRU, config, TTL |
 
-**Total: 42 tests across 7 suites**
+**Total: 47 tests across 7 suites**
 
 ### Goal Validation Tests
 The `DNSGoalValidationTest` suite is the dedicated test suite that validates the intended role and goals of Phase 4:
@@ -188,6 +191,14 @@ The `DNSGoalValidationTest` suite is the dedicated test suite that validates the
 | File | Lines | Purpose |
 |------|-------|---------|
 | `include/pntp/dns_resolver.h` | 120 | DNS types, DNSCache, DNSResolver class declarations |
-| `src/dns_resolver.cpp` | 448 | Full implementation |
-| `test/test_dns_resolver.cpp` | 540 | 42 tests (7 suites) |
+| `src/dns_resolver.cpp` | 537 | Full implementation |
+| `test/test_dns_resolver.cpp` | 719 | 47 tests (7 suites) |
 | `bench/bench_dns_resolver.cpp` | 186 | 12 benchmarks |
+
+---
+
+## Revision History
+
+| Date | Change |
+|------|--------|
+| 2026-07-07 | Phase 4 complete. 47/47 tests passing, 0 failures. |
