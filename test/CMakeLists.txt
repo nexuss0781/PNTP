@@ -18,8 +18,10 @@ set(PNTP_TEST_SOURCES
     ${CMAKE_SOURCE_DIR}/src/pntp_core.asm
     ${CMAKE_SOURCE_DIR}/src/dns_resolver.cpp
     ${CMAKE_SOURCE_DIR}/src/tls_interceptor.cpp
+    ${CMAKE_SOURCE_DIR}/src/http2_parser.cpp
     test_dns_resolver.cpp
     test_tls_interceptor.cpp
+    test_http2_parser.cpp
 )
 
 add_executable(pntp_tests ${PNTP_TEST_SOURCES})

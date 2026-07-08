@@ -10,5 +10,5 @@ cmake -S . -B build -G Ninja -DPNTP_WERROR=OFF -DPNTP_BUILD_TESTS=ON -DPNTP_BUIL
 ninja -C build pntp_tests 2>&1
 
 echo ""
-echo "=== Phase 4: DNS Resolver + Phase 5: TLS Interceptor Tests ==="
+echo "=== All Tests: DNS Resolver + TLS Interceptor + HTTP/2 Full Stack ==="
 ./build/test/pntp_tests 2>&1
