@@ -183,7 +183,7 @@ static void BM_FrameParse_Goaway(benchmark::State& state) {
     Http2Parser parser;
     parser.sendPreface();
 
-    auto frame = parser.serializeGoaway(1, Http2Error::NO_ERROR);
+    auto frame = parser.serializeGoaway(1, H2_NO_ERROR);
 
     for (auto _ : state) {
         Http2Parser p;
@@ -198,7 +198,7 @@ static void BM_FrameParse_RstStream(benchmark::State& state) {
     Http2Parser parser;
     parser.sendPreface();
 
-    auto frame = parser.serializeRstStream(1, Http2Error::CANCEL);
+    auto frame = parser.serializeRstStream(1, H2_CANCEL);
 
     for (auto _ : state) {
         Http2Parser p;

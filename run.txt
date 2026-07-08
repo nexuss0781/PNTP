@@ -6,9 +6,18 @@ echo "=== Working dir: $(pwd) ==="
 apt-get update -qq && apt-get install -y -qq libgtest-dev libgmock-dev 2>/dev/null || true
 
 rm -rf build
-cmake -S . -B build -G Ninja -DPNTP_WERROR=OFF -DPNTP_BUILD_TESTS=ON -DPNTP_BUILD_BENCH=OFF 2>&1
-ninja -C build pntp_tests 2>&1
+cmake -S . -B build -G Ninja -DPNTP_WERROR=OFF \
+    -DPNTP_BUILD_TESTS=ON -DPNTP_BUILD_BENCH=ON 2>&1
+ninja -C build pntp_tests pntp_v4 pntp_bench 2>&1
 
 echo ""
-echo "=== All Tests: DNS Resolver + TLS Interceptor + HTTP/2 Full Stack ==="
+echo "=== All Tests: DNS + TLS + HTTP/2 Full Stack (Phase 0-6) ==="
 ./build/test/pntp_tests 2>&1
+
+echo ""
+echo "=== Benchmarks: HTTP/2 + Core ==="
+./build/bench/pntp_bench --benchmark_min_time=0.01 2>&1
+
+echo ""
+echo "=== Main binary built ==="
+ls -la build/pntp_v4

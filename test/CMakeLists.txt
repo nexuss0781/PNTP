@@ -37,3 +37,16 @@ target_include_directories(pntp_tests PRIVATE
 
 include(GoogleTest)
 gtest_discover_tests(pntp_tests)
+
+# ── Fuzzing harness (standalone, no libFuzzer required) ──────────
+option(PNTP_BUILD_FUZZ "Build fuzzing harness" OFF)
+if(PNTP_BUILD_FUZZ)
+    add_executable(pntp_fuzz_http2
+        ${CMAKE_SOURCE_DIR}/src/http2_parser.cpp
+        fuzz_http2_parser.cpp
+    )
+    target_include_directories(pntp_fuzz_http2 PRIVATE ${CMAKE_SOURCE_DIR}/include)
+    target_link_libraries(pntp_fuzz_http2 PRIVATE OpenSSL::SSL OpenSSL::Crypto)
+    target_compile_options(pntp_fuzz_http2 PRIVATE -fsanitize=address,undefined -g -O1)
+    target_link_options(pntp_fuzz_http2 PRIVATE -fsanitize=address,undefined)
+endif()

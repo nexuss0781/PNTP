@@ -499,11 +499,11 @@ TEST_F(StreamStateMachineTest, CloseStream) {
 TEST_F(StreamStateMachineTest, ActiveStreamCount) {
     EXPECT_EQ(parser.activeStreamCount(), 0);
     auto sid = parser.openStream();
-    // Stream starts as IDLE, not yet "active"
-    // To make it active, we'd need to transition it to OPEN
-    // For now verify that at least the stream is tracked
-    EXPECT_GE(parser.activeStreamCount(), 0);
+    // IDLE streams are NOT counted as active
+    EXPECT_EQ(parser.activeStreamCount(), 0);
+    // Close the idle stream — count should stay 0
     parser.closeStream(sid);
+    EXPECT_EQ(parser.activeStreamCount(), 0);
 }
 
 TEST_F(StreamStateMachineTest, StreamLimit) {
@@ -855,9 +855,12 @@ TEST_F(Http2GoalValidationTest, StreamStateMachine_MultipleStreams) {
     auto s1 = parser.openStream();
     auto s2 = parser.openStream();
     EXPECT_NE(s1, s2);
-    // Streams start as IDLE, not "active" — just verify they have different IDs
-    EXPECT_NE(s1, 0);
-    EXPECT_NE(s2, 0);
+    // IDLE streams don't count as active
+    EXPECT_EQ(parser.activeStreamCount(), 0);
+    // Close both — still 0 active
+    parser.closeStream(s1);
+    parser.closeStream(s2);
+    EXPECT_EQ(parser.activeStreamCount(), 0);
 }
 
 TEST_F(Http2GoalValidationTest, FlowControl_InitialWindow) {

@@ -332,6 +332,7 @@ private:
     std::unordered_map<uint32_t, StreamData> streams_;
     uint32_t next_stream_id_ = 1;
     uint32_t last_processed_stream_id_ = 0;
+    size_t active_stream_count_ = 0;
 
     // ── Flow Control ─────────────────────────────────────────────
     uint32_t connection_window_ = 65535;
