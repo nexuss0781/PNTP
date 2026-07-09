@@ -1,4 +1,5 @@
 #include "pntp/tcp_engine.h"
+#include "pntp/http1_parser.h"
 #include <cstring>
 #include <cstdlib>
 #include <cmath>
@@ -822,8 +823,15 @@ std::string TCPEngine::transcendentFetch(const std::string& url) {
     TCPConnection* conn = open(host, port, 5000);
     if (!conn) return "";
 
-    std::string request = "GET " + path + " HTTP/1.1\r\nHost: " + host + "\r\nConnection: close\r\n\r\n";
-    if (!send(conn, reinterpret_cast<const uint8_t*>(request.data()), request.size())) {
+    // Build HTTP/1.1 request via serializer
+    Http1Request req;
+    req.method = H1_GET;
+    req.path = path;
+    req.version = H1_VER_1_1;
+    std::vector<Http1Header> req_headers = {{"Host", host}, {"Connection", "close"}};
+    auto request = Http1Parser::serializeRequest(req, req_headers, nullptr, 0);
+
+    if (!send(conn, request.data(), request.size())) {
         close(conn);
         return "";
     }
@@ -839,10 +847,15 @@ std::string TCPEngine::transcendentFetch(const std::string& url) {
 
     close(conn);
 
-    std::string response(response_body.begin(), response_body.end());
-    size_t body_start = response.find("\r\n\r\n");
-    if (body_start != std::string::npos) {
-        return response.substr(body_start + 4);
+    // Parse response via Http1Parser
+    Http1Parser parser;
+    parser.feed(response_body.data(), response_body.size());
+    if (parser.isComplete() && parser.isResponse() &&
+        parser.getResponse().status_code / 100 == 2) {
+        auto body = parser.getBody();
+        return std::string(body.begin(), body.end());
     }
-    return response;
+
+    // Fallback: return everything if parsing fails
+    return std::string(response_body.begin(), response_body.end());
 }

@@ -1,6 +1,7 @@
 #include "pntp/dns_resolver.h"
 #include "pntp/pntp_core.h"
 #include "pntp/tls_interceptor.h"
+#include "pntp/http1_parser.h"
 
 #include <cstring>
 #include <cstdlib>
@@ -412,25 +413,23 @@ DNSResult DNSResolver::resolveViaDoH(const std::string& host,
 
     tls_->disconnect(conn.get());
 
-    // Find HTTP body after \r\n\r\n
-    auto it = std::search(http_response.begin(), http_response.end(),
-                          "\r\n\r\n", "\r\n\r\n" + 4);
-    if (it == http_response.end()) return result;
+    // Parse HTTP response via Http1Parser
+    Http1Parser http_parser;
+    http_parser.feed(http_response.data(), http_response.size());
+    if (!http_parser.isComplete() || !http_parser.isResponse() ||
+        http_parser.getResponse().status_code != 200) {
+        tls_->disconnect(conn.get());
+        return result;
+    }
 
-    size_t body_start = static_cast<size_t>(it - http_response.begin()) + 4;
-    size_t body_len = http_response.size() - body_start;
-    if (body_len < 12) return result;
-
-    // Check HTTP status
-    std::string status_line(http_response.begin(),
-                            http_response.begin() + static_cast<ptrdiff_t>(body_start));
-    if (status_line.find("200") == std::string::npos) return result;
+    auto body = http_parser.getBody();
+    if (body.size() < 12) return result;
 
     std::vector<uint32_t> ipv4;
     std::vector<std::array<uint8_t, 16>> ipv6;
     uint32_t ttl = 0;
 
-    if (parseResponse(http_response.data() + body_start, body_len,
+    if (parseResponse(body.data(), body.size(),
                       id, ipv4, ipv6, ttl)) {
         result.ipv4_addresses = std::move(ipv4);
         result.ipv6_addresses = std::move(ipv6);

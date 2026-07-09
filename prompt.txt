@@ -1,8 +1,30 @@
-APPROVED ARCHTECT PHASE 4 fully
+APPROVED ARCHTECT PHASE 7 fully
 
-implement everything in such high quality
-TLS in phase 5 will rereview and fill the gap u left, since u needed phase 5 pre existing u will left notes to replace on the final phase 4 docs
-implement testing that actual role and goals are met in a dedicated test
-don't append to other phase tests it becomes complex and taking a long time
+you need to be just compilant to your plan and implement fully the given phase and integrations 
+then write the planned rigorously  tests
 
-update your todo and continue thoroghly
+then just push and present
+
+update your todo and continue thoroughly
+
+output
+full implementation
+tests 
+we need also benchmarks and throughput
+docs/phase_7.md (complete documentation for downstream phases)
+
+don't use terminal to build and compile until the test pass
+ use terminal only to push to github
+
+don'y includ build and compile in your todo
+focus on implementation tests and benchmarks
+
+after you finish
+
+git add . && git commit -m " message
+-
+-
+
+
+
+" && git push

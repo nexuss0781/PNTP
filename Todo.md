@@ -156,31 +156,31 @@
 ## Phase 6 — HTTP/2 Full Stack
 
 ```
-[ ] P6-001: Implement HPACK static table (61 entries per RFC 7541 Appendix A) (1h)
-[ ] P6-002: Implement HPACK dynamic table: add/evict/lookup entries (2h)
-[ ] P6-003: Implement HPACK Huffman decoder: lookup table → output bytes (3h)
-[ ] P6-004: Implement HPACK Huffman encoder: byte → lookup code + bits (2h)
-[ ] P6-005: Implement HPACK decode(): indexed, literal+indexing, table size update (3h)
-[ ] P6-006: Implement HPACK encode(): index ref, literal, table management (2h)
-[ ] P6-007: Implement stream state machine: IDLE/OPEN/HALF_CLOSED/CLOSED transitions (2h)
-[ ] P6-008: Implement HEADERS frame handler: END_STREAM, END_HEADERS, PADDED, PRIORITY (2h)
-[ ] P6-009: Implement DATA frame handler: flow control consumption, END_STREAM (1h)
-[ ] P6-010: Implement SETTINGS handler: ACK, apply remote settings, send local (1.5h)
-[ ] P6-011: Implement WINDOW_UPDATE: connection + stream window management (1.5h)
-[ ] P6-012: Implement GOAWAY handler: last_stream_id, graceful drain (1h)
-[ ] P6-013: Implement PING handler: respond with flags=ACK (0.5h)
-[ ] P6-014: Implement PRIORITY handler: dependency tree with weight (2h)
-[ ] P6-015: Implement RST_STREAM handler: close stream, notify error (0.5h)
-[ ] P6-016: Implement CONTINUATION reassembly: accumulate header block fragments (1h)
-[ ] P6-017: Implement connection preface validation: verify PRI * HTTP/2.0 (0.5h)
-[ ] P6-018: Implement stream multiplexing: concurrent open stream limit (1.5h)
-[ ] P6-019: Implement flow control autotuning: window update based on BDP estimate (2h)
-[ ] P6-020: Implement request/response header validation (RFC 7540 Section 8) (1.5h)
-[ ] P6-021: Write unit test: parse 1000 random frame sequences, verify round-trip (2h)
-[ ] P6-022: Write unit test: HPACK encode/decode 100 random header sets (2h)
-[ ] P6-023: Write integration test: full h2c request/response via nginx HTTP/2 (3h)
-[ ] P6-024: Write fuzz test: libFuzzer harness for parseData with random bytes (2h)
-[ ] P6-025: Write benchmark: frame parsing throughput in frames/second (1h)
+[x] P6-001: Implement HPACK static table (61 entries per RFC 7541 Appendix A) (1h)
+[x] P6-002: Implement HPACK dynamic table: add/evict/lookup entries (2h)
+[x] P6-003: Implement HPACK Huffman decoder: lookup table → output bytes (3h)
+[x] P6-004: Implement HPACK Huffman encoder: byte → lookup code + bits (2h)
+[x] P6-005: Implement HPACK decode(): indexed, literal+indexing, table size update (3h)
+[x] P6-006: Implement HPACK encode(): index ref, literal, table management (2h)
+[x] P6-007: Implement stream state machine: IDLE/OPEN/HALF_CLOSED/CLOSED transitions (2h)
+[x] P6-008: Implement HEADERS frame handler: END_STREAM, END_HEADERS, PADDED, PRIORITY (2h)
+[x] P6-009: Implement DATA frame handler: flow control consumption, END_STREAM (1h)
+[x] P6-010: Implement SETTINGS handler: ACK, apply remote settings, send local (1.5h)
+[x] P6-011: Implement WINDOW_UPDATE: connection + stream window management (1.5h)
+[x] P6-012: Implement GOAWAY handler: last_stream_id, graceful drain (1h)
+[x] P6-013: Implement PING handler: respond with flags=ACK (0.5h)
+[x] P6-014: Implement PRIORITY handler: dependency tree with weight (2h)
+[x] P6-015: Implement RST_STREAM handler: close stream, notify error (0.5h)
+[x] P6-016: Implement CONTINUATION reassembly: accumulate header block fragments (1h)
+[x] P6-017: Implement connection preface validation: verify PRI * HTTP/2.0 (0.5h)
+[x] P6-018: Implement stream multiplexing: concurrent open stream limit (1.5h)
+[x] P6-019: Implement flow control autotuning: window update based on BDP estimate (2h)
+[x] P6-020: Implement request/response header validation (RFC 7540 Section 8) (1.5h)
+[x] P6-021: Write unit test: parse 1000 random frame sequences, verify round-trip (2h)
+[x] P6-022: Write unit test: HPACK encode/decode 100 random header sets (2h)
+[x] P6-023: Write integration test: full h2c request/response via nginx HTTP/2 (3h)
+[x] P6-024: Write fuzz test: libFuzzer harness for parseData with random bytes (2h)
+[x] P6-025: Write benchmark: frame parsing throughput in frames/second (1h)
 ```
 
 **Total:** 40h
@@ -190,18 +190,18 @@
 ## Phase 7 — HTTP/1.1 Parser
 
 ```
-[ ] P7-001: Implement request line parser: METHOD SP path SP HTTP/1.1 CRLF (1h)
-[ ] P7-002: Implement response line parser: HTTP/1.1 SP status SP reason CRLF (1h)
-[ ] P7-003: Implement header parser: key: value CRLF with folding/obs-fold (2h)
-[ ] P7-004: Implement chunked transfer decoding: size CRLF data CRLF trailer (1.5h)
-[ ] P7-005: Implement Content-Length reader: exactly N bytes (0.5h)
-[ ] P7-006: Implement Connection: keep-alive vs close state tracking (0.5h)
-[ ] P7-007: Implement Upgrade: h2c detection for HTTP/2 cleartext upgrade (0.5h)
-[ ] P7-008: Implement 100 Continue: expect-continue → auto-send 100 (1h)
-[ ] P7-009: Implement request serialization: Headers → wire format (0.5h)
-[ ] P7-010: Implement response serialization (0.5h)
-[ ] P7-011: Write unit test: parse 1000 random HTTP messages from corpus (1h)
-[ ] P7-012: Write integration test: fetch via nginx, compare with curl (1h)
+[x] P7-001: Implement request line parser: METHOD SP path SP HTTP/1.1 CRLF (1h)
+[x] P7-002: Implement response line parser: HTTP/1.1 SP status SP reason CRLF (1h)
+[x] P7-003: Implement header parser: key: value CRLF with folding/obs-fold (2h)
+[x] P7-004: Implement chunked transfer decoding: size CRLF data CRLF trailer (1.5h)
+[x] P7-005: Implement Content-Length reader: exactly N bytes (0.5h)
+[x] P7-006: Implement Connection: keep-alive vs close state tracking (0.5h)
+[x] P7-007: Implement Upgrade: h2c detection for HTTP/2 cleartext upgrade (0.5h)
+[x] P7-008: Implement 100 Continue: expect-continue → auto-send 100 (1h)
+[x] P7-009: Implement request serialization: Headers → wire format (0.5h)
+[x] P7-010: Implement response serialization (0.5h)
+[x] P7-011: Write unit test: parse 1000 random HTTP messages from corpus (1h)
+[x] P7-012: Write integration test: fetch via nginx, compare with curl (1h)
 ```
 
 **Total:** 10.5h
@@ -410,9 +410,9 @@
 | P2: Raw Socket | 14.00 | 2 |
 | P3: TCP Engine | 31.25 [x] | 2 |
 | P4: DNS Resolver | 11.50 [x] | 2 |
-| P5: TLS Interceptor | 29.00 | 2 |
-| P6: HTTP/2 | 40.00 | 2 |
-| P7: HTTP/1.1 | 10.50 | 2 |
+| P5: TLS Interceptor | 29.00 [x] | 2 |
+| P6: HTTP/2 | 40.00 [x] | 2 |
+| P7: HTTP/1.1 | 10.50 [x] | 2 |
 | P8: URL Manipulator | 15.50 | 2 |
 | P9: Data Extractor | 23.00 | 2 |
 | P10: Transcendence Engine | 18.75 | 2 |

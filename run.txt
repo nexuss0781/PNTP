@@ -11,11 +11,11 @@ cmake -S . -B build -G Ninja -DPNTP_WERROR=OFF \
 ninja -C build pntp_tests pntp_v4 pntp_bench 2>&1
 
 echo ""
-echo "=== All Tests: DNS + TLS + HTTP/2 Full Stack (Phase 0-6) ==="
+echo "=== All Tests: DNS + TLS + HTTP/2 + HTTP/1.1 Full Stack (Phase 0-7) ==="
 ./build/test/pntp_tests 2>&1
 
 echo ""
-echo "=== Benchmarks: HTTP/2 + Core ==="
+echo "=== Benchmarks: HTTP/2 + HTTP/1.1 + Core ==="
 ./build/bench/pntp_bench --benchmark_min_time=0.01 2>&1
 
 echo ""

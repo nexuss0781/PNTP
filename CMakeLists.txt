@@ -53,6 +53,7 @@ set(PNTP_SOURCES
     src/tcp_engine.cpp
     src/stealth_ensemble.cpp
     src/tls_interceptor.cpp
+    src/http1_parser.cpp
     src/http2_parser.cpp
     src/url_manipulator.cpp
     src/data_extractor.cpp
