@@ -147,12 +147,12 @@ Phase 16: V5 Foundation                   (wk 16-17)
 - [x] Implement TLS 1.3 handshake intercept (supported_versions, key_share, sig_algs)
 - [x] Implement session resumption (session ticket storage + PSK)
 - [x] Implement ALPN routing (h2, http/1.1 negotiation)
-- [ ] Implement 0-RTT early data handling (with replay protection)
+- [x] Implement 0-RTT early data handling (with replay protection)
 - [x] Implement NSS key log for debugging (`SSLKEYLOGFILE`)
 - [x] Add memory-safe key clearing (`clearSensitiveData()`)
 - [x] Add constant-time comparison for sensitive operations
 - [ ] Add OCSP response handling (optional, for complete MITM fidelity)
-- [ ] Test: HTTPS fetch through MITM proxy, verify decrypted content matches direct
+- [x] Test: HTTPS fetch through MITM proxy, verify decrypted content matches direct
 
 **Files:** `tls_interceptor.h/.cpp`
 
@@ -202,7 +202,7 @@ Phase 16: V5 Foundation                   (wk 16-17)
 - [x] Implement Upgrade: h2c (HTTP/2 cleartext upgrade)
 - [x] Implement 100 Continue handling
 - [x] Implement request/response serialization
-- [ ] Test: fetch via nginx, compare headers and body with curl
+- [x] Test: fetch via nginx, compare headers and body with curl
 
 **Files:** `http1_parser.h/.cpp` (NEW)
 
@@ -220,9 +220,9 @@ Phase 16: V5 Foundation                   (wk 16-17)
 - [x] Implement `normalize()` — lower case scheme/host, remove default port, dot-segments, empty query/fragment
 - [x] Implement `mutateQuery()` — SET, DELETE, RENAME, SIGN operations
 - [x] Implement `authInject()` — BEARER, BASIC, COOKIE, DIGEST header generation
-- [ ] Implement redirect chain tracer (follow 3xx, max hops configurable)
+- [x] Implement redirect chain tracer (follow 3xx, max hops configurable)
 - [x] Implement `setAuthProvider()` for pluggable auth strategies
-- [ ] Test: parse 1000 random URLs from HTTP Archive, verify correctness against curl
+- [x] Test: parse 1000 random URLs from HTTP Archive, verify correctness against curl
 
 **Files:** `url_manipulator.h/.cpp`
 

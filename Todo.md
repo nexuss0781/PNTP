@@ -140,12 +140,12 @@
 [x] P5-007: Implement TLS 1.3 handshake intercept: supported_versions, key_share, sig_algs (3h)
 [x] P5-008: Implement session resumption: store session tickets, attempt PSK on reconnect (2h)
 [x] P5-009: Implement ALPN routing: negotiate h2 or http/1.1, expose result (1h)
-[ ] P5-010: Implement 0-RTT early data: queue early data, replay detection (2h)
+[x] P5-010: Implement 0-RTT early data: queue early data, replay detection (2h)
 [x] P5-011: Implement NSS key log: write CLIENT_RANDOM + MASTER_SECRET to file (1h)
 [x] P5-012: Implement clearSensitiveData(): OPENSSL_cleanse on keys, stack variables (0.5h)
 [x] P5-013: Add constant-time comparison for sensitive data: CRYPTO_memcmp wrapper (0.5h)
-[ ] P5-014: Write integration test: fetch through MITM, compare body with direct fetch (3h)
-[ ] P5-015: Write integration test: TLS 1.3 only server, verify MITM works (2h)
+[x] P5-014: Write integration test: fetch through MITM, compare body with direct fetch (3h)
+[x] P5-015: Write integration test: TLS 1.3 only server, verify MITM works (2h)
 [x] P5-016: Write benchmark: TLS handshake MITM latency overhead (1h)
 ```
 
@@ -216,11 +216,11 @@
 [x] P8-003: Implement normalize(): lower scheme/host, remove default port, dot-segments (2h)
 [x] P8-004: Implement mutateQuery(): SET, DELETE, RENAME, SIGN operations (2h)
 [x] P8-005: Implement authInject(): BEARER, BASIC, COOKIE, DIGEST header generation (2h)
-[ ] P8-006: Implement redirect chain tracer: follow 3xx via TCP engine (2h)
+[x] P8-006: Implement redirect chain tracer: follow 3xx via TCP engine (2h)
 [x] P8-007: Implement setAuthProvider(): pluggable auth strategy interface (1h)
-[ ] P8-008: Write unit test: parse 1000 URLs from HTTP Archive, compare with curl --url-parse (1h)
+[x] P8-008: Write unit test: parse 1000 URLs from HTTP Archive, compare with curl --url-parse (1h)
 [x] P8-009: Write unit test: normalize equivalence (www.a.com/ == A:80/a) (0.5h)
-[ ] P8-010: Write unit test: redirect chain with 5 hops (1h)
+[x] P8-010: Write unit test: redirect chain with 5 hops (1h)
 ```
 
 **Total:** 15.5h
