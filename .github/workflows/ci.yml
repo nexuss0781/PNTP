@@ -10,7 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install deps
-        run: sudo apt-get update && sudo apt-get install -y build-essential cmake ninja-build libssl-dev
+        run: sudo apt-get update && sudo apt-get install -y build-essential cmake ninja-build libssl-dev nasm
       - name: Configure
         run: cmake -B build -DCMAKE_BUILD_TYPE=Debug -DPNTP_BUILD_TESTS=ON -DPNTP_BUILD_BENCH=ON
       - name: Build
