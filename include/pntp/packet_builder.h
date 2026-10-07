@@ -12,6 +12,8 @@ struct MAC {
     std::array<uint8_t, 6> bytes{};
     static MAC broadcast() { return {{0xff, 0xff, 0xff, 0xff, 0xff, 0xff}}; }
     static MAC zero() { return {}; }
+    bool operator==(const MAC& o) const { return bytes == o.bytes; }
+    bool operator!=(const MAC& o) const { return bytes != o.bytes; }
 };
 
 struct IPv4Addr {
@@ -65,6 +67,8 @@ public:
     static constexpr size_t IP_HDR_LEN   = 20;
     static constexpr size_t TCP_HDR_LEN  = 20;
     static constexpr size_t ETH_P_IP     = 0x0800;
+    static constexpr size_t ARP_ETHERTYPE = 0x0806;
+    static constexpr size_t ARP_HDR_LEN  = 28;
 
     static uint16_t computeChecksum(const uint16_t* data, size_t len);
     static uint16_t computeTCPChecksum(
@@ -146,6 +150,17 @@ public:
         bool push = true, uint16_t window = 65535);
 
     static size_t tcpHeaderWithOptionsLen(const TCPOptions& opts);
+
+    // ── ARP (RFC 826) ──────────────────────────────────────────────
+    // Build a full Ethernet+ARP request frame asking for the MAC of
+    // target_ip. sender_ip/target_ip are host byte order.
+    static std::vector<uint8_t> buildARPRequest(
+        const MAC& src_mac, uint32_t sender_ip, uint32_t target_ip);
+
+    // Parse an Ethernet+ARP reply frame. On success fills the sender
+    // MAC/IP (host byte order) and returns true.
+    static bool parseARPReply(const uint8_t* frame, size_t len,
+                              MAC& out_mac, uint32_t& out_ip);
 };
 
 #endif

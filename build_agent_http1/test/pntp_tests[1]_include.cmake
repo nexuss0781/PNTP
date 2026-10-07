@@ -1,0 +1,5 @@
+if(EXISTS "/home/nexuss0781/Desktop/Nex/PNTP/build_agent_http1/test/pntp_tests[1]_tests.cmake")
+  include("/home/nexuss0781/Desktop/Nex/PNTP/build_agent_http1/test/pntp_tests[1]_tests.cmake")
+else()
+  add_test(pntp_tests_NOT_BUILT pntp_tests_NOT_BUILT)
+endif()

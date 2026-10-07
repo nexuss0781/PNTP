@@ -9,7 +9,6 @@
 
 // Forward declarations
 static void writeUint16(uint8_t* data, uint16_t val);
-static void writeUint32(uint8_t* data, uint32_t val);
 
 // ═════════════════════════════════════════════════════════════════════
 // Test Helpers
@@ -307,6 +306,52 @@ TEST_F(HandshakeParseTest, ParseServerHello_Minimal) {
     EXPECT_EQ(sh.selected_version, 0x0304);
 }
 
+TEST_F(HandshakeParseTest, ParseServerHello_ALPN) {
+    std::vector<uint8_t> data;
+    data.push_back(0x03); data.push_back(0x03); // version
+    for (int i = 0; i < 32; ++i) data.push_back(static_cast<uint8_t>(i));
+    data.push_back(0x00); // session_id empty
+    data.push_back(0x13); data.push_back(0x01); // cipher_suite
+    data.push_back(0x00); // compression
+
+    std::vector<uint8_t> ext;
+    // supported_versions
+    uint8_t sv_type[2] = {0, 43};
+    ext.insert(ext.end(), sv_type, sv_type + 2);
+    uint8_t sv_len[2] = {0, 2};
+    ext.insert(ext.end(), sv_len, sv_len + 2);
+    ext.push_back(0x03); ext.push_back(0x04);
+
+    // ALPN: selected protocol "h2"
+    uint8_t alpn_type[2] = {0, 16};
+    ext.insert(ext.end(), alpn_type, alpn_type + 2);
+    uint8_t alpn_len[2] = {0, 5};           // 2-byte list len + 1 len + 2 h2
+    ext.insert(ext.end(), alpn_len, alpn_len + 2);
+    ext.push_back(0x00); ext.push_back(0x03); // ProtocolNameList len
+    ext.push_back(0x02);                      // ProtocolName len
+    ext.push_back('h'); ext.push_back('2');
+
+    uint16_t ext_total = static_cast<uint16_t>(ext.size());
+    data.push_back(static_cast<uint8_t>((ext_total >> 8) & 0xFF));
+    data.push_back(static_cast<uint8_t>(ext_total & 0xFF));
+    data.insert(data.end(), ext.begin(), ext.end());
+
+    auto sh = interceptor.parseServerHello(data.data(), data.size());
+    EXPECT_EQ(sh.alpn, "h2");
+}
+
+TEST_F(HandshakeParseTest, ParseServerHello_NoALPN) {
+    std::vector<uint8_t> data;
+    data.push_back(0x03); data.push_back(0x03);
+    for (int i = 0; i < 32; ++i) data.push_back(static_cast<uint8_t>(i));
+    data.push_back(0x00);
+    data.push_back(0x13); data.push_back(0x01);
+    data.push_back(0x00);
+
+    auto sh = interceptor.parseServerHello(data.data(), data.size());
+    EXPECT_TRUE(sh.alpn.empty());
+}
+
 // ═════════════════════════════════════════════════════════════════════
 // Key Schedule Tests
 // ═════════════════════════════════════════════════════════════════════
@@ -371,7 +416,6 @@ TEST_F(KeyScheduleTest, DeriveSecret_DifferentLabel_DifferentOutput) {
 }
 
 TEST_F(KeyScheduleTest, DeriveTrafficKeys_KeyAndIV) {
-    auto md = EVP_sha256();
     std::vector<uint8_t> secret(32, 0x11);
     std::vector<uint8_t> transcript(32, 0x22);
     TrafficKey key;
@@ -400,7 +444,6 @@ TEST_F(KeyScheduleTest, DeriveTrafficKeys_SHA384_KeyLength) {
 }
 
 TEST_F(KeyScheduleTest, FinishedVerifyData) {
-    auto md = EVP_sha256();
     std::vector<uint8_t> base_key(32, 0x55);
     std::vector<uint8_t> transcript(32, 0x66);
     auto vd = interceptor.computeFinishedVerifyData(
@@ -880,7 +923,7 @@ TEST_F(ProxyTest, StartProxy_DoubleStart) {
 // Goal Validation Tests
 // ═════════════════════════════════════════════════════════════════════
 
-class GoalValidationTest : public ::testing::Test {
+class TLSGoalValidationTest : public ::testing::Test {
 protected:
     TLSInterceptor interceptor;
 
@@ -889,7 +932,7 @@ protected:
     }
 };
 
-TEST_F(GoalValidationTest, DynamicCertGeneration) {
+TEST_F(TLSGoalValidationTest, DynamicCertGeneration) {
     // P5-001: Dynamic X.509 cert generation works
     CertEntry* entry = interceptor.getOrCreateCert("target.example.com");
     ASSERT_NE(entry, nullptr);
@@ -899,7 +942,7 @@ TEST_F(GoalValidationTest, DynamicCertGeneration) {
     EXPECT_FALSE(entry->der.empty());
 }
 
-TEST_F(GoalValidationTest, PerDomainCertCache) {
+TEST_F(TLSGoalValidationTest, PerDomainCertCache) {
     // P5-002: Per-domain cert cache works
     CertEntry* e1 = interceptor.getOrCreateCert("domain1.com");
     CertEntry* e2 = interceptor.getOrCreateCert("domain2.com");
@@ -909,7 +952,7 @@ TEST_F(GoalValidationTest, PerDomainCertCache) {
     EXPECT_NE(e1->der, e2->der); // different domains = different certs
 }
 
-TEST_F(GoalValidationTest, AEADEncryptDecrypt) {
+TEST_F(TLSGoalValidationTest, AEADEncryptDecrypt) {
     // P5-001 record encryption works
     TrafficKey key;
     RAND_bytes(key.key, 16);
@@ -924,7 +967,7 @@ TEST_F(GoalValidationTest, AEADEncryptDecrypt) {
     ASSERT_EQ(pt, original);
 }
 
-TEST_F(GoalValidationTest, X25519KeyExchange) {
+TEST_F(TLSGoalValidationTest, X25519KeyExchange) {
     // P5-001: Key exchange produces correct shared secret
     EVP_PKEY* alice = interceptor.generateX25519Keypair();
     EVP_PKEY* bob = interceptor.generateX25519Keypair();
@@ -944,9 +987,8 @@ TEST_F(GoalValidationTest, X25519KeyExchange) {
     EVP_PKEY_free(bob);
 }
 
-TEST_F(GoalValidationTest, HKDFKeySchedule) {
+TEST_F(TLSGoalValidationTest, HKDFKeySchedule) {
     // P5-003: Key schedule derives traffic keys
-    auto md = EVP_sha256();
     std::vector<uint8_t> secret(32, 0x11);
     std::vector<uint8_t> transcript(32, 0x22);
     TrafficKey k;
@@ -962,7 +1004,7 @@ TEST_F(GoalValidationTest, HKDFKeySchedule) {
     EXPECT_TRUE(iv_nz);
 }
 
-TEST_F(GoalValidationTest, MemorySafety) {
+TEST_F(TLSGoalValidationTest, MemorySafety) {
     // P5-012/013: clearSensitiveData and constantTimeCompare
     TrafficKey key;
     RAND_bytes(key.key, 16);
@@ -982,7 +1024,7 @@ TEST_F(GoalValidationTest, MemorySafety) {
     EXPECT_FALSE(TLSInterceptor::constantTimeCompare(a, c, 3));
 }
 
-TEST_F(GoalValidationTest, FullHandshakeMessageRoundTrip) {
+TEST_F(TLSGoalValidationTest, FullHandshakeMessageRoundTrip) {
     // Verify that serialized handshake messages can be parsed back
     HskServerHello sh;
     sh.version = 0x0303;
@@ -1004,7 +1046,7 @@ TEST_F(GoalValidationTest, FullHandshakeMessageRoundTrip) {
     EXPECT_EQ(sh2.key_share.key_exchange, sh.key_share.key_exchange);
 }
 
-TEST_F(GoalValidationTest, ClientHelloParsing_AllExtensions) {
+TEST_F(TLSGoalValidationTest, ClientHelloParsing_AllExtensions) {
     // Verify ClientHello parsing extracts multiple extensions correctly
     std::vector<uint8_t> data;
     data.push_back(0x03); data.push_back(0x03);
@@ -1048,4 +1090,354 @@ TEST_F(GoalValidationTest, ClientHelloParsing_AllExtensions) {
 static void writeUint16(uint8_t* data, uint16_t val) {
     data[0] = static_cast<uint8_t>((val >> 8) & 0xFF);
     data[1] = static_cast<uint8_t>(val & 0xFF);
+}
+
+// ═════════════════════════════════════════════════════════════════════
+// ByteStream Record Layer Tests
+// ═════════════════════════════════════════════════════════════════════
+
+#include <sys/socket.h>
+#include <unistd.h>
+#include "pntp/byte_stream.h"
+
+class ByteStreamRecordTest : public ::testing::Test {
+protected:
+    TLSInterceptor interceptor;
+};
+
+TEST_F(ByteStreamRecordTest, FdByteStream_WriteReadRecordRoundTrip) {
+    int sv[2];
+    ASSERT_EQ(socketpair(AF_UNIX, SOCK_STREAM, 0, sv), 0);
+
+    FdByteStream writer(sv[0], /*owns_fd=*/false);
+    std::vector<uint8_t> payload = {0xDE, 0xAD, 0xBE, 0xEF};
+    ASSERT_TRUE(interceptor.writeRecord(writer,
+        static_cast<uint8_t>(ContentType::HANDSHAKE),
+        payload.data(), payload.size()));
+
+    FdByteStream reader(sv[1], /*owns_fd=*/false);
+    auto rec = interceptor.readRecord(reader, 2000);
+    EXPECT_EQ(rec.type, static_cast<uint8_t>(ContentType::HANDSHAKE));
+    EXPECT_EQ(rec.payload, payload);
+
+    close(sv[0]);
+    close(sv[1]);
+}
+
+TEST_F(ByteStreamRecordTest, FdByteStream_ReadTimeoutEmpty) {
+    int sv[2];
+    ASSERT_EQ(socketpair(AF_UNIX, SOCK_STREAM, 0, sv), 0);
+
+    FdByteStream reader(sv[1], /*owns_fd=*/false);
+    auto rec = interceptor.readRecord(reader, 50);
+    EXPECT_TRUE(rec.payload.empty());
+
+    close(sv[0]);
+    close(sv[1]);
+}
+
+// ═════════════════════════════════════════════════════════════════════
+// 0-RTT early data (P5-010)
+// ═════════════════════════════════════════════════════════════════════
+
+class EarlyDataTest : public ::testing::Test {
+protected:
+    TLSInterceptor interceptor;
+
+    void SetUp() override {
+        ASSERT_TRUE(interceptor.initialize());
+    }
+
+    // Builds a ClientHello offering a PSK and 0-RTT early data.
+    static HskClientHello makeHello(uint8_t ticket_byte,
+                                    uint8_t random_byte) {
+        HskClientHello hello;
+        hello.random.assign(32, random_byte);
+        hello.has_psk = true;
+        hello.psk_mode_dhe = true;
+        hello.offers_early_data = true;
+        hello.psk_identity.assign(12, ticket_byte);
+        return hello;
+    }
+};
+
+TEST_F(EarlyDataTest, ParseClientHello_EarlyDataExtension) {
+    // ClientHello carrying the empty early_data extension (type 42).
+    std::vector<uint8_t> data;
+    data.push_back(0x03); data.push_back(0x03);
+    for (int i = 0; i < 32; ++i) data.push_back(static_cast<uint8_t>(i));
+    data.push_back(0x00);  // session_id len
+    data.push_back(0x00); data.push_back(0x02);
+    data.push_back(0x13); data.push_back(0x01);
+    data.push_back(0x01); data.push_back(0x00);
+
+    std::vector<uint8_t> ext;
+    ext.push_back(0x00); ext.push_back(0x2A);  // EARLY_DATA
+    ext.push_back(0x00); ext.push_back(0x00);  // empty body
+    uint16_t ext_total = static_cast<uint16_t>(ext.size());
+    data.push_back(static_cast<uint8_t>((ext_total >> 8) & 0xFF));
+    data.push_back(static_cast<uint8_t>(ext_total & 0xFF));
+    data.insert(data.end(), ext.begin(), ext.end());
+
+    auto ch = interceptor.parseClientHello(data.data(), data.size());
+    EXPECT_TRUE(ch.offers_early_data);
+
+    // Control: drop the extension block, use empty extensions.
+    data.resize(data.size() - 4);
+    data.push_back(0x00); data.push_back(0x00);
+    auto ch2 = interceptor.parseClientHello(data.data(), data.size());
+    EXPECT_FALSE(ch2.offers_early_data);
+}
+
+TEST_F(EarlyDataTest, AcceptRequiresEarlyDataEnabled) {
+    interceptor.setEarlyDataEnabled(false);
+    EXPECT_FALSE(interceptor.acceptEarlyData(makeHello(1, 2)));
+    interceptor.setEarlyDataEnabled(true);
+    EXPECT_TRUE(interceptor.acceptEarlyData(makeHello(1, 2)));
+}
+
+TEST_F(EarlyDataTest, AcceptRequiresPskAndOffer) {
+    interceptor.setEarlyDataEnabled(true);
+    HskClientHello no_offer = makeHello(1, 2);
+    no_offer.offers_early_data = false;
+    EXPECT_FALSE(interceptor.acceptEarlyData(no_offer));
+
+    HskClientHello no_psk = makeHello(1, 2);
+    no_psk.has_psk = false;
+    EXPECT_FALSE(interceptor.acceptEarlyData(no_psk));
+}
+
+TEST_F(EarlyDataTest, Replay_SecondOfferIsRejected) {
+    interceptor.setEarlyDataEnabled(true);
+    HskClientHello first = makeHello(7, 9);
+    EXPECT_TRUE(interceptor.acceptEarlyData(first));
+
+    HskClientHello replay = makeHello(7, 9);  // same ticket + random
+    EXPECT_FALSE(interceptor.acceptEarlyData(replay));
+}
+
+TEST_F(EarlyDataTest, Replay_DistinctTicketOrRandomIsFresh) {
+    interceptor.setEarlyDataEnabled(true);
+    EXPECT_TRUE(interceptor.acceptEarlyData(makeHello(7, 9)));
+    // Same ticket, different client random -> a new handshake.
+    EXPECT_TRUE(interceptor.acceptEarlyData(makeHello(7, 10)));
+    // Different ticket -> fresh.
+    EXPECT_TRUE(interceptor.acceptEarlyData(makeHello(8, 9)));
+}
+
+TEST_F(EarlyDataTest, Fingerprint_DistinguishesInput) {
+    auto a = TLSInterceptor::earlyDataFingerprint(makeHello(7, 9));
+    auto b = TLSInterceptor::earlyDataFingerprint(makeHello(7, 9));
+    EXPECT_EQ(a, b);
+    EXPECT_NE(a, TLSInterceptor::earlyDataFingerprint(makeHello(8, 9)));
+    EXPECT_NE(a, TLSInterceptor::earlyDataFingerprint(makeHello(7, 8)));
+    EXPECT_FALSE(a.empty());
+}
+
+TEST_F(EarlyDataTest, ReplayDetected_RecordsAndMigrates) {
+    auto fp = TLSInterceptor::earlyDataFingerprint(makeHello(3, 4));
+    EXPECT_FALSE(interceptor.replayDetected(fp));
+    EXPECT_TRUE(interceptor.replayDetected(fp));
+    // Empty fingerprint behaves like any other key.
+    EXPECT_FALSE(interceptor.replayDetected({}));
+    EXPECT_TRUE(interceptor.replayDetected({}));
+}
+
+TEST_F(EarlyDataTest, Queue_RequiresEnabledAndSingleBurst) {
+    const uint8_t payload[] = {'H', 'E', 'L', 'L', 'O'};
+    EXPECT_FALSE(interceptor.queueEarlyData(payload, 5));
+    EXPECT_EQ(interceptor.earlyDataQueued(), 0u);
+
+    interceptor.setEarlyDataEnabled(true);
+    EXPECT_TRUE(interceptor.queueEarlyData(payload, 5));
+    EXPECT_EQ(interceptor.earlyDataQueued(), 5u);
+
+    // Second burst is rejected while one is pending.
+    EXPECT_FALSE(interceptor.queueEarlyData(payload, 5));
+    // Empty and oversized attempts are rejected.
+    EXPECT_FALSE(interceptor.queueEarlyData(payload, 0));
+    std::vector<uint8_t> big(40u * 1024u, 0xAA);
+    EXPECT_FALSE(interceptor.queueEarlyData(big.data(), big.size()));
+
+    auto drained = interceptor.takeQueuedEarlyData();
+    ASSERT_EQ(drained.size(), 5u);
+    EXPECT_EQ(drained, std::vector<uint8_t>(payload, payload + 5));
+    EXPECT_EQ(interceptor.earlyDataQueued(), 0u);
+}
+
+TEST_F(EarlyDataTest, Queue_CapEnforced) {
+    interceptor.setEarlyDataEnabled(true);
+    std::vector<uint8_t> big(33u * 1024u, 0xBB);
+    EXPECT_FALSE(interceptor.queueEarlyData(big.data(), big.size()));
+    EXPECT_EQ(interceptor.earlyDataQueued(), 0u);
+}
+
+TEST_F(EarlyDataTest, EnqueueDrainClientEarlyData) {
+    MITMConnection conn;
+    std::vector<uint8_t> one(100, 0x11);
+    interceptor.enqueueClientEarlyData(conn, one);
+    EXPECT_EQ(conn.client_early_data.size(), 100u);
+
+    std::vector<uint8_t> rest(33u * 1024u, 0x22);  // over cap
+    interceptor.enqueueClientEarlyData(conn, rest);
+    EXPECT_EQ(conn.client_early_data.size(), 32u * 1024u);  // capped
+
+    auto drained = interceptor.drainClientEarlyData(conn);
+    EXPECT_EQ(drained.size(), 32u * 1024u);
+    EXPECT_TRUE(conn.client_early_data.empty());
+    EXPECT_TRUE(interceptor.drainClientEarlyData(conn).empty());
+}
+
+// ═════════════════════════════════════════════════════════════════════
+// MITM Integration (P5-014, P5-015)
+// ═════════════════════════════════════════════════════════════════════
+
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <signal.h>
+#include <sys/wait.h>
+#include <cstdlib>
+
+class MITMIntegrationTest : public ::testing::Test {
+protected:
+    TLSInterceptor interceptor;
+
+    void SetUp() override {
+        ASSERT_TRUE(interceptor.initialize());
+    }
+
+    void TearDown() override {
+        interceptor.stopProxy();
+        interceptor.clearUpstreamOverrides();
+        killChildren();
+    }
+
+    static bool hasOpenSSL() {
+        return std::system("which openssl >/dev/null 2>&1") == 0;
+    }
+
+    static int getFreePort() {
+        int fd = socket(AF_INET, SOCK_STREAM, 0);
+        if (fd < 0) return 40000 + (std::rand() % 20000);
+        struct sockaddr_in addr{};
+        addr.sin_family = AF_INET;
+        addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+        addr.sin_port = 0;
+        if (bind(fd, reinterpret_cast<struct sockaddr*>(&addr), sizeof(addr)) < 0) {
+            close(fd);
+            return 40000 + (std::rand() % 20000);
+        }
+        socklen_t len = sizeof(addr);
+        if (getsockname(fd, reinterpret_cast<struct sockaddr*>(&addr), &len) < 0) {
+            close(fd);
+            return 40000 + (std::rand() % 20000);
+        }
+        int port = ntohs(addr.sin_port);
+        close(fd);
+        return port;
+    }
+
+    static void killChildren() {
+        std::system("pkill -TERM openssl 2>/dev/null");
+        usleep(200000);
+        std::system("pkill -KILL openssl 2>/dev/null");
+        usleep(100000);
+    }
+
+    static pid_t startTLSServer(int port, bool tls13_only) {
+        const char* cert = "/tmp/pntp_test_cert_mitm.pem";
+        const char* key  = "/tmp/pntp_test_key_mitm.pem";
+        std::string cmd = "openssl req -x509 -newkey rsa:2048 -nodes "
+                          "-keyout " + std::string(key) + " -out " + std::string(cert) +
+                          " -days 1 -subj \"/CN=127.0.0.1\" >/dev/null 2>&1";
+        std::system(cmd.c_str());
+
+        pid_t pid = fork();
+        if (pid < 0) return -1;
+        if (pid == 0) {
+            std::string log = "/tmp/pntp_sserv" + std::to_string(port) + ".log";
+            int fd = open(log.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
+            if (fd >= 0) {
+                dup2(fd, STDOUT_FILENO);
+                dup2(fd, STDERR_FILENO);
+                close(fd);
+            }
+            std::string s = "openssl s_server -accept " + std::to_string(port) +
+                            " -cert " + std::string(cert) + " -key " + std::string(key) +
+                            " -brief -quiet";
+            if (tls13_only) s += " -tls1_3";
+            execl("/bin/sh", "sh", "-c", s.c_str(), nullptr);
+            _exit(1);
+        }
+        usleep(500000);
+        return pid;
+    }
+
+    static void stopTLSServer(pid_t pid) {
+        if (pid <= 0) { killChildren(); return; }
+        kill(pid, SIGTERM);
+        usleep(200000);
+        kill(pid, SIGKILL);
+        waitpid(pid, nullptr, WNOHANG);
+    }
+};
+
+TEST_F(MITMIntegrationTest, MitmEndToEndWithOpenSSL) {
+    const char* env = getenv("PNTP_ENABLE_MITM_INTEGRATION");
+    if (!env || env[0] == '0') { GTEST_SKIP() << "PNTP_ENABLE_MITM_INTEGRATION not set"; }
+    if (!hasOpenSSL()) {
+        GTEST_SKIP() << "OpenSSL not found";
+    }
+    int srv_port = getFreePort();
+    int mitm_port = getFreePort();
+    pid_t spid = startTLSServer(srv_port, false);
+    ASSERT_GT(spid, 0);
+    interceptor.setUpstreamOverride("127.0.0.1", {std::string("127.0.0.1"), static_cast<uint16_t>(srv_port)});
+    ASSERT_TRUE(interceptor.startProxy(mitm_port));
+    std::string log = "/tmp/pntp_sclient_mitm_" + std::to_string(mitm_port) + ".log";
+    std::string sclient = "printf \"GET / HTTP/1.1\\r\\nHost: 127.0.0.1\\r\\n\\r\\n\" | "
+                          "timeout 15 openssl s_client -connect 127.0.0.1:" +
+                          std::to_string(mitm_port) +
+                          " -servername 127.0.0.1 -brief -tls1_3 >" + log + " 2>&1";
+    int rc = std::system(sclient.c_str());
+    EXPECT_EQ(WIFEXITED(rc) ? WEXITSTATUS(rc) : -1, 0);
+    interceptor.stopProxy();
+    stopTLSServer(spid);
+    interceptor.clearUpstreamOverrides();
+}
+
+TEST_F(MITMIntegrationTest, Tls13OnlyServerMitm) {
+    const char* env = getenv("PNTP_ENABLE_MITM_INTEGRATION");
+    if (!env || env[0] == '0') { GTEST_SKIP() << "PNTP_ENABLE_MITM_INTEGRATION not set"; }
+    if (!hasOpenSSL()) {
+        GTEST_SKIP() << "OpenSSL not found";
+    }
+    int srv_port = getFreePort();
+    int mitm_port = getFreePort();
+    pid_t spid = startTLSServer(srv_port, true);
+    ASSERT_GT(spid, 0);
+    interceptor.setUpstreamOverride("127.0.0.1", {std::string("127.0.0.1"), static_cast<uint16_t>(srv_port)});
+    ASSERT_TRUE(interceptor.startProxy(mitm_port));
+    std::string log13 = "/tmp/pntp_sclient13_mitm_" + std::to_string(mitm_port) + ".log";
+    std::string sclient13 = "printf \"GET / HTTP/1.1\\r\\nHost: 127.0.0.1\\r\\n\\r\\n\" | "
+                            "timeout 15 openssl s_client -connect 127.0.0.1:" +
+                            std::to_string(mitm_port) +
+                            " -servername 127.0.0.1 -tls1_3 -brief >" + log13 + " 2>&1";
+    int rc13 = std::system(sclient13.c_str());
+    EXPECT_EQ(WIFEXITED(rc13) ? WEXITSTATUS(rc13) : -1, 0);
+
+    std::string log12 = "/tmp/pntp_sclient12_mitm_" + std::to_string(mitm_port) + ".log";
+    std::string sclient12 = "printf \"GET / HTTP/1.1\\r\\nHost: 127.0.0.1\\r\\n\\r\\n\" | "
+                            "timeout 10 openssl s_client -connect 127.0.0.1:" +
+                            std::to_string(mitm_port) +
+                            " -servername 127.0.0.1 -tls1_2 -brief >" + log12 + " 2>&1";
+    int rc12 = std::system(sclient12.c_str());
+    EXPECT_NE(WIFEXITED(rc12) ? WEXITSTATUS(rc12) : 1, 0);
+
+    interceptor.stopProxy();
+    stopTLSServer(spid);
+    interceptor.clearUpstreamOverrides();
 }

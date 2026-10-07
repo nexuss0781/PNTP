@@ -16,14 +16,28 @@ endif()
 
 set(PNTP_TEST_SOURCES
     ${CMAKE_SOURCE_DIR}/src/pntp_core.asm
+    ${CMAKE_SOURCE_DIR}/src/raw_socket_handler.cpp
+    ${CMAKE_SOURCE_DIR}/src/packet_builder.cpp
+    ${CMAKE_SOURCE_DIR}/src/tcp_engine.cpp
+    ${CMAKE_SOURCE_DIR}/src/stealth_ensemble.cpp
+    ${CMAKE_SOURCE_DIR}/src/byte_stream.cpp
     ${CMAKE_SOURCE_DIR}/src/dns_resolver.cpp
     ${CMAKE_SOURCE_DIR}/src/tls_interceptor.cpp
     ${CMAKE_SOURCE_DIR}/src/http1_parser.cpp
     ${CMAKE_SOURCE_DIR}/src/http2_parser.cpp
+    ${CMAKE_SOURCE_DIR}/src/url_manipulator.cpp
+    ${CMAKE_SOURCE_DIR}/src/data_extractor.cpp
+    ${CMAKE_SOURCE_DIR}/src/cookie_jar.cpp
+    ${CMAKE_SOURCE_DIR}/src/transcendence_engine.cpp
     test_http1_parser.cpp
     test_dns_resolver.cpp
     test_tls_interceptor.cpp
     test_http2_parser.cpp
+    test_url_manipulator.cpp
+    test_data_extractor.cpp
+    test_transcendence_engine.cpp
+    test_packet_builder.cpp
+    test_tcp_engine.cpp
 )
 
 add_executable(pntp_tests ${PNTP_TEST_SOURCES})

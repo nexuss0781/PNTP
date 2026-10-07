@@ -1,0 +1,3 @@
+/home/nexuss0781/Desktop/Nex/PNTP/build_agent_tls/_deps/googletest-subbuild/CMakeFiles/googletest-populate.dir
+/home/nexuss0781/Desktop/Nex/PNTP/build_agent_tls/_deps/googletest-subbuild/CMakeFiles/edit_cache.dir
+/home/nexuss0781/Desktop/Nex/PNTP/build_agent_tls/_deps/googletest-subbuild/CMakeFiles/rebuild_cache.dir

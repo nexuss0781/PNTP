@@ -370,8 +370,8 @@ std::vector<uint8_t> HpackHuffman::encode(const std::string& input) {
     uint64_t bits = 0;
     uint8_t nbits = 0;
 
-    for (unsigned char c : input) {
-        const auto& hc = kHuffmanTable[c];
+    for (char c : input) {
+        const auto& hc = kHuffmanTable[static_cast<unsigned char>(c)];
         bits = (bits << hc.bits) | hc.code;
         nbits += hc.bits;
 
@@ -409,7 +409,7 @@ std::string HpackHuffman::decode(const uint8_t* data, size_t len) {
             ++safety;
             bool found = false;
             for (int ch = 0; ch < 256; ++ch) {
-                const auto& hc = kHuffmanTable[ch];
+                const auto& hc = kHuffmanTable[static_cast<size_t>(ch)];
                 if (nbits < hc.bits) continue;
                 int shift = nbits - hc.bits;
                 uint32_t expected = static_cast<uint32_t>(bits >> shift);
@@ -1199,7 +1199,7 @@ bool Http2Parser::processDataFrame(const Http2FrameHeader& hdr, const uint8_t* p
         if (hdr.length == 0) return false;
         uint8_t pad_len = payload[0];
         offset = 1;
-        if (1 + pad_len > hdr.length) {
+        if (static_cast<uint32_t>(1) + pad_len > hdr.length) {
             emitFrameError("DATA padding exceeds frame length");
             return false;
         }
@@ -1490,6 +1490,7 @@ bool Http2Parser::processPushPromiseFrame(const Http2FrameHeader& hdr, const uin
 // ═════════════════════════════════════════════════════════════════════
 
 bool Http2Parser::processPingFrame(const Http2FrameHeader& hdr, const uint8_t* payload) {
+    (void)payload;
     if (hdr.stream_id != 0) {
         emitFrameError("PING frame with non-zero stream_id");
         return false;

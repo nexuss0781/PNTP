@@ -123,6 +123,11 @@ struct TCPConnection {
     uint32_t dup_ack_count = 0;
     uint32_t last_ack_received = 0;
 
+    // Wire statistics (read by FetchResult): total packets injected on
+    // the wire and how many of those were retransmissions.
+    uint32_t packets_sent = 0;
+    uint32_t retransmit_count = 0;
+
     bool     fin_sent = false;
     bool     fin_received = false;
     uint32_t fin_seq = 0;
@@ -170,16 +175,27 @@ private:
     pntp::DNSResolver dns_resolver_;
     MAC local_mac;
     uint32_t local_ip = 0;
+    uint32_t local_netmask_ = 0;
     uint16_t ip_id_counter = 0;
     std::map<uint16_t, std::unique_ptr<TCPConnection>> connections;
+    std::string interface_name_;
 
     uint16_t allocatePort();
     uint32_t generateISS();
     bool resolveHost(const std::string& host, uint32_t& out_ip, MAC& out_mac);
 
-    bool sendRawPacket(const TCPConnection* conn, const std::vector<uint8_t>& packet);
+    // ── Next-hop / gateway resolution ────────────────────────────────
+    // Determine the on-link next-hop MAC for a destination IP. Local
+    // destinations are ARP'd directly; remote ones go out the default
+    // gateway (found via /proc/net/route). Falls back to a zero MAC
+    // (loopback) when no gateway is configured or ARP is unavailable.
+    bool resolveNextHopMAC(uint32_t dst_ip, MAC& out_mac);
+    bool readDefaultGateway(uint32_t& gateway);
+    bool arpLookup(uint32_t target_ip, MAC& out_mac);
+
+    bool sendRawPacket(TCPConnection* conn, const std::vector<uint8_t>& packet);
     bool sendSYN(TCPConnection* conn);
-    bool sendACK(const TCPConnection* conn);
+    bool sendACK(TCPConnection* conn);
     bool sendData(TCPConnection* conn, const uint8_t* data, size_t len, bool push);
     bool sendFIN(TCPConnection* conn);
     bool sendRST(TCPConnection* conn, uint32_t seq, uint32_t ack);

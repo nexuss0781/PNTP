@@ -9,6 +9,7 @@
 #include <iomanip>
 #include <algorithm>
 #include <set>
+#include <chrono>
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/socket.h>
@@ -30,7 +31,6 @@
 
 // ── OpenSSL Initialization (one-time) ────────────────────────────────
 
-static bool openssl_initialized = false;
 static std::once_flag openssl_init_flag;
 
 static void initOpenSSL() {
@@ -55,10 +55,6 @@ static std::string _hexStr(const uint8_t* data, size_t len) {
         oss << std::hex << std::setw(2) << std::setfill('0')
             << static_cast<int>(data[i]);
     return oss.str();
-}
-
-static std::vector<uint8_t> toVector(const uint8_t* data, size_t len) {
-    return {data, data + len};
 }
 
 static uint16_t readUint16(const uint8_t* data) {
@@ -127,11 +123,35 @@ bool TLSInterceptor::initialize() {
 // TLS Record Layer (RFC 8446 Section 5)
 // ═════════════════════════════════════════════════════════════════════
 
-TLSRecord TLSInterceptor::readRecord(int fd) {
+// Read exactly len bytes from the stream, honoring timeout_ms as a
+// cumulative deadline (0 = block indefinitely). Returns bytes read.
+static ssize_t readExact(ByteStream& stream, uint8_t* buf, size_t len,
+                         uint32_t timeout_ms) {
+    auto start = std::chrono::steady_clock::now();
+    size_t todo = len;
+    size_t off = 0;
+    while (off < todo) {
+        uint32_t budget = timeout_ms;
+        if (timeout_ms > 0) {
+            auto now = std::chrono::steady_clock::now();
+            uint64_t elapsed = static_cast<uint64_t>(
+                std::chrono::duration_cast<std::chrono::milliseconds>(
+                    now - start).count());
+            if (elapsed >= timeout_ms) break;
+            budget = static_cast<uint32_t>(timeout_ms - elapsed);
+        }
+        ssize_t n = stream.read(buf + off, todo - off, budget);
+        if (n <= 0) break;
+        off += static_cast<size_t>(n);
+    }
+    return static_cast<ssize_t>(off);
+}
+
+TLSRecord TLSInterceptor::readRecord(ByteStream& stream,
+                                     uint32_t timeout_ms) {
     TLSRecord rec;
     uint8_t header[5];
-    ssize_t n = ::read(fd, header, 5);
-    if (n != 5) return rec;
+    if (readExact(stream, header, 5, timeout_ms) != 5) return rec;
 
     rec.type = header[0];
     rec.version = readUint16(header + 1);
@@ -140,20 +160,20 @@ TLSRecord TLSInterceptor::readRecord(int fd) {
     if (payload_len == 0 || payload_len > 16384 + 256) return rec;
 
     rec.payload.resize(payload_len);
-    size_t total_read = 0;
-    while (total_read < payload_len) {
-        n = ::read(fd, rec.payload.data() + total_read,
-                    payload_len - total_read);
-        if (n <= 0) {
-            rec.payload.clear();
-            return rec;
-        }
-        total_read += static_cast<size_t>(n);
+    if (readExact(stream, rec.payload.data(), payload_len, timeout_ms) !=
+        static_cast<ssize_t>(payload_len)) {
+        rec.payload.clear();
+        return rec;
     }
     return rec;
 }
 
-bool TLSInterceptor::writeRecord(int fd, uint8_t type,
+TLSRecord TLSInterceptor::readRecord(int fd) {
+    FdByteStream stream(fd, /*owns_fd=*/false);
+    return readRecord(stream, 0);
+}
+
+bool TLSInterceptor::writeRecord(ByteStream& stream, uint8_t type,
                                   const uint8_t* data, size_t len) {
     if (len > 16384 + 256) return false;
     uint8_t header[5];
@@ -163,14 +183,19 @@ bool TLSInterceptor::writeRecord(int fd, uint8_t type,
     header[3] = static_cast<uint8_t>((len >> 8) & 0xFF);
     header[4] = static_cast<uint8_t>(len & 0xFF);
 
-    if (::write(fd, header, 5) != 5) return false;
-    if (len > 0 && ::write(fd, data, len) != static_cast<ssize_t>(len))
-        return false;
+    if (!stream.write(header, 5)) return false;
+    if (len > 0 && !stream.write(data, len)) return false;
     return true;
 }
 
+bool TLSInterceptor::writeRecord(int fd, uint8_t type,
+                                  const uint8_t* data, size_t len) {
+    FdByteStream stream(fd, /*owns_fd=*/false);
+    return writeRecord(stream, type, data, len);
+}
+
 bool TLSInterceptor::writeRecordVec(
-    int fd, uint8_t type,
+    ByteStream& stream, uint8_t type,
     const std::vector<std::vector<uint8_t>>& parts) {
     size_t total = 0;
     for (const auto& p : parts) total += p.size();
@@ -183,13 +208,18 @@ bool TLSInterceptor::writeRecordVec(
     header[3] = static_cast<uint8_t>((total >> 8) & 0xFF);
     header[4] = static_cast<uint8_t>(total & 0xFF);
 
-    if (::write(fd, header, 5) != 5) return false;
+    if (!stream.write(header, 5)) return false;
     for (const auto& p : parts) {
-        if (!p.empty() && ::write(fd, p.data(), p.size()) !=
-                           static_cast<ssize_t>(p.size()))
-            return false;
+        if (!p.empty() && !stream.write(p.data(), p.size())) return false;
     }
     return true;
+}
+
+bool TLSInterceptor::writeRecordVec(
+    int fd, uint8_t type,
+    const std::vector<std::vector<uint8_t>>& parts) {
+    FdByteStream stream(fd, /*owns_fd=*/false);
+    return writeRecordVec(stream, type, parts);
 }
 
 // ── AEAD Encryption / Decryption ─────────────────────────────────────
@@ -242,7 +272,6 @@ std::vector<uint8_t> TLSInterceptor::aeadEncrypt(
 
     EVP_CIPHER_CTX_free(ctx);
 
-    ciphertext.resize(pt_len + 16); // ciphertext + tag
     return ciphertext;
 }
 
@@ -405,10 +434,10 @@ std::vector<uint8_t> TLSInterceptor::parseExtensions(
             case ExtensionType::ALPN: {
                 uint16_t alen = readUint16(ext_data);
                 size_t apos = 2;
-                while (apos + 1 < 2 + alen) {
+                while (apos + 1 < static_cast<size_t>(2) + alen) {
                     uint8_t plen = ext_data[apos];
                     ++apos;
-                    if (apos + plen <= 2 + alen) {
+                    if (apos + plen <= static_cast<size_t>(2) + alen) {
                         out.alpn.emplace_back(
                             reinterpret_cast<const char*>(ext_data + apos),
                             plen);
@@ -466,6 +495,13 @@ std::vector<uint8_t> TLSInterceptor::parseExtensions(
                             ext_data + binder_offset + 4 + blen - 2);
                     }
                 }
+                break;
+            }
+            case ExtensionType::EARLY_DATA: {
+                // Presence of the extension (empty body) signals that
+                // the client will send 0-RTT early data immediately
+                // after its first flight (RFC 8446 §4.2.10).
+                out.offers_early_data = true;
                 break;
             }
             default:
@@ -531,6 +567,28 @@ HskServerHello TLSInterceptor::parseServerHello(const uint8_t* data,
                             data + offset + eoff);
                     }
                 }
+                if (etype == static_cast<uint16_t>(
+                        ExtensionType::ALPN)) {
+                    // Server's ALPN extension carries the single
+                    // selected protocol: ProtocolNameList then one
+                    // ProtocolName<1..255>.
+                    if (elen >= 3) {
+                        uint16_t proto_list = readUint16(
+                            data + offset + eoff);
+                        if (proto_list + 2 <= elen) {
+                            uint8_t p_len = data[offset + eoff + 2];
+                            if (p_len >= 1 &&
+                                static_cast<size_t>(proto_list) ==
+                                    static_cast<size_t>(p_len) + 1 &&
+                                eoff + 3 + p_len <= ext_len) {
+                                sh.alpn.assign(
+                                    reinterpret_cast<const char*>(
+                                        data + offset + eoff + 3),
+                                    p_len);
+                            }
+                        }
+                    }
+                }
                 eoff += elen;
             }
         }
@@ -545,6 +603,7 @@ HskServerHello TLSInterceptor::parseServerHello(const uint8_t* data,
 
 std::vector<uint8_t> TLSInterceptor::serializeHandshakeHeader(
     HandshakeType type, const uint8_t* body, size_t body_len) {
+    (void)body;
 
     std::vector<uint8_t> hdr(4);
     hdr[0] = static_cast<uint8_t>(type);
@@ -625,9 +684,7 @@ std::vector<uint8_t> TLSInterceptor::serializeCertificate(
     body.push_back(0);
 
     // CertificateEntry count (1 for leaf + chain)
-    uint8_t entry_count[3] = {0, 0, 1}; // 24-bit
-    // Actually request_context is 1 byte, then certificate_list is 3-byte length
-    // Wait - RFC 8446: Certificate struct is:
+    // RFC 8446: Certificate struct is:
     //   opaque certificate_request_context<0..2^8-1>;
     //   CertificateEntry certificate_list<0..2^24-1>;
 
@@ -682,7 +739,6 @@ std::vector<uint8_t> TLSInterceptor::serializeCertificateVerify(
     CipherSuite suite) {
 
     const EVP_MD* md = selectHash(suite);
-    size_t hlen = hashLength(suite);
 
     // Build the signature content:
     // " " + "TLS 1.3, server CertificateVerify" + 0x00 + transcript_hash
@@ -695,7 +751,7 @@ std::vector<uint8_t> TLSInterceptor::serializeCertificateVerify(
                        transcript_hash.end());
 
     // Hash the signature content
-    std::vector<uint8_t> digest(EVP_MD_size(md));
+    std::vector<uint8_t> digest(static_cast<size_t>(EVP_MD_size(md)));
     unsigned int digest_len = static_cast<unsigned int>(digest.size());
     EVP_MD_CTX* mdctx = EVP_MD_CTX_new();
     EVP_DigestInit_ex(mdctx, md, nullptr);
@@ -751,6 +807,9 @@ std::vector<uint8_t> TLSInterceptor::serializeNewSessionTicket(
     const TrafficKey& app_key,
     const std::vector<uint8_t>& transcript_hash,
     CipherSuite suite) {
+    (void)app_key;
+    (void)transcript_hash;
+    (void)suite;
 
     std::vector<uint8_t> body;
 
@@ -846,26 +905,43 @@ std::vector<uint8_t> TLSInterceptor::serializeSupportedVersionsExtension(
 
 std::vector<uint8_t> TLSInterceptor::serializeALPNExtension(
     const std::string& proto) {
+    if (proto.empty()) return {};
+    return serializeALPNExtension(std::vector<std::string>{proto});
+}
+
+std::vector<uint8_t> TLSInterceptor::serializeALPNExtension(
+    const std::vector<std::string>& protos) {
 
     std::vector<uint8_t> ext;
+    if (protos.empty()) return ext;
 
     uint8_t etype[2];
     writeUint16(etype, static_cast<uint16_t>(ExtensionType::ALPN));
     ext.insert(ext.end(), etype, etype + 2);
 
     // ALPN extension data:
-    //   protocol_name_list (2 bytes) + name (len byte + string)
-    uint8_t proto_len = static_cast<uint8_t>(proto.size());
-    uint16_t list_len = static_cast<uint16_t>(proto_len + 1);
+    //   protocol_name_list (2 bytes)
+    //     + per protocol: name (len byte + string)
+    std::vector<uint8_t> name_list;
+    for (const auto& proto : protos) {
+        if (proto.empty()) continue;
+        name_list.push_back(static_cast<uint8_t>(proto.size()));
+        name_list.insert(name_list.end(), proto.begin(), proto.end());
+    }
+    if (name_list.empty()) {
+        ext.clear();
+        return ext;
+    }
+
+    uint16_t list_len = static_cast<uint16_t>(name_list.size());
     uint8_t list_len_buf[2];
     writeUint16(list_len_buf, list_len);
     uint8_t ext_data_len[2];
-    writeUint16(ext_data_len, list_len + 2);
+    writeUint16(ext_data_len, static_cast<uint16_t>(list_len + 2));
 
     ext.insert(ext.end(), ext_data_len, ext_data_len + 2);
     ext.insert(ext.end(), list_len_buf, list_len_buf + 2);
-    ext.push_back(proto_len);
-    ext.insert(ext.end(), proto.begin(), proto.end());
+    ext.insert(ext.end(), name_list.begin(), name_list.end());
 
     return ext;
 }
@@ -903,7 +979,7 @@ std::vector<uint8_t> TLSInterceptor::hkdfExtract(
     const std::vector<uint8_t>& salt,
     const std::vector<uint8_t>& ikm) {
 
-    std::vector<uint8_t> prk(EVP_MD_size(md));
+    std::vector<uint8_t> prk(static_cast<size_t>(EVP_MD_size(md)));
     // HKDF-Extract(salt, ikm) = HMAC-Hash(salt, ikm)
     unsigned int prk_len = static_cast<unsigned int>(prk.size());
     const uint8_t* salt_ptr = salt.empty() ? nullptr : salt.data();
@@ -928,21 +1004,40 @@ std::vector<uint8_t> TLSInterceptor::hkdfExpand(
     output.reserve(L);
     std::vector<uint8_t> T;
 
+    if (!md || !prk.data()) return {};
+
+    OSSL_PARAM params[] = {
+        OSSL_PARAM_construct_utf8_string(
+            OSSL_MAC_PARAM_DIGEST,
+            const_cast<char*>(EVP_MD_get0_name(md)), 0),
+        OSSL_PARAM_construct_end()
+    };
+
+    EVP_MAC* mac = EVP_MAC_fetch(nullptr, "HMAC", nullptr);
+    if (!mac) return {};
+
     uint8_t counter = 1;
     while (output.size() < L) {
-        HMAC_CTX* ctx = HMAC_CTX_new();
-        HMAC_Init_ex(ctx, prk.data(), static_cast<int>(prk.size()), md,
-                      nullptr);
+        EVP_MAC_CTX* ctx = EVP_MAC_CTX_new(mac);
+        if (!ctx || !EVP_MAC_init(ctx, prk.data(), prk.size(), params)) {
+            EVP_MAC_CTX_free(ctx);
+            EVP_MAC_free(mac);
+            return {};
+        }
 
         if (!T.empty())
-            HMAC_Update(ctx, T.data(), T.size());
-        HMAC_Update(ctx, info.data(), info.size());
-        HMAC_Update(ctx, &counter, 1);
+            EVP_MAC_update(ctx, T.data(), T.size());
+        EVP_MAC_update(ctx, info.data(), info.size());
+        EVP_MAC_update(ctx, &counter, 1);
 
         T.resize(hash_len);
-        unsigned int t_len = static_cast<unsigned int>(hash_len);
-        HMAC_Final(ctx, T.data(), &t_len);
-        HMAC_CTX_free(ctx);
+        size_t t_len = hash_len;
+        if (!EVP_MAC_final(ctx, T.data(), &t_len, hash_len)) {
+            EVP_MAC_CTX_free(ctx);
+            EVP_MAC_free(mac);
+            return {};
+        }
+        EVP_MAC_CTX_free(ctx);
 
         size_t needed = L - output.size();
         size_t to_copy = std::min(needed, hash_len);
@@ -951,6 +1046,7 @@ std::vector<uint8_t> TLSInterceptor::hkdfExpand(
         ++counter;
     }
 
+    EVP_MAC_free(mac);
     return output;
 }
 
@@ -1002,7 +1098,6 @@ void TLSInterceptor::deriveTrafficKeys(
     CipherSuite suite) {
 
     const EVP_MD* md = selectHash(suite);
-    size_t hlen = hashLength(suite);
 
     // Derive-Secret(secret, label, transcript_hash) -> traffic_secret
     auto traffic_secret = deriveSecret(md, secret, label, transcript_hash);
@@ -1305,7 +1400,6 @@ void TLSInterceptor::clearCertCache() {
 
 void TLSInterceptor::deriveAllKeys(HandshakeState& state) {
     const EVP_MD* md = selectHash(state.negotiated_cipher);
-    size_t hlen = hashLength(state.negotiated_cipher);
 
     // Client Leg:
     //   handshake_secret_client = HKDF-Extract(0, ECDHE(client_pub, mitm_priv))
@@ -1365,7 +1459,7 @@ std::vector<uint8_t> TLSInterceptor::computeTranscriptHash(
     const std::vector<uint8_t>& messages, CipherSuite suite) {
 
     const EVP_MD* md = selectHash(suite);
-    std::vector<uint8_t> hash(EVP_MD_size(md));
+    std::vector<uint8_t> hash(static_cast<size_t>(EVP_MD_size(md)));
     unsigned int hash_len = static_cast<unsigned int>(hash.size());
 
     EVP_MD_CTX* ctx = EVP_MD_CTX_new();
@@ -1385,10 +1479,18 @@ std::vector<uint8_t> TLSInterceptor::computeTranscriptHash(
 bool TLSInterceptor::clientLeg(HandshakeState& state, CertEntry* cert,
                                 int client_fd) {
     // Read ClientHello from client
-    TLSRecord rec = readRecord(client_fd);
-    if (rec.type != static_cast<uint8_t>(ContentType::HANDSHAKE) ||
-        rec.payload.empty()) {
-        return false;
+    TLSRecord rec;
+    bool ch_preparsed = !state.client_hello_wire.empty() &&
+                        state.client_hello.random.size() == 32;
+    if (ch_preparsed) {
+        rec.type = static_cast<uint8_t>(ContentType::HANDSHAKE);
+        rec.payload = state.client_hello_wire;
+    } else {
+        rec = readRecord(client_fd);
+        if (rec.type != static_cast<uint8_t>(ContentType::HANDSHAKE) ||
+            rec.payload.empty()) {
+            return false;
+        }
     }
 
     // Parse handshake header
@@ -1610,6 +1712,7 @@ bool TLSInterceptor::clientLeg(HandshakeState& state, CertEntry* cert,
 
 bool TLSInterceptor::completeClientHandshake(HandshakeState& state,
                                                int client_fd) {
+    (void)state;
     (void)client_fd;
     // The client leg handshake is completed in clientLeg() above
     return true;
@@ -2153,8 +2256,19 @@ void TLSInterceptor::handleConnection(int client_fd) {
         return;
     }
 
+    std::string target_host = sni_host;
+    uint16_t target_port = 443;
+    {
+        std::lock_guard<std::mutex> lock(upstream_mutex_);
+        auto it = upstream_overrides_.find(sni_host);
+        if (it != upstream_overrides_.end()) {
+            target_host = it->second.host;
+            target_port = it->second.port;
+        }
+    }
+
     // Resolve host
-    struct hostent* he = gethostbyname(sni_host.c_str());
+    struct hostent* he = gethostbyname(target_host.c_str());
     if (!he) {
         close(client_fd);
         close(server_fd);
@@ -2164,7 +2278,7 @@ void TLSInterceptor::handleConnection(int client_fd) {
     struct sockaddr_in server_addr;
     std::memset(&server_addr, 0, sizeof(server_addr));
     server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(443);
+    server_addr.sin_port = htons(target_port);
     std::memcpy(&server_addr.sin_addr, he->h_addr_list[0],
                 static_cast<size_t>(he->h_length));
 
@@ -2294,9 +2408,68 @@ TLSInterceptor::connect(const std::string& host,
                          uint16_t port,
                          uint32_t timeout_ms) {
 
+    int fd = createTCPConnection(host, port, timeout_ms);
+    if (fd < 0) return nullptr;
+
+    FdByteStream stream(fd, /*owns_fd=*/false);
+    auto conn = performOutboundHandshake(stream, host, port, timeout_ms);
+    if (!conn) {
+        close(fd);
+        return nullptr;
+    }
+    conn->fd = fd;
+    return conn;
+}
+
+std::unique_ptr<TLSInterceptor::TLSConnection>
+TLSInterceptor::connectOverTCP(TCPEngine* engine,
+                               const std::string& host,
+                               uint16_t port,
+                               uint32_t timeout_ms) {
+    if (!engine) return nullptr;
+
+    TCPConnection* tcp = engine->open(host, port, timeout_ms);
+    if (!tcp) return nullptr;
+
+    auto stream = std::make_unique<RawTCPByteStream>(engine, tcp,
+                                                     /*owns_conn=*/true);
+    auto conn = performOutboundHandshake(*stream, host, port, timeout_ms);
+    if (!conn) {
+        stream->close();
+        return nullptr;
+    }
+    conn->stream = std::move(stream);
+    return conn;
+}
+
+std::unique_ptr<TLSInterceptor::TLSConnection>
+TLSInterceptor::connectOverTCP(TCPEngine* engine,
+                               TCPConnection* tcp,
+                               const std::string& host,
+                               uint16_t port,
+                               uint32_t timeout_ms) {
+    if (!engine || !tcp) return nullptr;
+
+    auto stream = std::make_unique<RawTCPByteStream>(engine, tcp,
+                                                     /*owns_conn=*/false);
+    auto conn = performOutboundHandshake(*stream, host, port, timeout_ms);
+    if (!conn) {
+        // Caller owns tcp and is responsible for closing it.
+        stream->close();
+        return nullptr;
+    }
+    conn->stream = std::move(stream);
+    return conn;
+}
+
+// Shared outbound TLS 1.3 handshake over an arbitrary byte transport.
+std::unique_ptr<TLSInterceptor::TLSConnection>
+TLSInterceptor::performOutboundHandshake(ByteStream& stream,
+                                         const std::string& host,
+                                         uint16_t port,
+                                         uint32_t timeout_ms) {
+    (void)port;
     auto conn = std::make_unique<TLSConnection>();
-    conn->fd = createTCPConnection(host, port, timeout_ms);
-    if (conn->fd < 0) return nullptr;
 
     // Build ClientHello
     HskClientHello ch;
@@ -2343,7 +2516,6 @@ TLSInterceptor::connect(const std::string& host,
 
     // SNI
     {
-        uint8_t sn_type = 0;
         uint8_t sn_len[2];
         writeUint16(sn_len, static_cast<uint16_t>(host.size()));
         uint8_t list_len[2];
@@ -2444,9 +2616,9 @@ TLSInterceptor::connect(const std::string& host,
         ext_data.insert(ext_data.end(), sa.begin(), sa.end());
     }
 
-    // ALPN
+    // ALPN — offer every configured protocol in preference order
     if (!alpn_protos_.empty()) {
-        auto alpn_ext = serializeALPNExtension(alpn_protos_[0]);
+        auto alpn_ext = serializeALPNExtension(alpn_protos_);
         ext_data.insert(ext_data.end(), alpn_ext.begin(), alpn_ext.end());
     }
 
@@ -2462,27 +2634,24 @@ TLSInterceptor::connect(const std::string& host,
     // Send ClientHello
     std::vector<uint8_t> ch_msg = ch_hdr;
     ch_msg.insert(ch_msg.end(), ch_body.begin(), ch_body.end());
-    if (!writeRecord(conn->fd,
+    if (!writeRecord(stream,
                       static_cast<uint8_t>(ContentType::HANDSHAKE),
                       ch_msg.data(), ch_msg.size())) {
         EVP_PKEY_free(cli_key);
-        close(conn->fd);
         return nullptr;
     }
 
     // Read ServerHello
-    TLSRecord sh_rec = readRecord(conn->fd);
+    TLSRecord sh_rec = readRecord(stream, timeout_ms);
     if (sh_rec.type != static_cast<uint8_t>(ContentType::HANDSHAKE) ||
         sh_rec.payload.empty()) {
         EVP_PKEY_free(cli_key);
-        close(conn->fd);
         return nullptr;
     }
 
     if (sh_rec.payload[0] !=
         static_cast<uint8_t>(HandshakeType::SERVER_HELLO)) {
         EVP_PKEY_free(cli_key);
-        close(conn->fd);
         return nullptr;
     }
 
@@ -2490,9 +2659,10 @@ TLSInterceptor::connect(const std::string& host,
     auto sh = parseServerHello(sh_rec.payload.data() + 4, sh_len);
     if (sh.random.empty()) {
         EVP_PKEY_free(cli_key);
-        close(conn->fd);
         return nullptr;
     }
+    // Capture the server-selected ALPN protocol (for HTTP/2 detection).
+    conn->alpn = sh.alpn;
 
     // Build transcript
     std::vector<uint8_t> transcript;
@@ -2507,7 +2677,6 @@ TLSInterceptor::connect(const std::string& host,
     EVP_PKEY_free(cli_key);
 
     if (shared_secret.empty()) {
-        close(conn->fd);
         return nullptr;
     }
 
@@ -2528,48 +2697,47 @@ TLSInterceptor::connect(const std::string& host,
                        CipherSuite::TLS_AES_128_GCM_SHA256);
 
     // Read server encrypted flight
-    TLSRecord ccs_or_enc = readRecord(conn->fd);
+    TLSRecord ccs_or_enc = readRecord(stream, timeout_ms);
     if (ccs_or_enc.type == static_cast<uint8_t>(
             ContentType::CHANGE_CIPHER_SPEC)) {
-        ccs_or_enc = readRecord(conn->fd);
+        ccs_or_enc = readRecord(stream, timeout_ms);
     }
 
     auto ee_data = aeadDecrypt(svr_hs_key, ccs_or_enc.payload.data(),
                                 ccs_or_enc.payload.size());
-    if (ee_data.empty()) { close(conn->fd); return nullptr; }
+    if (ee_data.empty()) { return nullptr; }
     svr_hs_key.seq++;
     transcript.insert(transcript.end(), ee_data.begin(), ee_data.end());
 
     // Read Certificate
-    TLSRecord cert_rec = readRecord(conn->fd);
+    TLSRecord cert_rec = readRecord(stream, timeout_ms);
     auto cert_data = aeadDecrypt(svr_hs_key, cert_rec.payload.data(),
                                   cert_rec.payload.size());
-    if (cert_data.empty()) { close(conn->fd); return nullptr; }
+    if (cert_data.empty()) { return nullptr; }
     svr_hs_key.seq++;
     transcript.insert(transcript.end(), cert_data.begin(), cert_data.end());
 
     // Read CertificateVerify
-    TLSRecord cv_rec = readRecord(conn->fd);
+    TLSRecord cv_rec = readRecord(stream, timeout_ms);
     auto cv_data = aeadDecrypt(svr_hs_key, cv_rec.payload.data(),
                                 cv_rec.payload.size());
-    if (cv_data.empty()) { close(conn->fd); return nullptr; }
+    if (cv_data.empty()) { return nullptr; }
     svr_hs_key.seq++;
     transcript.insert(transcript.end(), cv_data.begin(), cv_data.end());
 
     // Read Finished
-    TLSRecord fin_rec = readRecord(conn->fd);
+    TLSRecord fin_rec = readRecord(stream, timeout_ms);
     auto fin_data = aeadDecrypt(svr_hs_key, fin_rec.payload.data(),
                                  fin_rec.payload.size());
-    if (fin_data.empty()) { close(conn->fd); return nullptr; }
+    if (fin_data.empty()) { return nullptr; }
     svr_hs_key.seq++;
     transcript.insert(transcript.end(), fin_data.begin(), fin_data.end());
 
     // Send CCS + Finished
     uint8_t ccs_data[] = {0x01};
-    if (!writeRecord(conn->fd,
+    if (!writeRecord(stream,
                       static_cast<uint8_t>(ContentType::CHANGE_CIPHER_SPEC),
                       ccs_data, 1)) {
-        close(conn->fd);
         return nullptr;
     }
 
@@ -2588,10 +2756,9 @@ TLSInterceptor::connect(const std::string& host,
                                         ContentType::HANDSHAKE),
                                     cli_fin_msg.data(),
                                     cli_fin_msg.size());
-    if (!writeRecord(conn->fd,
+    if (!writeRecord(stream,
                       static_cast<uint8_t>(ContentType::APPLICATION_DATA),
                       enc_cli_fin.data(), enc_cli_fin.size())) {
-        close(conn->fd);
         return nullptr;
     }
     cli_hs_key.seq++;
@@ -2614,7 +2781,18 @@ TLSInterceptor::connect(const std::string& host,
 
 void TLSInterceptor::disconnect(TLSConnection* conn) {
     if (!conn) return;
-    if (conn->fd >= 0) {
+    if (conn->stream) {
+        // Send close_notify over the byte-stream transport.
+        uint8_t alert[] = {0x01, 0x00}; // warning, close_notify
+        auto enc_alert = aeadEncrypt(conn->write_key,
+                                      static_cast<uint8_t>(ContentType::ALERT),
+                                      alert, 2);
+        writeRecord(*conn->stream,
+                     static_cast<uint8_t>(ContentType::APPLICATION_DATA),
+                     enc_alert.data(), enc_alert.size());
+        conn->stream->close();
+        conn->stream.reset();
+    } else if (conn->fd >= 0) {
         // Send close_notify
         uint8_t alert[] = {0x01, 0x00}; // warning, close_notify
         auto enc_alert = aeadEncrypt(conn->write_key,
@@ -2625,26 +2803,31 @@ void TLSInterceptor::disconnect(TLSConnection* conn) {
                      enc_alert.data(), enc_alert.size());
 
         close(conn->fd);
+        conn->fd = -1;
     }
     clearSensitiveData(conn->read_key);
     clearSensitiveData(conn->write_key);
-    conn->fd = -1;
     conn->connected = false;
 }
 
 std::vector<uint8_t> TLSInterceptor::readData(TLSConnection* conn,
                                                uint32_t timeout_ms) {
-    if (!conn || !conn->connected || conn->fd < 0) return {};
+    if (!conn || !conn->connected) return {};
+    if (!conn->stream && conn->fd < 0) return {};
 
-    // Set receive timeout
-    if (timeout_ms > 0) {
-        struct timeval tv;
-        tv.tv_sec = timeout_ms / 1000;
-        tv.tv_usec = (timeout_ms % 1000) * 1000;
-        setsockopt(conn->fd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
+    TLSRecord rec;
+    if (conn->stream) {
+        rec = readRecord(*conn->stream, timeout_ms);
+    } else {
+        // Set receive timeout on the POSIX fd
+        if (timeout_ms > 0) {
+            struct timeval tv;
+            tv.tv_sec = timeout_ms / 1000;
+            tv.tv_usec = (timeout_ms % 1000) * 1000;
+            setsockopt(conn->fd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
+        }
+        rec = readRecord(conn->fd);
     }
-
-    TLSRecord rec = readRecord(conn->fd);
     if (rec.payload.empty()) return {};
 
     if (rec.type == static_cast<uint8_t>(ContentType::ALERT)) {
@@ -2668,7 +2851,8 @@ std::vector<uint8_t> TLSInterceptor::readData(TLSConnection* conn,
 
 bool TLSInterceptor::writeData(TLSConnection* conn,
                                 const uint8_t* data, size_t len) {
-    if (!conn || !conn->connected || conn->fd < 0) return false;
+    if (!conn || !conn->connected) return false;
+    if (!conn->stream && conn->fd < 0) return false;
 
     auto ciphertext = aeadEncrypt(conn->write_key,
                                    static_cast<uint8_t>(
@@ -2677,6 +2861,11 @@ bool TLSInterceptor::writeData(TLSConnection* conn,
     if (ciphertext.empty()) return false;
     conn->write_key.seq++;
 
+    if (conn->stream) {
+        return writeRecord(*conn->stream,
+                            static_cast<uint8_t>(ContentType::APPLICATION_DATA),
+                            ciphertext.data(), ciphertext.size());
+    }
     return writeRecord(conn->fd,
                         static_cast<uint8_t>(ContentType::APPLICATION_DATA),
                         ciphertext.data(), ciphertext.size());
@@ -2792,8 +2981,118 @@ SessionTicket* TLSInterceptor::findSessionTicket(const std::string& domain) {
 }
 
 // ═════════════════════════════════════════════════════════════════════
+// 0-RTT early data (RFC 8446 §8)
+// ═════════════════════════════════════════════════════════════════════
+
+static uint64_t nowEpochSeconds() {
+    return static_cast<uint64_t>(
+        std::chrono::duration_cast<std::chrono::seconds>(
+            std::chrono::system_clock::now().time_since_epoch()).count());
+}
+
+void TLSInterceptor::setEarlyDataEnabled(bool enabled) {
+    early_data_enabled_ = enabled;
+}
+
+bool TLSInterceptor::queueEarlyData(const uint8_t* data, size_t len) {
+    if (!early_data_enabled_ || len == 0 || !data) return false;
+    if (len > 32u * 1024u) return false;  // per-attempt cap
+    std::lock_guard<std::mutex> lock(early_data_mutex_);
+    if (!early_data_queue_.empty()) return false;  // one burst per handshake
+    early_data_queue_.assign(data, data + len);
+    return true;
+}
+
+size_t TLSInterceptor::earlyDataQueued() const {
+    std::lock_guard<std::mutex> lock(early_data_mutex_);
+    return early_data_queue_.size();
+}
+
+std::vector<uint8_t> TLSInterceptor::takeQueuedEarlyData() {
+    std::lock_guard<std::mutex> lock(early_data_mutex_);
+    std::vector<uint8_t> out = std::move(early_data_queue_);
+    early_data_queue_.clear();
+    return out;
+}
+
+std::vector<uint8_t> TLSInterceptor::earlyDataFingerprint(
+    const HskClientHello& hello) {
+    std::vector<uint8_t> fp;
+    fp.reserve(hello.psk_identity.size() + hello.random.size());
+    fp.insert(fp.end(), hello.psk_identity.begin(), hello.psk_identity.end());
+    fp.insert(fp.end(), hello.random.begin(), hello.random.end());
+    return fp;
+}
+
+bool TLSInterceptor::replayDetected(const std::vector<uint8_t>& fingerprint) {
+    std::lock_guard<std::mutex> lock(replay_mutex_);
+    uint64_t now = nowEpochSeconds();
+    uint64_t window = session_timeout_;
+
+    // Evict full entries: anything older than window, then the oldest
+    // entry when the cache is at capacity.
+    if (replay_cache_.size() >= 4096) {
+        auto oldest = replay_cache_.begin();
+        for (auto it = replay_cache_.begin(); it != replay_cache_.end(); ++it) {
+            if (it->second < oldest->second) oldest = it;
+        }
+        replay_cache_.erase(oldest);
+    }
+    auto hit = replay_cache_.find(
+        std::string(reinterpret_cast<const char*>(fingerprint.data()),
+                    fingerprint.size()));
+    if (hit != replay_cache_.end()) {
+        return (now - hit->second) <= window;
+    }
+    replay_cache_.emplace(
+        std::string(reinterpret_cast<const char*>(fingerprint.data()),
+                    fingerprint.size()),
+        now);
+    return false;
+}
+
+bool TLSInterceptor::acceptEarlyData(const HskClientHello& hello) {
+    if (!early_data_enabled_) return false;
+    if (!hello.offers_early_data) return false;
+    if (!hello.has_psk) return false;
+    std::vector<uint8_t> fp = earlyDataFingerprint(hello);
+    if (replayDetected(fp)) return false;
+    return true;
+}
+
+void TLSInterceptor::enqueueClientEarlyData(
+    MITMConnection& conn, const std::vector<uint8_t>& bytes) {
+    if (bytes.empty()) return;
+    const size_t kCap = 32u * 1024u;
+    if (conn.client_early_data.size() >= kCap) return;
+    size_t room = kCap - conn.client_early_data.size();
+    size_t n = std::min(room, bytes.size());
+    conn.client_early_data.insert(conn.client_early_data.end(),
+                                  bytes.begin(),
+                                  bytes.begin() + static_cast<std::ptrdiff_t>(n));
+}
+
+std::vector<uint8_t> TLSInterceptor::drainClientEarlyData(
+    MITMConnection& conn) {
+    std::vector<uint8_t> out = std::move(conn.client_early_data);
+    conn.client_early_data.clear();
+    return out;
+}
+
+// ═════════════════════════════════════════════════════════════════════
 // NSS Key Log
 // ═════════════════════════════════════════════════════════════════════
+
+void TLSInterceptor::setUpstreamOverride(const std::string& sni,
+                                         const UpstreamOverride& ov) {
+    std::lock_guard<std::mutex> lock(upstream_mutex_);
+    upstream_overrides_[sni] = ov;
+}
+
+void TLSInterceptor::clearUpstreamOverrides() {
+    std::lock_guard<std::mutex> lock(upstream_mutex_);
+    upstream_overrides_.clear();
+}
 
 void TLSInterceptor::setKeyLogPath(const std::string& path) {
     std::lock_guard<std::mutex> lock(keylog_mutex_);

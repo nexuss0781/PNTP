@@ -11,17 +11,23 @@ add_executable(pntp_bench
     ${CMAKE_SOURCE_DIR}/src/raw_socket_handler.cpp
     ${CMAKE_SOURCE_DIR}/src/packet_builder.cpp
     ${CMAKE_SOURCE_DIR}/src/tcp_engine.cpp
+    ${CMAKE_SOURCE_DIR}/src/stealth_ensemble.cpp
+    ${CMAKE_SOURCE_DIR}/src/byte_stream.cpp
     ${CMAKE_SOURCE_DIR}/src/http1_parser.cpp
     ${CMAKE_SOURCE_DIR}/src/http2_parser.cpp
     ${CMAKE_SOURCE_DIR}/src/url_manipulator.cpp
     ${CMAKE_SOURCE_DIR}/src/dns_resolver.cpp
     ${CMAKE_SOURCE_DIR}/src/tls_interceptor.cpp
+    ${CMAKE_SOURCE_DIR}/src/data_extractor.cpp
+    ${CMAKE_SOURCE_DIR}/src/cookie_jar.cpp
+    ${CMAKE_SOURCE_DIR}/src/transcendence_engine.cpp
     bench_http1_parser.cpp
     bench_pntp_core.cpp
     bench_raw_socket.cpp
     bench_http2_parser.cpp
     bench_tcp_engine.cpp
     bench_tls_interceptor.cpp
+    bench_transcendence_engine.cpp
 )
 
 target_link_libraries(pntp_bench PRIVATE benchmark::benchmark OpenSSL::SSL OpenSSL::Crypto)

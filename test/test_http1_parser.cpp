@@ -298,13 +298,13 @@ TEST(ContentLengthBodyTest, ZeroLength) {
 TEST(ContentLengthBodyTest, PartialFeed) {
     Http1Parser parser;
     std::string resp = "HTTP/1.1 200 OK\r\nContent-Length: 10\r\n\r\nabc";
-    size_t n = parser.feed(reinterpret_cast<const uint8_t*>(resp.data()), resp.size());
+    parser.feed(reinterpret_cast<const uint8_t*>(resp.data()), resp.size());
     EXPECT_FALSE(parser.isComplete()); // Not done yet
     EXPECT_EQ(parser.getBody().size(), 3);
 
     // Feed remaining
     std::string rest = "defghij";
-    n = parser.feed(reinterpret_cast<const uint8_t*>(rest.data()), rest.size());
+    parser.feed(reinterpret_cast<const uint8_t*>(rest.data()), rest.size());
     // After first feed, we're in BODY_CONTENT_LENGTH state.
     // The feed returned 0 because the headers are already processed.
     // Actually, the second feed should work because buffer_ tracks position.

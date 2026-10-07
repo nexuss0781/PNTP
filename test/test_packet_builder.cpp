@@ -539,3 +539,97 @@ TEST_F(PacketBuilderSegmentTest, BuildDataSegment_PayloadParsed) {
     EXPECT_EQ(payload.data[3], 0x6C);
     EXPECT_EQ(payload.data[4], 0x6F);
 }
+
+// ═════════════════════════════════════════════════════════════════════
+// ARP Tests (RFC 826)
+// ═════════════════════════════════════════════════════════════════════
+
+TEST(ARPTest, BuildARPRequest_Length) {
+    MAC src;
+    src.bytes = {0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff};
+    auto frame = PacketBuilder::buildARPRequest(
+        src, 0xC0A80101, 0xC0A801FE);
+    EXPECT_EQ(frame.size(), PacketBuilder::ETH_HDR_LEN + PacketBuilder::ARP_HDR_LEN);
+}
+
+TEST(ARPTest, BuildARPRequest_EthernetHeader) {
+    MAC src;
+    src.bytes = {0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff};
+    auto frame = PacketBuilder::buildARPRequest(
+        src, 0xC0A80101, 0xC0A801FE);
+
+    // dst is broadcast
+    for (int i = 0; i < 6; ++i) EXPECT_EQ(frame[i], 0xFF);
+    for (int i = 0; i < 6; ++i) EXPECT_EQ(frame[6 + i], src.bytes[i]);
+    uint16_t etype = static_cast<uint16_t>(frame[12]) << 8 | frame[13];
+    EXPECT_EQ(etype, 0x0806);
+}
+
+TEST(ARPTest, BuildARPRequest_Body) {
+    MAC src;
+    src.bytes = {0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff};
+    auto frame = PacketBuilder::buildARPRequest(
+        src, 0xC0A80101, 0xC0A801FE);
+    const uint8_t* arp = frame.data() + PacketBuilder::ETH_HDR_LEN;
+
+    EXPECT_EQ(arp[0], 0x00);
+    EXPECT_EQ(arp[1], 0x01); // htype = ethernet
+    EXPECT_EQ(arp[2], 0x08);
+    EXPECT_EQ(arp[3], 0x00); // ptype = IPv4
+    EXPECT_EQ(arp[4], 6);    // hlen
+    EXPECT_EQ(arp[5], 4);    // plen
+    EXPECT_EQ(arp[6], 0x00);
+    EXPECT_EQ(arp[7], 0x01); // op = request
+    for (int i = 0; i < 6; ++i) EXPECT_EQ(arp[8 + i], src.bytes[i]);
+    // sender proto = 192.168.1.1
+    EXPECT_EQ(arp[14], 0xC0);
+    EXPECT_EQ(arp[15], 0xA8);
+    EXPECT_EQ(arp[16], 0x01);
+    EXPECT_EQ(arp[17], 0x01);
+    // target hw = zero
+    for (int i = 0; i < 6; ++i) EXPECT_EQ(arp[18 + i], 0);
+    // target proto = 192.168.1.254
+    EXPECT_EQ(arp[24], 0xC0);
+    EXPECT_EQ(arp[25], 0xA8);
+    EXPECT_EQ(arp[26], 0x01);
+    EXPECT_EQ(arp[27], 0xFE);
+}
+
+TEST(ARPTest, ParseARPReply_Valid) {
+    uint8_t reply_mac[6] = {0x00, 0x11, 0x22, 0x33, 0x44, 0x55};
+    std::vector<uint8_t> frame(14 + 28, 0);
+    for (int i = 0; i < 6; ++i) frame[i] = 0x11;           // eth dst
+    for (int i = 0; i < 6; ++i) frame[6 + i] = 0xaa;       // eth src
+    frame[12] = 0x08;
+    frame[13] = 0x06;                                       // ARP
+    uint8_t* arp = frame.data() + 14;
+    arp[4] = 6; arp[5] = 4;                             // hlen/plen
+    arp[6] = 0x00; arp[7] = 0x02;                          // op = reply
+    std::memcpy(arp + 8, reply_mac, 6);                    // sender ha
+    arp[14] = 0xC0; arp[15] = 0xA8; arp[16] = 0x01; arp[17] = 0xFE;
+    arp[18] = 0; arp[19] = 0; arp[20] = 0; arp[21] = 0; arp[22] = 0; arp[23] = 0;
+    arp[24] = 0xC0; arp[25] = 0xA8; arp[26] = 0x01; arp[27] = 0x01;
+
+    MAC mac;
+    uint32_t ip = 0;
+    ASSERT_TRUE(PacketBuilder::parseARPReply(frame.data(), frame.size(), mac, ip));
+    for (int i = 0; i < 6; ++i) ASSERT_EQ(mac.bytes[i], reply_mac[i]);
+    EXPECT_EQ(ip, 0xC0A801FE);
+}
+
+TEST(ARPTest, ParseARPReply_RejectsRequest) {
+    auto frame = PacketBuilder::buildARPRequest(
+        MAC::zero(), 0xC0A80101, 0xC0A801FE);
+    MAC mac;
+    uint32_t ip = 0;
+    EXPECT_FALSE(PacketBuilder::parseARPReply(frame.data(), frame.size(), mac, ip));
+}
+
+TEST(ARPTest, ParseARPReply_RejectsNonARP) {
+    uint8_t frame[20] = {0};
+    frame[12] = 0x08;
+    frame[13] = 0x00; // IP, not ARP
+    MAC mac;
+    uint32_t ip = 0;
+    EXPECT_FALSE(PacketBuilder::parseARPReply(frame, sizeof(frame), mac, ip));
+}

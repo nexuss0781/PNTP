@@ -228,4 +228,4 @@ static void BM_SerializeChunk(benchmark::State& state) {
 }
 BENCHMARK(BM_SerializeChunk)->RangeMultiplier(10)->Range(10, 10000);
 
-BENCHMARK_MAIN();
+// BENCHMARK_MAIN removed - defined in bench_pntp_core.cpp

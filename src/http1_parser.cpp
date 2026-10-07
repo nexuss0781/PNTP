@@ -27,6 +27,7 @@ void Http1Parser::reset() {
     has_content_length_ = false;
     has_transfer_encoding_chunked_ = false;
     chunk_size_remaining_ = 0;
+    chunk_crlf_remaining_ = 0;
     chunk_line_buffer_.clear();
     connection_close_ = false;
     connection_keep_alive_ = false;
@@ -58,18 +59,48 @@ size_t Http1Parser::feed(const uint8_t* data, size_t len) {
                     return consumed;
                 }
                 consumed = len;
+                // \r\n may straddle the feed boundary; check after appending
+                if (line_buffer_.size() >= 2 &&
+                    line_buffer_[line_buffer_.size() - 2] == '\r' &&
+                    line_buffer_.back() == '\n') {
+                    std::string line = line_buffer_.substr(0, line_buffer_.size() - 2);
+                    line_buffer_.clear();
+                    if (line.rfind("HTTP/", 0) == 0) {
+                        if (!parseResponseLine(line)) {
+                            state_ = H1_STATE_ERROR;
+                            return consumed;
+                        }
+                        is_request_ = false;
+                    } else {
+                        if (!parseRequestLine(line)) {
+                            state_ = H1_STATE_ERROR;
+                            return consumed;
+                        }
+                        is_request_ = true;
+                    }
+                    state_ = H1_STATE_HEADERS;
+                }
                 break;
             }
             line_buffer_.append(reinterpret_cast<const char*>(data + consumed),
                                 line_end);
             consumed += line_end + 2; // skip \r\n
 
-            if (!parseRequestLine(line_buffer_)) {
-                state_ = H1_STATE_ERROR;
-                return consumed;
+            // Auto-detect responses: a line starting with "HTTP/" is a status line
+            if (line_buffer_.rfind("HTTP/", 0) == 0) {
+                if (!parseResponseLine(line_buffer_)) {
+                    state_ = H1_STATE_ERROR;
+                    return consumed;
+                }
+                is_request_ = false;
+            } else {
+                if (!parseRequestLine(line_buffer_)) {
+                    state_ = H1_STATE_ERROR;
+                    return consumed;
+                }
+                is_request_ = true;
             }
             line_buffer_.clear();
-            is_request_ = true;
             state_ = H1_STATE_HEADERS;
             break;
         }
@@ -85,6 +116,19 @@ size_t Http1Parser::feed(const uint8_t* data, size_t len) {
                     return consumed;
                 }
                 consumed = len;
+                // \r\n may straddle the feed boundary; check after appending
+                if (line_buffer_.size() >= 2 &&
+                    line_buffer_[line_buffer_.size() - 2] == '\r' &&
+                    line_buffer_.back() == '\n') {
+                    std::string line = line_buffer_.substr(0, line_buffer_.size() - 2);
+                    line_buffer_.clear();
+                    if (!parseResponseLine(line)) {
+                        state_ = H1_STATE_ERROR;
+                        return consumed;
+                    }
+                    is_request_ = false;
+                    state_ = H1_STATE_HEADERS;
+                }
                 break;
             }
             line_buffer_.append(reinterpret_cast<const char*>(data + consumed),
@@ -112,12 +156,46 @@ size_t Http1Parser::feed(const uint8_t* data, size_t len) {
                     return consumed;
                 }
                 consumed = len;
+                // \r\n may straddle the feed boundary; check after appending
+                if (line_buffer_.size() >= 2 &&
+                    line_buffer_[line_buffer_.size() - 2] == '\r' &&
+                    line_buffer_.back() == '\n') {
+                    std::string line = line_buffer_.substr(0, line_buffer_.size() - 2);
+                    line_buffer_.clear();
+
+                    // Empty line = end of headers
+                    if (line.empty()) {
+                        processSpecialHeaders();
+                        determineBodyState();
+                        break;
+                    }
+
+                    // Handle obs-fold (line starts with space or tab)
+                    if ((!line.empty() && (line[0] == ' ' || line[0] == '\t')) &&
+                        !headers_.empty()) {
+                        headers_.back().value += line;
+                        break;
+                    }
+
+                    if (!parseHeaderLine(line)) {
+                        state_ = H1_STATE_ERROR;
+                        return consumed;
+                    }
+                }
                 break;
             }
 
-            std::string line(reinterpret_cast<const char*>(data + consumed),
-                             line_end);
+            line_buffer_.append(reinterpret_cast<const char*>(data + consumed),
+                                line_end);
+            std::string line = line_buffer_;
+            line_buffer_.clear();
             consumed += line_end + 2;
+
+            // Reject oversized complete header lines (RFC 7230 safety)
+            if (line.size() > MAX_HEADER_SIZE) {
+                state_ = H1_STATE_ERROR;
+                return consumed;
+            }
 
             // Empty line = end of headers
             if (line.empty()) {
@@ -177,6 +255,12 @@ size_t Http1Parser::feed(const uint8_t* data, size_t len) {
         default:
             return consumed;
         }
+    }
+
+    // A close-delimited message is complete once all currently
+    // available bytes have been consumed (REST-style single-shot reads)
+    if (state_ == H1_STATE_BODY_CLOSE_DELIMITED && consumed == len) {
+        state_ = H1_STATE_COMPLETE;
     }
 
     return consumed;
@@ -335,8 +419,11 @@ void Http1Parser::processSpecialHeaders() {
     expect_continue_ = false;
     upgrade_info_ = Http1UpgradeInfo{};
 
+    bool saw_connection_header = false;
+
     for (const auto& h : headers_) {
         if (h.name == "connection") {
+            saw_connection_header = true;
             // Parse connection options
             std::string lc_value = h.value;
             for (char& c : lc_value) c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
@@ -376,6 +463,17 @@ void Http1Parser::processSpecialHeaders() {
             }
         }
     }
+
+    // RFC 7230 §6.3: HTTP/1.1 defaults to persistent connections
+    // unless "Connection: close"; HTTP/1.0 defaults to close.
+    if (!saw_connection_header) {
+        Http1Version ver = is_request_ ? request_.version : response_.version;
+        if (ver == H1_VER_1_0) {
+            connection_close_ = true;
+        } else {
+            connection_keep_alive_ = true;
+        }
+    }
 }
 
 // ─── Detect Upgrade ──────────────────────────────────────────────────
@@ -409,8 +507,9 @@ void Http1Parser::detectUpgrade() {
 // ─── Determine Body State ────────────────────────────────────────────
 
 void Http1Parser::determineBodyState() {
-    // HEAD requests have no body
-    if (is_request_ && request_.method == H1_HEAD) {
+    // HEAD requests have no body unless a body is explicitly framed
+    if (is_request_ && request_.method == H1_HEAD &&
+        !has_content_length_ && !has_transfer_encoding_chunked_) {
         body_bytes_read_ = 0;
         state_ = H1_STATE_COMPLETE;
         return;
@@ -442,22 +541,16 @@ void Http1Parser::determineBodyState() {
         return;
     }
 
-    // For requests without body and no content-length, complete
+    // Requests without a body and without CL/TE complete immediately
+    // (RFC 7230 §3.3.3: no Content-Length/Transfer-Encoding means no body)
     if (is_request_) {
-        if (request_.method == H1_GET || request_.method == H1_DELETE ||
-            request_.method == H1_HEAD || request_.method == H1_OPTIONS ||
-            request_.method == H1_TRACE) {
-            state_ = H1_STATE_COMPLETE;
-            return;
-        }
-        // Methods that can have body without Content-Length: close-delimited
-        state_ = H1_STATE_BODY_CLOSE_DELIMITED;
+        state_ = H1_STATE_COMPLETE;
         return;
     }
 
-    // For responses: close-delimited (HTTP/1.0) or keep-alive without CL
-    if (!is_request_ && !connection_keep_alive_ &&
-        response_.version == H1_VER_1_0) {
+    // Responses: close-delimited when the connection will close
+    if (connection_close_ ||
+        (response_.version == H1_VER_1_0 && !connection_keep_alive_)) {
         state_ = H1_STATE_BODY_CLOSE_DELIMITED;
         return;
     }
@@ -487,6 +580,19 @@ size_t Http1Parser::readContentLengthBody(const uint8_t* data, size_t len) {
 
 size_t Http1Parser::processChunkSize(const uint8_t* data, size_t len) {
     size_t consumed = 0;
+
+    // Consume the CRLF that terminates the previous chunk-data before
+    // parsing the next chunk-size line (RFC 7230 §4.1)
+    while (chunk_crlf_remaining_ > 0 && consumed < len) {
+        char expect = (chunk_crlf_remaining_ == 2) ? '\r' : '\n';
+        if (data[consumed] != static_cast<uint8_t>(expect)) {
+            state_ = H1_STATE_ERROR;
+            return consumed;
+        }
+        --chunk_crlf_remaining_;
+        ++consumed;
+    }
+    if (chunk_crlf_remaining_ > 0) return consumed; // need more bytes
 
     if (!chunk_line_buffer_.empty()) {
         // We have buffered partial line data
@@ -579,7 +685,8 @@ size_t Http1Parser::processChunkData(const uint8_t* data, size_t len) {
     body_bytes_read_ += to_read;
 
     if (chunk_size_remaining_ == 0) {
-        // Need to consume the trailing CRLF after chunk data
+        // RFC 7230 §4.1: chunk-data is terminated by CRLF
+        chunk_crlf_remaining_ = 2;
         state_ = H1_STATE_BODY_CHUNK_SIZE;
     }
 
@@ -702,14 +809,6 @@ std::vector<uint8_t> Http1Parser::serializeRequest(
 
     std::ostringstream oss;
     oss << method << " " << wire << " " << ver << "\r\n";
-
-    // Check if Host header is already present
-    bool has_host = false;
-    for (const auto& h : headers) {
-        std::string lc = h.name;
-        for (char& c : lc) c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
-        if (lc == "host") { has_host = true; break; }
-    }
 
     for (const auto& h : headers) {
         oss << h.name << ": " << h.value << "\r\n";

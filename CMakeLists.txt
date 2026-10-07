@@ -40,7 +40,6 @@ endif()
 
 # ── Dependencies ────────────────────────────────────────────────────
 find_package(OpenSSL REQUIRED)
-find_package(CURL QUIET)
 
 # ── Include directories ─────────────────────────────────────────────
 include_directories(${CMAKE_SOURCE_DIR}/include)
@@ -52,12 +51,14 @@ set(PNTP_SOURCES
     src/packet_builder.cpp
     src/tcp_engine.cpp
     src/stealth_ensemble.cpp
+    src/byte_stream.cpp
     src/tls_interceptor.cpp
     src/http1_parser.cpp
     src/http2_parser.cpp
     src/url_manipulator.cpp
     src/data_extractor.cpp
     src/transcendence_engine.cpp
+    src/cookie_jar.cpp
     src/dns_resolver.cpp
     src/performance_monitor.cpp
     src/main.cpp
@@ -72,11 +73,6 @@ target_link_libraries(pntp_v4 PRIVATE
     OpenSSL::SSL
     OpenSSL::Crypto
 )
-
-if(CURL_FOUND)
-    target_link_libraries(pntp_v4 PRIVATE CURL::libcurl)
-    target_compile_definitions(pntp_v4 PRIVATE PNTP_HAVE_CURL)
-endif()
 
 # ── Raw socket test tool ───────────────────────────────────────────
 add_executable(pntp_test_raw_socket

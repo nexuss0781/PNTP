@@ -1,5 +1,6 @@
 #include "pntp/raw_socket_handler.h"
 #include "pntp/pntp_core.h"
+#include <arpa/inet.h>
 #include <iostream>
 #include <iomanip>
 #include <thread>
@@ -81,11 +82,12 @@ int main() {
     double secs = std::chrono::duration<double>(end - start).count();
 
     auto st = handler.getStats();
+    double spread_secs = static_cast<double>(count) / secs;
     std::cout << "\n=== Results ===\n"
               << "Packets:    " << count << "\n"
               << "Bytes:      " << bytes << "\n"
               << "Duration:   " << secs << " s\n"
-              << "Rate:       " << (count / secs) << " pkt/s\n"
+              << "Rate:       " << spread_secs << " pkt/s\n"
               << "Stats:      " << st.packets_captured << " captured, "
               << st.packets_dropped_kernel << " dropped\n";
 

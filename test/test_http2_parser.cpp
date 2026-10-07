@@ -508,7 +508,7 @@ TEST_F(StreamStateMachineTest, ActiveStreamCount) {
 
 TEST_F(StreamStateMachineTest, StreamLimit) {
     for (int i = 0; i < 150; ++i) {
-        auto sid = parser.openStream();
+        parser.openStream();
         // After 100 concurrent, returns 0
     }
     // Should still have at most 100 active
@@ -683,9 +683,9 @@ TEST_F(FrameFeedTest, PartialFrameBuffered) {
 // Edge Cases
 // ═════════════════════════════════════════════════════════════════════
 
-class EdgeCaseTest : public ::testing::Test {};
+class Http2EdgeCaseTest : public ::testing::Test {};
 
-TEST_F(EdgeCaseTest, ZeroIDStream) {
+TEST_F(Http2EdgeCaseTest, ZeroIDStream) {
     Http2Parser parser;
     auto frame = Http2Parser::makeFrameHeader(0, H2_DATA, 0, 0);
     parser.sendPreface();
@@ -694,7 +694,7 @@ TEST_F(EdgeCaseTest, ZeroIDStream) {
     EXPECT_GT(consumed, 0);  // frame is consumed
 }
 
-TEST_F(EdgeCaseTest, VeryLargeStreamID) {
+TEST_F(Http2EdgeCaseTest, VeryLargeStreamID) {
     Http2Parser parser;
     auto frame = Http2Parser::makeFrameHeader(0, H2_PRIORITY, 0, 0x7FFFFFFF);
     parser.sendPreface();
@@ -702,7 +702,7 @@ TEST_F(EdgeCaseTest, VeryLargeStreamID) {
     EXPECT_GT(consumed, 0);
 }
 
-TEST_F(EdgeCaseTest, OversizedFrame) {
+TEST_F(Http2EdgeCaseTest, OversizedFrame) {
     Http2Parser parser;
     // Remote max frame size defaults to 16384
     auto frame = Http2Parser::makeFrameHeader(99999, H2_DATA, 0, 1);
@@ -712,7 +712,7 @@ TEST_F(EdgeCaseTest, OversizedFrame) {
     EXPECT_GT(consumed, 0);
 }
 
-TEST_F(EdgeCaseTest, MultipleOpenStreams) {
+TEST_F(Http2EdgeCaseTest, MultipleOpenStreams) {
     Http2Parser parser;
     parser.sendPreface();
     for (int i = 0; i < 10; ++i) {
@@ -722,7 +722,7 @@ TEST_F(EdgeCaseTest, MultipleOpenStreams) {
     EXPECT_LE(parser.activeStreamCount(), 100);
 }
 
-TEST_F(EdgeCaseTest, StreamOpenCloseCycle) {
+TEST_F(Http2EdgeCaseTest, StreamOpenCloseCycle) {
     Http2Parser parser;
     for (int i = 0; i < 5; ++i) {
         auto sid = parser.openStream();

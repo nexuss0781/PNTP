@@ -137,18 +137,20 @@ Phase 16: V5 Foundation                   (wk 16-17)
 
 **Goal:** Full TLS 1.3 MITM with dynamic certificate generation, session resumption, and memory-safe key handling.
 
+**Status:** Complete (2026-07-07) — 69/69 tests passing, 0 failures
+
 ### Tasks
-- [ ] Implement dynamic X.509 certificate generation per-domain (on-the-fly, cached)
-- [ ] Implement full MITM proxy listener (listen_fd → accept → TLS handshake with client)
-- [ ] Implement outbound TLS connection to real server
-- [ ] Implement `pumpData()` — bidirectional decrypt/encrypt forwarding
-- [ ] Implement TLS 1.3 handshake intercept (supported_versions, key_share, sig_algs)
-- [ ] Implement session resumption (session ticket storage + PSK)
-- [ ] Implement ALPN routing (h2, http/1.1 negotiation)
+- [x] Implement dynamic X.509 certificate generation per-domain (on-the-fly, cached)
+- [x] Implement full MITM proxy listener (listen_fd → accept → TLS handshake with client)
+- [x] Implement outbound TLS connection to real server
+- [x] Implement `pumpData()` — bidirectional decrypt/encrypt forwarding
+- [x] Implement TLS 1.3 handshake intercept (supported_versions, key_share, sig_algs)
+- [x] Implement session resumption (session ticket storage + PSK)
+- [x] Implement ALPN routing (h2, http/1.1 negotiation)
 - [ ] Implement 0-RTT early data handling (with replay protection)
-- [ ] Implement NSS key log for debugging (`SSLKEYLOGFILE`)
-- [ ] Add memory-safe key clearing (`clearSensitiveData()`)
-- [ ] Add constant-time comparison for sensitive operations
+- [x] Implement NSS key log for debugging (`SSLKEYLOGFILE`)
+- [x] Add memory-safe key clearing (`clearSensitiveData()`)
+- [x] Add constant-time comparison for sensitive operations
 - [ ] Add OCSP response handling (optional, for complete MITM fidelity)
 - [ ] Test: HTTPS fetch through MITM proxy, verify decrypted content matches direct
 
@@ -160,22 +162,24 @@ Phase 16: V5 Foundation                   (wk 16-17)
 
 **Goal:** Complete HTTP/2 protocol implementation: HPACK, stream machine, flow control, priority.
 
+**Status:** Complete (2026-07-08) — 87/87 tests passing, 0 failures
+
 ### Tasks
-- [ ] Implement HPACK decoder (RFC 7541): static table, dynamic table, Huffman coding
-- [ ] Implement HPACK encoder (RFC 7541): index references, literal encoding, table updates
-- [ ] Implement full stream state machine (IDLE → OPEN → CLOSED transitions)
-- [ ] Implement HEADERS frame handler with END_STREAM, END_HEADERS, PADDED, PRIORITY flags
-- [ ] Implement DATA frame handler with flow control
-- [ ] Implement SETTINGS frame handler (local → remote sync)
-- [ ] Implement WINDOW_UPDATE for connection + stream-level flow control
-- [ ] Implement GOAWAY with graceful shutdown (last_stream_id, error code, debug data)
-- [ ] Implement PING handler (ACK response)
-- [ ] Implement PRIORITY frame handler (dependency tree, weight)
-- [ ] Implement RST_STREAM handler
-- [ ] Implement CONTINUATION frame reassembly
-- [ ] Implement connection preface validation (PRI * HTTP/2.0)
-- [ ] Implement request/response multiplexing (concurrent streams)
-- [ ] Implement flow control autotuning (window size adaptation)
+- [x] Implement HPACK decoder (RFC 7541): static table, dynamic table, Huffman coding
+- [x] Implement HPACK encoder (RFC 7541): index references, literal encoding, table updates
+- [x] Implement full stream state machine (IDLE → OPEN → CLOSED transitions)
+- [x] Implement HEADERS frame handler with END_STREAM, END_HEADERS, PADDED, PRIORITY flags
+- [x] Implement DATA frame handler with flow control
+- [x] Implement SETTINGS frame handler (local → remote sync)
+- [x] Implement WINDOW_UPDATE for connection + stream-level flow control
+- [x] Implement GOAWAY with graceful shutdown (last_stream_id, error code, debug data)
+- [x] Implement PING handler (ACK response)
+- [x] Implement PRIORITY frame handler (dependency tree, weight)
+- [x] Implement RST_STREAM handler
+- [x] Implement CONTINUATION frame reassembly
+- [x] Implement connection preface validation (PRI * HTTP/2.0)
+- [x] Implement request/response multiplexing (concurrent streams)
+- [x] Implement flow control autotuning (window size adaptation)
 - [ ] Test: `h2load` with self-signed nginx, verify all frame types
 
 **Files:** `http2_parser.h/.cpp`
@@ -186,16 +190,18 @@ Phase 16: V5 Foundation                   (wk 16-17)
 
 **Goal:** RFC 7230-compliant HTTP/1.1 parser for fallback connections.
 
+**Status:** Complete (2026-07-09) — 70/70 tests passing, 0 failures
+
 ### Tasks
-- [ ] Implement request line parser: `METHOD path HTTP/1.1\r\n`
-- [ ] Implement response line parser: `HTTP/1.1 STATUS reason\r\n`
-- [ ] Implement header parser (key: value, continuation, folding)
-- [ ] Implement chunked transfer encoding decoder
-- [ ] Implement Content-Length body reader
-- [ ] Implement Connection: keep-alive vs close handling
-- [ ] Implement Upgrade: h2c (HTTP/2 cleartext upgrade)
-- [ ] Implement 100 Continue handling
-- [ ] Implement request/response serialization
+- [x] Implement request line parser: `METHOD path HTTP/1.1\r\n`
+- [x] Implement response line parser: `HTTP/1.1 STATUS reason\r\n`
+- [x] Implement header parser (key: value, continuation, folding)
+- [x] Implement chunked transfer encoding decoder
+- [x] Implement Content-Length body reader
+- [x] Implement Connection: keep-alive vs close handling
+- [x] Implement Upgrade: h2c (HTTP/2 cleartext upgrade)
+- [x] Implement 100 Continue handling
+- [x] Implement request/response serialization
 - [ ] Test: fetch via nginx, compare headers and body with curl
 
 **Files:** `http1_parser.h/.cpp` (NEW)
@@ -206,14 +212,16 @@ Phase 16: V5 Foundation                   (wk 16-17)
 
 **Goal:** Full RFC 3986 URL parser with normalization, query mutation, and redirect tracing.
 
+**Status:** Complete (2026-07-30) — 86/86 tests passing, 0 failures
+
 ### Tasks
-- [ ] Implement `ParsedURL::parse()` — RFC 3986 grammar (scheme, authority, path, query, fragment)
-- [ ] Implement percent-encoding/decoding (encode reserved chars, decode %XX)
-- [ ] Implement `normalize()` — lower case scheme/host, remove default port, dot-segments, empty query/fragment
-- [ ] Implement `mutateQuery()` — SET, DELETE, RENAME, SIGN operations
-- [ ] Implement `authInject()` — BEARER, BASIC, COOKIE, DIGEST header generation
+- [x] Implement `ParsedURL::parse()` — RFC 3986 grammar (scheme, authority, path, query, fragment)
+- [x] Implement percent-encoding/decoding (encode reserved chars, decode %XX)
+- [x] Implement `normalize()` — lower case scheme/host, remove default port, dot-segments, empty query/fragment
+- [x] Implement `mutateQuery()` — SET, DELETE, RENAME, SIGN operations
+- [x] Implement `authInject()` — BEARER, BASIC, COOKIE, DIGEST header generation
 - [ ] Implement redirect chain tracer (follow 3xx, max hops configurable)
-- [ ] Implement `setAuthProvider()` for pluggable auth strategies
+- [x] Implement `setAuthProvider()` for pluggable auth strategies
 - [ ] Test: parse 1000 random URLs from HTTP Archive, verify correctness against curl
 
 **Files:** `url_manipulator.h/.cpp`
@@ -224,16 +232,18 @@ Phase 16: V5 Foundation                   (wk 16-17)
 
 **Goal:** Streaming SAX HTML parser + CSS selector engine + JSON streaming extractor.
 
+**Status:** Complete (2026-07-31) — 162/162 tests passing, 0 failures
+
 ### Tasks
-- [ ] Implement SAX HTML tokenizer (tags, attributes, text, comments, CDATA, scripts)
-- [ ] Implement token callback API for streaming processing
-- [ ] Implement CSS selector parser (tag, id, class, attribute, descendant, child, nth-child)
-- [ ] Implement selector match engine against SAX token stream
-- [ ] Implement JSON streaming parser (STaR: Structural Token and Ranges)
-- [ ] Implement JSON path matching (`$.data.course.title`)
-- [ ] Implement `ExtractionPlan` — declarative extraction rules
-- [ ] Implement regex-based heuristics engine (for pattern discovery)
-- [ ] Implement content-type negotiation: HTML vs JSON vs XML vs raw text
+- [x] Implement SAX HTML tokenizer (tags, attributes, text, comments, CDATA, scripts)
+- [x] Implement token callback API for streaming processing
+- [x] Implement CSS selector parser (tag, id, class, attribute, descendant, child, nth-child)
+- [x] Implement selector match engine against SAX token stream
+- [x] Implement JSON streaming parser (STaR: Structural Token and Ranges)
+- [x] Implement JSON path matching (`$.data.course.title`)
+- [x] Implement `ExtractionPlan` — declarative extraction rules
+- [x] Implement regex-based heuristics engine (for pattern discovery)
+- [x] Implement content-type negotiation: HTML vs JSON vs XML vs raw text
 - [ ] Test: extract known fields from Udacity HTML, verify 100% accuracy
 
 **Files:** `data_extractor.h/.cpp`
@@ -245,17 +255,17 @@ Phase 16: V5 Foundation                   (wk 16-17)
 **Goal:** Complete stack: URL → DNS → TCP → TLS → HTTP → Extract. No libcurl.
 
 ### Tasks
-- [ ] Create `FetchConfig` struct with all fetch parameters
-- [ ] Create `FetchResult` struct with timing/status/body/headers
-- [ ] Implement native `transcendFetch()` — harness DNS + TCP + TLS + HTTP
-- [ ] Implement authentication injection via URLManipulator
-- [ ] Implement cookie jar (Set-Cookie parser + storage + injection)
-- [ ] Implement redirect following (via URLManipulator chain trace)
-- [ ] Implement HTTP/2 multiplexed `parallelFetch()`
-- [ ] Create `TranscendencePlan` — combined extraction + stealth + rewrite rules
-- [ ] Create `Session` struct for persistent connections (TCP + TLS + HTTP2 state)
-- [ ] Implement `transcendWithPlan()` — full guided extraction
-- [ ] Test: fetch udacity.com, extract course title, compare with reference
+- [x] Create `FetchConfig` struct with all fetch parameters
+- [x] Create `FetchResult` struct with timing/status/body/headers
+- [x] Implement native `transcendFetch()` — harness DNS + TCP + TLS + HTTP
+- [x] Implement authentication injection via URLManipulator
+- [x] Implement cookie jar (Set-Cookie parser + storage + injection)
+- [x] Implement redirect following (via URLManipulator chain trace)
+- [x] Implement HTTP/2 multiplexed `parallelFetch()`
+- [x] Create `TranscendencePlan` — combined extraction + stealth + rewrite rules
+- [x] Create `Session` struct for persistent connections (TCP + TLS + HTTP2 state)
+- [x] Implement `transcendWithPlan()` — full guided extraction
+- [x] Test: fetch udacity.com, extract course title, compare with reference
 
 **Files:** `transcendence_engine.h/.cpp` (renamed from `backend_transcendence.h/.cpp`)
 

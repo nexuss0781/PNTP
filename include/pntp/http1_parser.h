@@ -137,6 +137,7 @@ private:
     size_t findLineEnd(const uint8_t* data, size_t len) const;
 
     // ── Body Reading ───────────────────────────────────────────────
+    void determineBodyState();
     size_t readContentLengthBody(const uint8_t* data, size_t len);
     size_t readChunkedBody(const uint8_t* data, size_t len);
     size_t readCloseDelimitedBody(const uint8_t* data, size_t len);
@@ -178,6 +179,7 @@ private:
 
     // ── Chunked State ──────────────────────────────────────────────
     size_t chunk_size_remaining_ = 0;
+    size_t chunk_crlf_remaining_ = 0;
     std::string chunk_line_buffer_;
 
     // ── Connection State ───────────────────────────────────────────

@@ -55,6 +55,9 @@ public:
     bool init(const std::string& interface_name);
     bool setRingParams(uint32_t block_num, uint32_t frame_size);
 
+    int getInterfaceIndex() const { return if_index; }
+    const std::string& getInterfaceName() const { return interface; }
+
     PacketView acquirePacket();
     void releasePacket(const PacketView& pkt);
 

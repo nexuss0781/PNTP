@@ -12,6 +12,7 @@
 #include <atomic>
 #include <thread>
 #include <mutex>
+#include "pntp/byte_stream.h"
 
 // ── Forward declarations for OpenSSL libcrypto (not libssl) ─────────
 typedef struct evp_pkey_st EVP_PKEY;
@@ -129,6 +130,7 @@ struct HskClientHello {
     bool has_psk = false;
     bool psk_mode_ke = false;
     bool psk_mode_dhe = false;
+    bool offers_early_data = false;
     std::vector<uint8_t> raw_extensions;
 };
 
@@ -140,6 +142,9 @@ struct HskServerHello {
     uint8_t compression_method = 0;
     KeyShareEntry key_share;
     uint16_t selected_version = 0x0304;
+    // Server-selected ALPN protocol (from the ALPN extension, empty
+    // when the server did not negotiate one).
+    std::string alpn;
 };
 
 // ── Certificate Entry ───────────────────────────────────────────────
@@ -163,6 +168,10 @@ struct MITMConnection {
     std::string alpn_protocol;
     CipherSuite negotiated_cipher = CipherSuite::TLS_AES_128_GCM_SHA256;
     bool handshake_done = false;
+    // Raw early-data records received from the client before the
+    // handshake completes (0-RTT). Only populated when the client's
+    // early_data offer was accepted (see acceptEarlyData()).
+    std::vector<uint8_t> client_early_data;
 };
 
 // ── Handshake Internal State ────────────────────────────────────────
@@ -236,6 +245,17 @@ public:
     bool isProxyRunning() const { return running_; }
     uint16_t getProxyPort() const { return proxy_port_; }
 
+    // ── Upstream override (for tests/integration) ──────────────────
+    // If an SNI maps to an override, the MITM will connect to
+    // override_host:override_port instead of SNI:443.
+    struct UpstreamOverride {
+        std::string host;
+        uint16_t port = 443;
+    };
+    void setUpstreamOverride(const std::string& sni, const UpstreamOverride& ov);
+    void clearUpstreamOverrides();
+    const UpstreamOverride* getUpstreamOverride(const std::string& sni) const;
+
     // ── Direct TLS Connect (for outbound / DoH) ────────────────────
     // Single-leg TLS connection (not MITM, for fetching through our stack)
     struct TLSConnection {
@@ -244,6 +264,9 @@ public:
         TrafficKey write_key;
         std::string alpn;
         bool connected = false;
+        // When set, the connection is carried over a ByteStream
+        // (raw-socket TCP) instead of a POSIX fd.
+        std::unique_ptr<ByteStream> stream;
     };
 
     // Connect to a TLS server directly (one leg, no MITM)
@@ -252,6 +275,25 @@ public:
                                             uint16_t port,
                                             uint32_t timeout_ms = 5000);
     void disconnect(TLSConnection* conn);
+
+    // Connect directly to a TLS server over the raw-socket TCP engine.
+    // Same TLS 1.3 handshake as connect(), but the transport is a
+    // TCPEngine connection (raw socket) exposed through a ByteStream.
+    std::unique_ptr<TLSConnection> connectOverTCP(
+        TCPEngine* engine,
+        const std::string& host,
+        uint16_t port,
+        uint32_t timeout_ms = 5000);
+
+    // Handshake over a caller-owned TCP connection. The caller keeps
+    // ownership of `conn`; disconnect() closes only the ByteStream
+    // wrapper (which does not close a caller-owned connection).
+    std::unique_ptr<TLSConnection> connectOverTCP(
+        TCPEngine* engine,
+        TCPConnection* conn,
+        const std::string& host,
+        uint16_t port,
+        uint32_t timeout_ms = 5000);
 
     // ── Data Operations ────────────────────────────────────────────
     // Read application data from a TLS connection (single leg)
@@ -284,13 +326,59 @@ public:
 
     void setMaxCertCache(size_t max) { max_cert_cache_ = max; }
 
+    // ── 0-RTT early data (RFC 8446 §8) ─────────────────────────────
+    // Disabled by default. When enabled:
+    //  - Client side: queueEarlyData() buffers application bytes to be
+    //    sent as early data on the next resumption handshake. The
+    //    queue is drained (takeQueuedEarlyData) once the early-data
+    //    window closes.
+    //  - MITM/server side: acceptEarlyData() decides whether to grant
+    //    0-RTT for the ClientHello offered. An offer is granted only
+    //    when early data is enabled, the ClientHello carries the
+    //    early_data extension, references a PSK/ticket, and is not a
+    //    replay within the anti-replay window (session_timeout_).
+    //    enqueueClientEarlyData() / drainClientEarlyData() move the
+    //    raw early-data records on accepted legs. Early data is
+    //    buffered verbatim; decryption is not performed by this layer.
+    void setEarlyDataEnabled(bool enabled);
+    bool isEarlyDataEnabled() const { return early_data_enabled_; }
+
+    // Returns false when disabled, the queue is non-empty, len is 0, or
+    // len exceeds the per-attempt cap (32 KiB).
+    bool queueEarlyData(const uint8_t* data, size_t len);
+    size_t earlyDataQueued() const;
+    std::vector<uint8_t> takeQueuedEarlyData();
+
+    // Anti-replay decision. Returns true only when the offer should be
+    // granted. A replayed attempt (same ticket + client random seen
+    // within session_timeout_) is rejected.
+    bool acceptEarlyData(const HskClientHello& hello);
+    // Fingerprint key for replay detection: ticket identity + random.
+    static std::vector<uint8_t> earlyDataFingerprint(
+        const HskClientHello& hello);
+    // Checks and records `fingerprint`. Returns true when it was
+    // already present (i.e. a replay). Bounded cache; entries older
+    // than session_timeout_ seconds are treated as fresh.
+    bool replayDetected(const std::vector<uint8_t>& fingerprint);
+
+    void enqueueClientEarlyData(MITMConnection& conn,
+                                const std::vector<uint8_t>& bytes);
+    std::vector<uint8_t> drainClientEarlyData(MITMConnection& conn);
+
 public:
     // ── Testing Support ────────────────────────────────────────────
     // Exposed as public for unit testing. These are core protocol
     // primitives that must be independently verifiable.
     TLSRecord readRecord(int fd);
+    // Byte-stream record layer (used by the raw-socket transport path).
+    // timeout_ms is honored for blocking reads on the stream.
+    TLSRecord readRecord(ByteStream& stream, uint32_t timeout_ms = 0);
     bool writeRecord(int fd, uint8_t type, const uint8_t* data, size_t len);
+    bool writeRecord(ByteStream& stream, uint8_t type,
+                     const uint8_t* data, size_t len);
     bool writeRecordVec(int fd, uint8_t type,
+                         const std::vector<std::vector<uint8_t>>& parts);
+    bool writeRecordVec(ByteStream& stream, uint8_t type,
                          const std::vector<std::vector<uint8_t>>& parts);
 
     std::vector<uint8_t> aeadDecrypt(const TrafficKey& key,
@@ -336,6 +424,8 @@ public:
     std::vector<uint8_t> serializeSupportedVersionsExtension(
         uint16_t version);
     std::vector<uint8_t> serializeALPNExtension(const std::string& proto);
+    std::vector<uint8_t> serializeALPNExtension(
+        const std::vector<std::string>& protos);
 
     // ── Key Schedule (RFC 8446 Section 7.1) ────────────────────────
     std::vector<uint8_t> hkdfExtract(const EVP_MD* md,
@@ -407,6 +497,16 @@ private:
     int createTCPConnection(const std::string& host, uint16_t port,
                              uint32_t timeout_ms);
 
+    // Shared outbound TLS 1.3 handshake. Runs ClientHello → Finished
+    // over the given transport (POSIX-fd or raw TCP) and returns the
+    // established connection with application keys + negotiated ALPN.
+    // The returned TLSConnection's fd/stream members are left to the
+    // caller to attach, so both connect() and connectOverTCP() reuse
+    // this exact handshake code.
+    std::unique_ptr<TLSConnection> performOutboundHandshake(
+        ByteStream& stream, const std::string& host, uint16_t port,
+        uint32_t timeout_ms);
+
     // ── Members ────────────────────────────────────────────────────
     X509* ca_cert_ = nullptr;
     EVP_PKEY* ca_key_ = nullptr;
@@ -429,6 +529,15 @@ private:
 
     std::unordered_map<std::string, SessionTicket> session_tickets_;
     std::mutex session_mutex_;
+
+    // ── Upstream overrides ──────────────────────────────────────────
+    std::unordered_map<std::string, UpstreamOverride> upstream_overrides_;
+    mutable std::mutex upstream_mutex_;
+
+    // ── 0-RTT early data ───────────────────────────────────────────
+    bool early_data_enabled_ = false;
+    std::vector<uint8_t> early_data_queue_;
+    mutable std::mutex early_data_mutex_;
 
     // Replay protection for 0-RTT
     std::unordered_map<std::string, uint64_t> replay_cache_;

@@ -37,8 +37,9 @@ void DNSCache::put(const std::string& host,
 
     uint64_t expiry = 0;
     if (ttl_seconds > 0) {
-        expiry = std::chrono::duration_cast<std::chrono::nanoseconds>(
-            std::chrono::steady_clock::now().time_since_epoch()).count()
+        int64_t now_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(
+            std::chrono::steady_clock::now().time_since_epoch()).count();
+        expiry = static_cast<uint64_t>(now_ns)
             + static_cast<uint64_t>(ttl_seconds) * 1'000'000'000ULL;
     } else {
         expiry = static_cast<uint64_t>(-1);
@@ -75,10 +76,11 @@ bool DNSCache::get(const std::string& host,
 
     auto& entry = it->second->second;
 
-    uint64_t now_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(
+    int64_t now_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(
         std::chrono::steady_clock::now().time_since_epoch()).count();
+    uint64_t now_ns_u = static_cast<uint64_t>(now_ns);
 
-    if (now_ns >= entry.expiry_ns) {
+    if (now_ns_u >= entry.expiry_ns) {
         list_.erase(it->second);
         map_.erase(it);
         return false;
@@ -93,12 +95,13 @@ bool DNSCache::get(const std::string& host,
 void DNSCache::sweep() {
     std::lock_guard<std::mutex> lock(*mutex_);
 
-    uint64_t now_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(
+    int64_t now_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(
         std::chrono::steady_clock::now().time_since_epoch()).count();
+    uint64_t now_ns_u = static_cast<uint64_t>(now_ns);
 
     auto it = list_.begin();
     while (it != list_.end()) {
-        if (now_ns >= it->second.expiry_ns) {
+        if (now_ns_u >= it->second.expiry_ns) {
             map_.erase(it->first);
             it = list_.erase(it);
         } else {
@@ -454,8 +457,6 @@ DNSResult DNSResolver::resolveViaSystem(const std::string& host, RecordType type
         return result;
     }
 
-    uint32_t min_ttl = 0;
-
     for (struct addrinfo* rp = res; rp != nullptr; rp = rp->ai_next) {
         if (rp->ai_family == AF_INET) {
             auto* sin = reinterpret_cast<struct sockaddr_in*>(rp->ai_addr);
@@ -552,17 +553,17 @@ DNSResult DNSResolver::resolve(const std::string& host,
 
 DNSResolver::DNSResolver()
     : dns_servers_{"1.1.1.1", "8.8.8.8"}
-    , doh_enabled_(false)
     , doh_url_("https://cloudflare-dns.com/dns-query")
     , doh_host_("cloudflare-dns.com")
-    , doh_path_("/dns-query") {}
+    , doh_path_("/dns-query")
+    , doh_enabled_(false) {}
 
 DNSResolver::DNSResolver(const std::vector<std::string>& dns_servers)
     : dns_servers_(dns_servers)
-    , doh_enabled_(false)
     , doh_url_("https://cloudflare-dns.com/dns-query")
     , doh_host_("cloudflare-dns.com")
-    , doh_path_("/dns-query") {}
+    , doh_path_("/dns-query")
+    , doh_enabled_(false) {}
 
 DNSResolver::~DNSResolver() = default;
 

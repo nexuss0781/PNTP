@@ -410,3 +410,63 @@ std::vector<uint8_t> PacketBuilder::buildDataSegment(
 
     return buildTCPSegment(dst_mac, src_mac, ii, ti, data, data_len);
 }
+
+// ── ARP (RFC 826) ────────────────────────────────────────────────────
+
+std::vector<uint8_t> PacketBuilder::buildARPRequest(
+    const MAC& src_mac, uint32_t sender_ip, uint32_t target_ip)
+{
+    std::vector<uint8_t> frame(ETH_HDR_LEN + ARP_HDR_LEN, 0);
+
+    // Ethernet header
+    MAC bcast = MAC::broadcast();
+    std::memcpy(frame.data() + 0, bcast.bytes.data(), 6);
+    std::memcpy(frame.data() + 6, src_mac.bytes.data(), 6);
+    uint16_t etype = htons(ARP_ETHERTYPE);
+    std::memcpy(frame.data() + 12, &etype, 2);
+
+    // ARP body
+    uint8_t* arp = frame.data() + ETH_HDR_LEN;
+    uint16_t htype = htons(1);              // Ethernet
+    uint16_t ptype = htons(0x0800);         // IPv4
+    std::memcpy(arp + 0, &htype, 2);
+    std::memcpy(arp + 2, &ptype, 2);
+    arp[4] = 6;                             // hardware addr len
+    arp[5] = 4;                             // protocol addr len
+    uint16_t op = htons(1);                 // ARP request
+    std::memcpy(arp + 6, &op, 2);
+    std::memcpy(arp + 8, src_mac.bytes.data(), 6);   // sender hardware
+    uint32_t sip = htonl(sender_ip);
+    std::memcpy(arp + 14, &sip, 4);                   // sender protocol
+    std::memset(arp + 18, 0, 6);                      // target hardware = 0
+    uint32_t tip = htonl(target_ip);
+    std::memcpy(arp + 24, &tip, 4);                   // target protocol
+
+    return frame;
+}
+
+bool PacketBuilder::parseARPReply(const uint8_t* frame, size_t len,
+                                  MAC& out_mac, uint32_t& out_ip) {
+    if (!frame || len < ETH_HDR_LEN + ARP_HDR_LEN) return false;
+
+    uint16_t etype;
+    std::memcpy(&etype, frame + 12, 2);
+    if (ntohs(etype) != ARP_ETHERTYPE) return false;
+
+    const uint8_t* arp = frame + ETH_HDR_LEN;
+    if (arp[4] != 6 || arp[5] != 4) return false;
+
+    uint16_t op;
+    std::memcpy(&op, arp + 6, 2);
+    if (ntohs(op) != 2) return false;       // ARP reply only
+
+    uint8_t mac_bytes[6];
+    std::memcpy(mac_bytes, arp + 8, 6);
+    out_mac.bytes = {mac_bytes[0], mac_bytes[1], mac_bytes[2],
+                     mac_bytes[3], mac_bytes[4], mac_bytes[5]};
+
+    uint32_t ip_net;
+    std::memcpy(&ip_net, arp + 14, 4);
+    out_ip = ntohl(ip_net);
+    return true;
+}

@@ -9,6 +9,8 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <net/if.h>
+#include <netinet/if_ether.h>
+#include <linux/if_packet.h>
 #include <poll.h>
 #include <algorithm>
 #include <iostream>
@@ -107,13 +109,13 @@ bool TCPEngine::initialize(const std::string& interface) {
     if (!raw_sock.init(interface)) {
         return false;
     }
+    interface_name_ = interface;
     auto filters = RawSocketHandler::makeBPF_TCPOnly();
     raw_sock.attachBPF(filters);
 
     int fd = raw_sock.getFd();
     if (fd >= 0) {
         struct sockaddr_in addr{};
-        socklen_t len = sizeof(addr);
         addr.sin_family = AF_INET;
         addr.sin_port = htons(80);
         inet_pton(AF_INET, "8.8.8.8", &addr.sin_addr);
@@ -124,6 +126,9 @@ bool TCPEngine::initialize(const std::string& interface) {
         if (tmp >= 0) {
             if (ioctl(tmp, SIOCGIFADDR, &ifr) == 0) {
                 local_ip = ntohl(reinterpret_cast<struct sockaddr_in*>(&ifr.ifr_addr)->sin_addr.s_addr);
+            }
+            if (ioctl(tmp, SIOCGIFNETMASK, &ifr) == 0) {
+                local_netmask_ = ntohl(reinterpret_cast<struct sockaddr_in*>(&ifr.ifr_netmask)->sin_addr.s_addr);
             }
             ::close(tmp);
         }
@@ -146,7 +151,9 @@ uint16_t TCPEngine::allocatePort() {
 uint32_t TCPEngine::generateISS() {
     uint32_t tsc_lo = static_cast<uint32_t>(get_rdtsc_serialized());
     uint64_t rand_val = stealth_rand();
-    return tsc_lo ^ static_cast<uint32_t>(rand_val) ^ (static_cast<uint32_t>(rand_val >> 32) * 6364136223846793005ULL);
+    uint32_t mix = static_cast<uint32_t>(rand_val) ^
+                   (static_cast<uint32_t>(rand_val >> 32) * 1284865837u);
+    return tsc_lo ^ mix;
 }
 
 bool TCPEngine::resolveHost(const std::string& host, uint32_t& out_ip, MAC& out_mac) {
@@ -156,8 +163,118 @@ bool TCPEngine::resolveHost(const std::string& host, uint32_t& out_ip, MAC& out_
     }
 
     out_ip = dns_result.ipv4_addresses[0];
-    out_mac.bytes = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+    out_mac = MAC::zero();
     return true;
+}
+
+// ── Next-hop / gateway resolution ────────────────────────────────────
+
+bool TCPEngine::readDefaultGateway(uint32_t& gateway) {
+    FILE* f = fopen("/proc/net/route", "r");
+    if (!f) return false;
+
+    char line[256];
+    bool found = false;
+    if (fgets(line, sizeof(line), f)) { // header
+        while (fgets(line, sizeof(line), f)) {
+            char iface[IFNAMSIZ] = {0};
+            char dest[16] = {0};
+            char gw[16] = {0};
+            if (sscanf(line, "%15s %15s %15s", iface, dest, gw) != 3)
+                continue;
+            if (interface_name_.empty() ||
+                interface_name_ == iface) {
+                if (strcmp(dest, "00000000") == 0) {
+                    unsigned long v = strtoul(gw, nullptr, 16);
+                    gateway = static_cast<uint32_t>(
+                        ((v & 0x000000FFUL) << 24) |
+                        ((v & 0x0000FF00UL) << 8)  |
+                        ((v & 0x00FF0000UL) >> 8)  |
+                        ((v & 0xFF000000UL) >> 24));
+                    found = true;
+                    break;
+                }
+            }
+        }
+    }
+    fclose(f);
+    return found;
+}
+
+bool TCPEngine::arpLookup(uint32_t target_ip, MAC& out_mac) {
+    int fd = socket(AF_PACKET, SOCK_RAW,
+                    htons(static_cast<uint16_t>(PacketBuilder::ARP_ETHERTYPE)));
+    if (fd < 0) return false;
+
+    struct sockaddr_ll sll{};
+    memset(&sll, 0, sizeof(sll));
+    sll.sll_family   = AF_PACKET;
+    sll.sll_protocol = htons(static_cast<uint16_t>(PacketBuilder::ARP_ETHERTYPE));
+    sll.sll_ifindex  = raw_sock.getInterfaceIndex();
+    if (bind(fd, reinterpret_cast<struct sockaddr*>(&sll), sizeof(sll)) < 0) {
+        ::close(fd);
+        return false;
+    }
+
+    auto req = PacketBuilder::buildARPRequest(local_mac, local_ip, target_ip);
+    if (sendto(fd, req.data(), req.size(), 0,
+               reinterpret_cast<struct sockaddr*>(&sll), sizeof(sll)) < 0) {
+        ::close(fd);
+        return false;
+    }
+
+    struct timeval tv{};
+    tv.tv_sec = 0;
+    tv.tv_usec = 200000; // 200ms per attempt
+    setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
+
+    bool resolved = false;
+    for (int attempt = 0; attempt < 3 && !resolved; ++attempt) {
+        if (attempt > 0) {
+            sendto(fd, req.data(), req.size(), 0,
+                   reinterpret_cast<struct sockaddr*>(&sll), sizeof(sll));
+        }
+        uint8_t buf[512];
+        ssize_t n = ::recvfrom(fd, buf, sizeof(buf), 0, nullptr, nullptr);
+        if (n <= 0) continue;
+
+        MAC mac;
+        uint32_t ip = 0;
+        if (PacketBuilder::parseARPReply(buf, static_cast<size_t>(n), mac, ip)) {
+            if (ip == target_ip) {
+                out_mac = mac;
+                resolved = true;
+            }
+        }
+    }
+    ::close(fd);
+    return resolved;
+}
+
+bool TCPEngine::resolveNextHopMAC(uint32_t dst_ip, MAC& out_mac) {
+    out_mac = MAC::zero();
+
+    // Loopback has no next-hop MAC; caller falls back to zero MAC.
+    if (dst_ip == 0 || (dst_ip >> 24) == 0x7F) return false;
+
+    bool on_link = true;
+    if (local_netmask_ != 0 && local_ip != 0) {
+        on_link = ((dst_ip & local_netmask_) == (local_ip & local_netmask_));
+    }
+
+    uint32_t target = dst_ip;
+    if (!on_link) {
+        if (!readDefaultGateway(target) || target == 0) {
+            return false;
+        }
+    }
+
+    if (arpLookup(target, out_mac) && out_mac != MAC::zero()) {
+        return true;
+    }
+
+    out_mac = MAC::zero();
+    return false;
 }
 
 TCPConnection* TCPEngine::open(const std::string& host, uint16_t port, uint32_t timeout_ms) {
@@ -167,6 +284,13 @@ TCPConnection* TCPEngine::open(const std::string& host, uint16_t port, uint32_t 
     MAC dst_mac;
     if (!resolveHost(host, dst_ip, dst_mac)) {
         return nullptr;
+    }
+
+    // Resolve the on-link next-hop MAC. For loopback (or when no
+    // gateway/ARP is available) we fall back to a zero MAC so the
+    // caller can still talk to directly-reachable hosts.
+    if (!resolveNextHopMAC(dst_ip, dst_mac)) {
+        dst_mac = MAC::zero();
     }
 
     auto conn = std::make_unique<TCPConnection>();
@@ -227,7 +351,6 @@ TCPConnection* TCPEngine::open(const std::string& host, uint16_t port, uint32_t 
     }
 
     if (raw_ptr->state != TCPState::ESTABLISHED) {
-        TCPConnection* result = raw_ptr;
         connections.erase(port_key);
         return nullptr;
     }
@@ -276,7 +399,7 @@ bool TCPEngine::send(TCPConnection* conn, const uint8_t* data, size_t len) {
         auto ret_seg = seg;
         conn->retransmit_queue.push_back(ret_seg);
 
-        conn->snd_nxt += chunk;
+        conn->snd_nxt += static_cast<uint32_t>(chunk);
         offset += chunk;
     }
     return true;
@@ -520,6 +643,7 @@ void TCPEngine::checkRetransmit(TCPConnection* conn, uint64_t current_tsc) {
                     it->seq, conn->rcv_nxt,
                     it->data.data(), it->data.size(), true, conn->rcv_wnd);
                 sendRawPacket(conn, frame);
+                conn->retransmit_count++;
 
                 it->sent_tsc = current_tsc;
                 it->fast_retransmitted = true;
@@ -539,7 +663,9 @@ void TCPEngine::processRetransmitQueue(TCPConnection* conn) {
         conn->retransmit_queue.end());
 }
 
-bool TCPEngine::sendRawPacket(const TCPConnection* conn, const std::vector<uint8_t>& packet) {
+bool TCPEngine::sendRawPacket(TCPConnection* conn, const std::vector<uint8_t>& packet) {
+    if (!conn) return false;
+    conn->packets_sent++;
     return raw_sock.injectPacket(packet.data(), packet.size());
 }
 
@@ -560,7 +686,7 @@ bool TCPEngine::sendSYN(TCPConnection* conn) {
     return sendRawPacket(conn, frame);
 }
 
-bool TCPEngine::sendACK(const TCPConnection* conn) {
+bool TCPEngine::sendACK(TCPConnection* conn) {
     auto frame = PacketBuilder::buildACK(
         conn->dst_mac, conn->src_mac,
         conn->src_ip, conn->dst_ip,
@@ -725,6 +851,7 @@ void TCPEngine::handleACK(TCPConnection* conn, const struct tcphdr* tcp, size_t 
                     oldest.seq, conn->rcv_nxt,
                     oldest.data.data(), oldest.data.size(), true, conn->rcv_wnd);
                 sendRawPacket(conn, frame);
+                conn->retransmit_count++;
 
                 conn->cubic.onCongestionEvent(get_rdtsc_serialized());
             }
